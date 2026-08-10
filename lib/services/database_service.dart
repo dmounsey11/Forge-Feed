@@ -1,23 +1,178 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/animal_profile.dart';
 import '../models/ingredient.dart';
 import '../models/pantry_item.dart';
 import '../models/species_requirement.dart';
 
 class DatabaseService extends ChangeNotifier {
-  DatabaseService();
-  DatabaseService._privateConstructor();
-  static final DatabaseService instance = DatabaseService._privateConstructor();
-
   final Set<String> _pantryIds = {};
   final Set<String> _supplementIds = {};
   final List<Ingredient> _ingredients = [];
   final List<SpeciesRequirement> _speciesRequirements = [];
+  final List<AnimalProfile> _profiles = [];
+
+  // Hand-picked allow-list of genuinely whole-food, feed-relevant records
+  // out of assets/data/ingredients.json (a raw USDA SR-Legacy human-food
+  // dump - most of it, e.g. branded snacks, is not appropriate to surface
+  // as feed ingredients, so we curate rather than bulk-load it).
+  static const Map<String, String> _curatedUsdaIngredientCategories = {
+    'ing_02487': 'Grains & Cereals', // Corn, sweet, yellow, raw
+    'ing_02772': 'Grains & Cereals', // Barley, hulled
+    'ing_02192': 'Grains & Cereals', // Rice, brown, long-grain, raw
+    'ing_01378': 'Grains & Cereals', // Wheat, hard red spring
+    'ing_02194': 'Grains & Cereals', // Oats
+    'ing_03541': 'Proteins & Meal', // Chicken, broilers or fryers, meat only, raw
+    'ing_01141': 'Proteins & Meal', // Beef, ground, 70% lean meat / 30% fat, raw
+    'ing_06175': 'Proteins & Meal', // Fish, salmon, Atlantic, wild, raw
+    'ing_07628': 'Proteins & Meal', // Fish, sardine, Atlantic, canned in oil, drained solids with bone
+    'ing_01940': 'Proteins & Meal', // Beef, variety meats and by-products, liver, raw
+    'ing_03776': 'Proteins & Meal', // Egg, whole, raw, fresh
+    'ing_00910': 'Produce', // Kale, raw
+    'ing_00937': 'Produce', // Pumpkin, raw
+    'ing_00951': 'Produce', // Spinach, raw
+    'ing_02882': 'Produce', // Carrots, raw
+    'ing_00971': 'Produce', // Sweet potato, raw, unprepared
+    'ing_00946': 'Natural Supplements', // Seaweed, kelp, raw
+    'ing_01903': 'Natural Supplements', // Seeds, flaxseed
+  };
+
+  static const _prefsKeyProfiles = 'ff_profiles';
+  static const _prefsKeyPantryIds = 'ff_pantry_ids';
+  static const _prefsKeySupplementIds = 'ff_supplement_ids';
+  static const _prefsKeyCustomIngredients = 'ff_custom_ingredients';
 
   Future<void> initialize() async {
     if (_ingredients.isEmpty) {
       _seedInitialCatalog();
+      await _loadCuratedUsdaIngredients();
     }
+    if (_speciesRequirements.isEmpty) {
+      await _loadSpeciesRequirements();
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    _loadPersistedProfiles(prefs);
+    _loadPersistedPantryState(prefs);
+
     notifyListeners();
+  }
+
+  Set<String> get _builtInIngredientIds => {
+        'usda_corn',
+        'usda_barley',
+        'usda_soybean_meal',
+        'usda_black_soldier_fly',
+        'supp_calcium_limestone',
+        'supp_oyster_shell',
+        'supp_dicalcium_phos',
+        'supp_poultry_probiotic',
+        ..._curatedUsdaIngredientCategories.keys,
+      };
+
+  void _loadPersistedProfiles(SharedPreferences prefs) {
+    final stored = prefs.getStringList(_prefsKeyProfiles);
+    if (stored != null) {
+      _profiles
+        ..clear()
+        ..addAll(stored.map((s) => AnimalProfile.fromJson(jsonDecode(s) as Map<String, dynamic>)));
+    } else if (_profiles.isEmpty) {
+      _seedInitialProfiles();
+    }
+  }
+
+  void _loadPersistedPantryState(SharedPreferences prefs) {
+    final customIngredients = prefs.getStringList(_prefsKeyCustomIngredients) ?? [];
+    for (final s in customIngredients) {
+      final ingredient = Ingredient.fromJson(jsonDecode(s) as Map<String, dynamic>);
+      if (!_ingredients.any((i) => i.id == ingredient.id)) {
+        _ingredients.add(ingredient);
+      }
+    }
+
+    final pantryIds = prefs.getStringList(_prefsKeyPantryIds);
+    if (pantryIds != null) {
+      _pantryIds
+        ..clear()
+        ..addAll(pantryIds);
+    }
+
+    final supplementIds = prefs.getStringList(_prefsKeySupplementIds);
+    if (supplementIds != null) {
+      _supplementIds
+        ..clear()
+        ..addAll(supplementIds);
+    }
+  }
+
+  Future<void> _persistProfiles() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+      _prefsKeyProfiles,
+      _profiles.map((p) => jsonEncode(p.toJson())).toList(),
+    );
+  }
+
+  Future<void> _persistPantryState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_prefsKeyPantryIds, _pantryIds.toList());
+    await prefs.setStringList(_prefsKeySupplementIds, _supplementIds.toList());
+    final builtIn = _builtInIngredientIds;
+    await prefs.setStringList(
+      _prefsKeyCustomIngredients,
+      _ingredients.where((i) => !builtIn.contains(i.id)).map((i) => jsonEncode(i.toJson())).toList(),
+    );
+  }
+
+  Future<void> _loadCuratedUsdaIngredients() async {
+    try {
+      final raw = await rootBundle.loadString('assets/data/ingredients.json');
+      final List<dynamic> decoded = jsonDecode(raw) as List<dynamic>;
+      for (final entry in decoded) {
+        final record = entry as Map<String, dynamic>;
+        final category = _curatedUsdaIngredientCategories[record['id']];
+        if (category == null) continue;
+        _ingredients.add(Ingredient.fromUsdaJson(record, categoryOverride: category));
+      }
+    } catch (e) {
+      debugPrint('Failed to load ingredients.json: $e');
+    }
+  }
+
+  Future<void> _loadSpeciesRequirements() async {
+    try {
+      final raw = await rootBundle.loadString('assets/data/animal_requirements.json');
+      final List<dynamic> decoded = jsonDecode(raw) as List<dynamic>;
+      _speciesRequirements.addAll(
+        decoded.map((e) => SpeciesRequirement.fromJson(e as Map<String, dynamic>)),
+      );
+    } catch (e) {
+      debugPrint('Failed to load animal_requirements.json: $e');
+    }
+  }
+
+  void _seedInitialProfiles() {
+    _profiles.addAll([
+      AnimalProfile(
+        id: '1',
+        name: 'Main Backyard Flock',
+        species: 'Livestock: Poultry (Chicken)',
+        headCount: 12,
+        productionStage: 'Active Layer',
+        environment: 'Outdoor',
+      ),
+      AnimalProfile(
+        id: '2',
+        name: 'Coturnix Quail Pens',
+        species: 'Livestock: Poultry (Quail)',
+        headCount: 24,
+        productionStage: 'Breeder / Production',
+        environment: 'Outdoor',
+      ),
+    ]);
   }
 
   void _seedInitialCatalog() {
@@ -125,6 +280,28 @@ class DatabaseService extends ChangeNotifier {
   List<Ingredient> get ingredients => List.unmodifiable(_ingredients);
   List<Ingredient> get masterIngredients => List.unmodifiable(_ingredients);
   List<SpeciesRequirement> get speciesRequirements => List.unmodifiable(_speciesRequirements);
+  List<AnimalProfile> get profiles => List.unmodifiable(_profiles);
+
+  void addProfile(AnimalProfile profile) {
+    _profiles.add(profile);
+    notifyListeners();
+    unawaited(_persistProfiles());
+  }
+
+  void updateProfile(AnimalProfile profile) {
+    final index = _profiles.indexWhere((p) => p.id == profile.id);
+    if (index != -1) {
+      _profiles[index] = profile;
+      notifyListeners();
+      unawaited(_persistProfiles());
+    }
+  }
+
+  void deleteProfile(String id) {
+    _profiles.removeWhere((p) => p.id == id);
+    notifyListeners();
+    unawaited(_persistProfiles());
+  }
 
   List<Ingredient> getAvailableCategories() => ingredients;
 
@@ -138,6 +315,7 @@ class DatabaseService extends ChangeNotifier {
       _pantryIds.add(id);
     }
     notifyListeners();
+    unawaited(_persistPantryState());
   }
 
   void toggleSupplementItem(String id) {
@@ -147,6 +325,7 @@ class DatabaseService extends ChangeNotifier {
       _supplementIds.add(id);
     }
     notifyListeners();
+    unawaited(_persistPantryState());
   }
 
   /// Adds a new custom ingredient to the master list if it doesn't exist
@@ -155,6 +334,7 @@ class DatabaseService extends ChangeNotifier {
       _ingredients.add(ingredient);
     }
     notifyListeners();
+    unawaited(_persistPantryState());
   }
 
   /// Accepts a PantryItem, registers its ingredient, and adds it to pantry stock
@@ -162,6 +342,7 @@ class DatabaseService extends ChangeNotifier {
     addIngredient(item.ingredient);
     _pantryIds.add(item.ingredient.id);
     notifyListeners();
+    unawaited(_persistPantryState());
   }
 
   List<Ingredient> getPantryIngredients() {

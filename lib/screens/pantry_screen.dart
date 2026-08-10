@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../services/database_service.dart';
 import '../widgets/master_ingredient_picker.dart';
 
@@ -21,53 +22,47 @@ class _PantryScreenState extends State<PantryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final db = DatabaseService.instance;
+    final db = context.watch<DatabaseService>();
+    final pantryItems = db.getPantryIngredients();
+    final supplementItems = db.getSupplementIngredients();
 
-    return AnimatedBuilder(
-      animation: db,
-      builder: (context, _) {
-        final pantryItems = db.getPantryIngredients();
-        final supplementItems = db.getSupplementIngredients();
-
-        return Scaffold(
-          backgroundColor: const Color(0xFF0D1117),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // SECTION 1: MY PANTRY
-                _buildSectionHeader(
-                  title: 'My Pantry',
-                  subtitle: 'On-hand bulk grains, meals, and primary ration ingredients',
-                  icon: Icons.inventory_2,
-                  buttonLabel: '+ Add Pantry Items',
-                  onPressed: () => _openCatalogModal(isSupplementMode: false),
-                ),
-                const SizedBox(height: 12),
-                pantryItems.isEmpty
-                    ? _buildEmptyCard('No base pantry items registered in stock.')
-                    : _buildStockGrid(pantryItems, isSupplement: false),
-
-                const SizedBox(height: 32),
-
-                // SECTION 2: MY SUPPLEMENTS
-                _buildSectionHeader(
-                  title: 'My Supplements',
-                  subtitle: 'Calcium, mineral packs, probiotics, and targeted micro-additives',
-                  icon: Icons.science,
-                  buttonLabel: '+ Add Supplements',
-                  onPressed: () => _openCatalogModal(isSupplementMode: true),
-                ),
-                const SizedBox(height: 12),
-                supplementItems.isEmpty
-                    ? _buildEmptyCard('No supplements registered in stock.')
-                    : _buildStockGrid(supplementItems, isSupplement: true),
-              ],
+    return Scaffold(
+      backgroundColor: const Color(0xFF0D1117),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // SECTION 1: MY PANTRY
+            _buildSectionHeader(
+              title: 'My Pantry',
+              subtitle: 'On-hand bulk grains, meals, and primary ration ingredients',
+              icon: Icons.inventory_2,
+              buttonLabel: '+ Add Pantry Items',
+              onPressed: () => _openCatalogModal(isSupplementMode: false),
             ),
-          ),
-        );
-      },
+            const SizedBox(height: 12),
+            pantryItems.isEmpty
+                ? _buildEmptyCard('No base pantry items registered in stock.')
+                : _buildStockGrid(db, pantryItems, isSupplement: false),
+
+            const SizedBox(height: 32),
+
+            // SECTION 2: MY SUPPLEMENTS
+            _buildSectionHeader(
+              title: 'My Supplements',
+              subtitle: 'Calcium, mineral packs, probiotics, and targeted micro-additives',
+              icon: Icons.science,
+              buttonLabel: '+ Add Supplements',
+              onPressed: () => _openCatalogModal(isSupplementMode: true),
+            ),
+            const SizedBox(height: 12),
+            supplementItems.isEmpty
+                ? _buildEmptyCard('No supplements registered in stock.')
+                : _buildStockGrid(db, supplementItems, isSupplement: true),
+          ],
+        ),
+      ),
     );
   }
 
@@ -120,9 +115,7 @@ class _PantryScreenState extends State<PantryScreen> {
     );
   }
 
-  Widget _buildStockGrid(List items, {required bool isSupplement}) {
-    final db = DatabaseService.instance;
-
+  Widget _buildStockGrid(DatabaseService db, List items, {required bool isSupplement}) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),

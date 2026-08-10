@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/animal_profile.dart';
+import '../services/database_service.dart';
+import '../services/nutrition_target_resolver.dart';
 import '../widgets/add_profile_dialog.dart';
 
 class ProfilesScreen extends StatefulWidget {
@@ -10,63 +13,36 @@ class ProfilesScreen extends StatefulWidget {
 }
 
 class _ProfilesScreenState extends State<ProfilesScreen> {
-  final List<AnimalProfile> _profiles = [
-    AnimalProfile(
-      id: '1',
-      name: 'Main Backyard Flock',
-      species: 'Livestock: Poultry (Chicken)',
-      headCount: 12,
-      productionStage: 'Active Layer',
-      environment: 'Outdoor',
-    ),
-    AnimalProfile(
-      id: '2',
-      name: 'Coturnix Quail Pens',
-      species: 'Livestock: Poultry (Quail)',
-      headCount: 24,
-      productionStage: 'Breeder / Production',
-      environment: 'Outdoor',
-    ),
-  ];
-
   void _openAddProfileDialog() {
+    final db = context.read<DatabaseService>();
     showDialog(
       context: context,
       builder: (ctx) => AddProfileDialog(
-        onProfileSaved: (newProfile) {
-          setState(() {
-            _profiles.add(newProfile);
-          });
-        },
+        onProfileSaved: (newProfile) => db.addProfile(newProfile),
       ),
     );
   }
 
   void _openEditProfileDialog(AnimalProfile profile) {
+    final db = context.read<DatabaseService>();
     showDialog(
       context: context,
       builder: (ctx) => AddProfileDialog(
         profileToEdit: profile,
-        onProfileSaved: (updatedProfile) {
-          setState(() {
-            final index = _profiles.indexWhere((p) => p.id == updatedProfile.id);
-            if (index != -1) {
-              _profiles[index] = updatedProfile;
-            }
-          });
-        },
+        onProfileSaved: (updatedProfile) => db.updateProfile(updatedProfile),
       ),
     );
   }
 
   void _deleteProfile(String id) {
-    setState(() {
-      _profiles.removeWhere((p) => p.id == id);
-    });
+    context.read<DatabaseService>().deleteProfile(id);
   }
 
   @override
   Widget build(BuildContext context) {
+    final db = context.watch<DatabaseService>();
+    final profiles = db.profiles;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0D1117),
       body: Padding(
@@ -95,7 +71,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
             const SizedBox(height: 20),
 
             Expanded(
-              child: _profiles.isEmpty
+              child: profiles.isEmpty
                   ? const Center(
                       child: Text(
                         'No profiles created yet.',
@@ -103,9 +79,10 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                       ),
                     )
                   : ListView.builder(
-                      itemCount: _profiles.length,
+                      itemCount: profiles.length,
                       itemBuilder: (context, index) {
-                        final profile = _profiles[index];
+                        final profile = profiles[index];
+                        final req = NutritionTargetResolver.resolve(profile, db.speciesRequirements);
                         return Container(
                           margin: const EdgeInsets.only(bottom: 16),
                           padding: const EdgeInsets.all(20),
@@ -164,11 +141,27 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                               const SizedBox(height: 10),
                               Wrap(
                                 spacing: 12,
-                                children: [
-                                  _NutrientBadge(label: 'Target Protein', value: '${profile.targetProteinPct.toStringAsFixed(1)}%'),
-                                  _NutrientBadge(label: 'Target Calcium', value: '${profile.targetCalciumPct.toStringAsFixed(1)}%'),
-                                  _NutrientBadge(label: 'Energy', value: '${profile.targetEnergyMeKcalLb.toInt()} kcal/lb'),
-                                ],
+                                children: req == null
+                                    ? const [
+                                        _NutrientBadge(
+                                          label: 'Nutrition data',
+                                          value: 'Not available yet for this species',
+                                        ),
+                                      ]
+                                    : [
+                                        _NutrientBadge(
+                                          label: 'Target Protein',
+                                          value: '${req.minProteinPerc.toStringAsFixed(1)}-${req.maxProteinPerc.toStringAsFixed(1)}%',
+                                        ),
+                                        _NutrientBadge(
+                                          label: 'Target Calcium',
+                                          value: '${req.minCalciumPerc.toStringAsFixed(1)}-${req.maxCalciumPerc.toStringAsFixed(1)}%',
+                                        ),
+                                        _NutrientBadge(
+                                          label: 'Energy',
+                                          value: '${req.minMeKcal.toInt()}-${req.maxMeKcal.toInt()} kcal/kg',
+                                        ),
+                                      ],
                               ),
                             ],
                           ),
