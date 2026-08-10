@@ -1,0 +1,2162 @@
+[
+  {
+    "id": "spec_2013_new_brunswick_python_attack",
+    "name": "2013 New Brunswick python attack",
+    "category": "Reptiles",
+    "description": "Captive profile for 2013 New Brunswick python attack.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_african_fattailed_gecko",
+    "name": "African fat-tailed gecko",
+    "category": "Reptiles",
+    "description": "Captive profile for African fat-tailed gecko.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_african_spurred_tortoise",
+    "name": "African spurred tortoise",
+    "category": "Reptiles",
+    "description": "Captive profile for African spurred tortoise.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_amethystine_python",
+    "name": "Amethystine python",
+    "category": "Reptiles",
+    "description": "Captive profile for Amethystine python.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_angonoka_tortoise",
+    "name": "Angonoka tortoise",
+    "category": "Reptiles",
+    "description": "Captive profile for Angonoka tortoise.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_argentine_black_and_white_tegu",
+    "name": "Argentine black and white tegu",
+    "category": "Reptiles",
+    "description": "Captive profile for Argentine black and white tegu.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_ball_python",
+    "name": "Ball python",
+    "category": "Reptiles",
+    "description": "Captive profile for Ball python.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_bluetongued_skink",
+    "name": "Blue-tongued skink",
+    "category": "Reptiles",
+    "description": "Captive profile for Blue-tongued skink.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_boa_constrictor",
+    "name": "Boa constrictor",
+    "category": "Reptiles",
+    "description": "Captive profile for Boa constrictor.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_bog_turtle",
+    "name": "Bog turtle",
+    "category": "Reptiles",
+    "description": "Captive profile for Bog turtle.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_bolson_tortoise",
+    "name": "Bolson tortoise",
+    "category": "Reptiles",
+    "description": "Captive profile for Bolson tortoise.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_burmese_python",
+    "name": "Burmese python",
+    "category": "Reptiles",
+    "description": "Captive profile for Burmese python.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_burmese_star_tortoise",
+    "name": "Burmese star tortoise",
+    "category": "Reptiles",
+    "description": "Captive profile for Burmese star tortoise.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_central_african_rock_python",
+    "name": "Central African rock python",
+    "category": "Reptiles",
+    "description": "Captive profile for Central African rock python.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_central_asian_tortoise",
+    "name": "Central Asian tortoise",
+    "category": "Reptiles",
+    "description": "Captive profile for Central Asian tortoise.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_central_bearded_dragon",
+    "name": "Central bearded dragon",
+    "category": "Reptiles",
+    "description": "Captive profile for Central bearded dragon.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_common_box_turtle",
+    "name": "Common box turtle",
+    "category": "Reptiles",
+    "description": "Captive profile for Common box turtle.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_common_flattail_gecko",
+    "name": "Common flat-tail gecko",
+    "category": "Reptiles",
+    "description": "Captive profile for Common flat-tail gecko.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_crested_gecko",
+    "name": "Crested gecko",
+    "category": "Reptiles",
+    "description": "Captive profile for Crested gecko.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_flapnecked_chameleon",
+    "name": "Flap-necked chameleon",
+    "category": "Reptiles",
+    "description": "Captive profile for Flap-necked chameleon.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_flattailed_day_gecko",
+    "name": "Flat-tailed day gecko",
+    "category": "Reptiles",
+    "description": "Captive profile for Flat-tailed day gecko.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_greek_tortoise",
+    "name": "Greek tortoise",
+    "category": "Reptiles",
+    "description": "Captive profile for Greek tortoise.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_anolis_carolinensis",
+    "name": "Anolis carolinensis",
+    "category": "Reptiles",
+    "description": "Captive profile for Anolis carolinensis.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_green_iguana",
+    "name": "Green iguana",
+    "category": "Reptiles",
+    "description": "Captive profile for Green iguana.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_green_iguana_in_captivity",
+    "name": "Green iguana in captivity",
+    "category": "Reptiles",
+    "description": "Captive profile for Green iguana in captivity.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_hermanns_tortoise",
+    "name": "Hermann's tortoise",
+    "category": "Reptiles",
+    "description": "Captive profile for Hermann's tortoise.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_indian_star_tortoise",
+    "name": "Indian star tortoise",
+    "category": "Reptiles",
+    "description": "Captive profile for Indian star tortoise.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_italian_wall_lizard",
+    "name": "Italian wall lizard",
+    "category": "Reptiles",
+    "description": "Captive profile for Italian wall lizard.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_jacksons_chameleon",
+    "name": "Jackson's chameleon",
+    "category": "Reptiles",
+    "description": "Captive profile for Jackson's chameleon.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_leopard_gecko",
+    "name": "Leopard gecko",
+    "category": "Reptiles",
+    "description": "Captive profile for Leopard gecko.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_lygodactylus_williamsi",
+    "name": "Lygodactylus williamsi",
+    "category": "Reptiles",
+    "description": "Captive profile for Lygodactylus williamsi.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_macgyver_the_lizard",
+    "name": "MacGyver the Lizard",
+    "category": "Reptiles",
+    "description": "Captive profile for MacGyver the Lizard.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_mauritius_lowland_forest_day_gecko",
+    "name": "Mauritius lowland forest day gecko",
+    "category": "Reptiles",
+    "description": "Captive profile for Mauritius lowland forest day gecko.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_mexican_alligator_lizard",
+    "name": "Mexican alligator lizard",
+    "category": "Reptiles",
+    "description": "Captive profile for Mexican alligator lizard.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_nile_monitor",
+    "name": "Nile monitor",
+    "category": "Reptiles",
+    "description": "Captive profile for Nile monitor.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_capture_of_painted_turtles",
+    "name": "Capture of painted turtles",
+    "category": "Reptiles",
+    "description": "Captive profile for Capture of painted turtles.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_panther_chameleon",
+    "name": "Panther chameleon",
+    "category": "Reptiles",
+    "description": "Captive profile for Panther chameleon.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_phelsuma_pronki",
+    "name": "Phelsuma pronki",
+    "category": "Reptiles",
+    "description": "Captive profile for Phelsuma pronki.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_pogona",
+    "name": "Pogona",
+    "category": "Reptiles",
+    "description": "Captive profile for Pogona.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_rankins_dragon",
+    "name": "Rankin's dragon",
+    "category": "Reptiles",
+    "description": "Captive profile for Rankin's dragon.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_redeared_slider",
+    "name": "Red-eared slider",
+    "category": "Reptiles",
+    "description": "Captive profile for Red-eared slider.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_reticulated_python",
+    "name": "Reticulated python",
+    "category": "Reptiles",
+    "description": "Captive profile for Reticulated python.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_savannah_monitor",
+    "name": "Savannah monitor",
+    "category": "Reptiles",
+    "description": "Captive profile for Savannah monitor.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_sceloporus_malachiticus",
+    "name": "Sceloporus malachiticus",
+    "category": "Reptiles",
+    "description": "Captive profile for Sceloporus malachiticus.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_scincus_scincus",
+    "name": "Scincus scincus",
+    "category": "Reptiles",
+    "description": "Captive profile for Scincus scincus.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_spider_tortoise",
+    "name": "Spider tortoise",
+    "category": "Reptiles",
+    "description": "Captive profile for Spider tortoise.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_standings_day_gecko",
+    "name": "Standing's day gecko",
+    "category": "Reptiles",
+    "description": "Captive profile for Standing's day gecko.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_substrate",
+    "name": "Substrate",
+    "category": "Reptiles",
+    "description": "Captive profile for Substrate.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_tiliqua_scincoides",
+    "name": "Tiliqua scincoides",
+    "category": "Reptiles",
+    "description": "Captive profile for Tiliqua scincoides.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_tokay_gecko",
+    "name": "Tokay gecko",
+    "category": "Reptiles",
+    "description": "Captive profile for Tokay gecko.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_uromastyx",
+    "name": "Uromastyx",
+    "category": "Reptiles",
+    "description": "Captive profile for Uromastyx.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_veiled_chameleon",
+    "name": "Veiled chameleon",
+    "category": "Reptiles",
+    "description": "Captive profile for Veiled chameleon.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_vipera_kaznakovi",
+    "name": "Vipera kaznakovi",
+    "category": "Reptiles",
+    "description": "Captive profile for Vipera kaznakovi.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1800.0,
+    "requirements": {
+      "crudeProtein": 20.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 15.0,
+      "calcium": 1.5,
+      "phosphorus": 0.8
+    }
+  },
+  {
+    "id": "spec_australian_zebra_finch",
+    "name": "Australian zebra finch",
+    "category": "Birds",
+    "description": "Captive profile for Australian zebra finch.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_barbary_dove",
+    "name": "Barbary dove",
+    "category": "Birds",
+    "description": "Captive profile for Barbary dove.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_budgerigar",
+    "name": "Budgerigar",
+    "category": "Birds",
+    "description": "Captive profile for Budgerigar.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_budgerigar_colour_genetics",
+    "name": "Budgerigar colour genetics",
+    "category": "Birds",
+    "description": "Captive profile for Budgerigar colour genetics.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_domestic_canary",
+    "name": "Domestic canary",
+    "category": "Birds",
+    "description": "Captive profile for Domestic canary.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_cockatiel",
+    "name": "Cockatiel",
+    "category": "Birds",
+    "description": "Captive profile for Cockatiel.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_common_ostrich",
+    "name": "Common ostrich",
+    "category": "Birds",
+    "description": "Captive profile for Common ostrich.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_darwins_rhea",
+    "name": "Darwin's rhea",
+    "category": "Birds",
+    "description": "Captive profile for Darwin's rhea.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_domestic_duck",
+    "name": "Domestic duck",
+    "category": "Birds",
+    "description": "Captive profile for Domestic duck.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_domestic_goose",
+    "name": "Domestic goose",
+    "category": "Birds",
+    "description": "Captive profile for Domestic goose.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_domestic_guinea_fowl",
+    "name": "Domestic guinea fowl",
+    "category": "Birds",
+    "description": "Captive profile for Domestic guinea fowl.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_domestic_muscovy_duck",
+    "name": "Domestic Muscovy duck",
+    "category": "Birds",
+    "description": "Captive profile for Domestic Muscovy duck.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_domestic_pigeon",
+    "name": "Domestic pigeon",
+    "category": "Birds",
+    "description": "Captive profile for Domestic pigeon.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_domesticated_quail",
+    "name": "Domesticated quail",
+    "category": "Birds",
+    "description": "Captive profile for Domesticated quail.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_empathy_in_chickens",
+    "name": "Empathy in chickens",
+    "category": "Birds",
+    "description": "Captive profile for Empathy in chickens.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_emu",
+    "name": "Emu",
+    "category": "Birds",
+    "description": "Captive profile for Emu.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_feral_chicken",
+    "name": "Feral chicken",
+    "category": "Birds",
+    "description": "Captive profile for Feral chicken.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_feral_pigeon",
+    "name": "Feral pigeon",
+    "category": "Birds",
+    "description": "Captive profile for Feral pigeon.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_gouldian_finch",
+    "name": "Gouldian finch",
+    "category": "Birds",
+    "description": "Captive profile for Gouldian finch.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_greater_rhea",
+    "name": "Greater rhea",
+    "category": "Birds",
+    "description": "Captive profile for Greater rhea.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_japanese_quail",
+    "name": "Japanese quail",
+    "category": "Birds",
+    "description": "Captive profile for Japanese quail.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_java_sparrow",
+    "name": "Java sparrow",
+    "category": "Birds",
+    "description": "Captive profile for Java sparrow.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_lutino_cockatiel",
+    "name": "Lutino cockatiel",
+    "category": "Birds",
+    "description": "Captive profile for Lutino cockatiel.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_pied_cockatiel",
+    "name": "Pied cockatiel",
+    "category": "Birds",
+    "description": "Captive profile for Pied cockatiel.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_poultry",
+    "name": "Poultry",
+    "category": "Birds",
+    "description": "Captive profile for Poultry.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_rhea",
+    "name": "Rhea",
+    "category": "Birds",
+    "description": "Captive profile for Rhea.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_society_finch",
+    "name": "Society finch",
+    "category": "Birds",
+    "description": "Captive profile for Society finch.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_star_finch",
+    "name": "Star finch",
+    "category": "Birds",
+    "description": "Captive profile for Star finch.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_domestic_turkey",
+    "name": "Domestic turkey",
+    "category": "Birds",
+    "description": "Captive profile for Domestic turkey.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_whitefaced_cockatiel",
+    "name": "White-faced cockatiel",
+    "category": "Birds",
+    "description": "Captive profile for White-faced cockatiel.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_parrot",
+    "name": "Parrot",
+    "category": "Birds",
+    "description": "Captive profile for Parrot.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_true_parrot",
+    "name": "True parrot",
+    "category": "Birds",
+    "description": "Captive profile for True parrot.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_amazon_parrot",
+    "name": "Amazon parrot",
+    "category": "Birds",
+    "description": "Captive profile for Amazon parrot.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_archaeopsittacus",
+    "name": "Archaeopsittacus",
+    "category": "Birds",
+    "description": "Captive profile for Archaeopsittacus.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_bavaripsitta",
+    "name": "Bavaripsitta",
+    "category": "Birds",
+    "description": "Captive profile for Bavaripsitta.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_cockatoo",
+    "name": "Cockatoo",
+    "category": "Birds",
+    "description": "Captive profile for Cockatoo.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_companion_parrot",
+    "name": "Companion parrot",
+    "category": "Birds",
+    "description": "Captive profile for Companion parrot.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_conure",
+    "name": "Conure",
+    "category": "Birds",
+    "description": "Captive profile for Conure.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_cyanoramphus",
+    "name": "Cyanoramphus",
+    "category": "Birds",
+    "description": "Captive profile for Cyanoramphus.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_fig_parrot",
+    "name": "Fig parrot",
+    "category": "Birds",
+    "description": "Captive profile for Fig parrot.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_funds_for_endangered_parrots",
+    "name": "Funds for Endangered Parrots",
+    "category": "Birds",
+    "description": "Captive profile for Funds for Endangered Parrots.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_international_parrot_trade",
+    "name": "International parrot trade",
+    "category": "Birds",
+    "description": "Captive profile for International parrot trade.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_loriinae",
+    "name": "Loriinae",
+    "category": "Birds",
+    "description": "Captive profile for Loriinae.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_mogontiacopsitta",
+    "name": "Mogontiacopsitta",
+    "category": "Birds",
+    "description": "Captive profile for Mogontiacopsitta.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_neotropical_parrot",
+    "name": "Neotropical parrot",
+    "category": "Birds",
+    "description": "Captive profile for Neotropical parrot.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_orangewinged_amazon",
+    "name": "Orange-winged amazon",
+    "category": "Birds",
+    "description": "Captive profile for Orange-winged amazon.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_parrot_bird_sanctuary_chandigarh",
+    "name": "Parrot Bird Sanctuary, Chandigarh",
+    "category": "Birds",
+    "description": "Captive profile for Parrot Bird Sanctuary, Chandigarh.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_parrot_tent",
+    "name": "Parrot tent",
+    "category": "Birds",
+    "description": "Captive profile for Parrot tent.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_parrotlet",
+    "name": "Parrotlet",
+    "category": "Birds",
+    "description": "Captive profile for Parrotlet.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_psittacidae",
+    "name": "Psittacidae",
+    "category": "Birds",
+    "description": "Captive profile for Psittacidae.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_psittacofulvin",
+    "name": "Psittacofulvin",
+    "category": "Birds",
+    "description": "Captive profile for Psittacofulvin.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_psittaculidae",
+    "name": "Psittaculidae",
+    "category": "Birds",
+    "description": "Captive profile for Psittaculidae.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_psittrichasiidae",
+    "name": "Psittrichasiidae",
+    "category": "Birds",
+    "description": "Captive profile for Psittrichasiidae.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_rackettail",
+    "name": "Racket-tail",
+    "category": "Birds",
+    "description": "Captive profile for Racket-tail.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_the_real_macaw",
+    "name": "The Real Macaw",
+    "category": "Birds",
+    "description": "Captive profile for The Real Macaw.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_riparian_parrotlet",
+    "name": "Riparian parrotlet",
+    "category": "Birds",
+    "description": "Captive profile for Riparian parrotlet.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_song_parrot",
+    "name": "Song parrot",
+    "category": "Birds",
+    "description": "Captive profile for Song parrot.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_still_life_with_a_peacock",
+    "name": "Still Life with a Peacock",
+    "category": "Birds",
+    "description": "Captive profile for Still Life with a Peacock.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_stochastic_parrot",
+    "name": "Stochastic parrot",
+    "category": "Birds",
+    "description": "Captive profile for Stochastic parrot.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_vasa_parrot",
+    "name": "Vasa parrot",
+    "category": "Birds",
+    "description": "Captive profile for Vasa parrot.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_the_wild_parrots_of_telegraph_hill",
+    "name": "The Wild Parrots of Telegraph Hill",
+    "category": "Birds",
+    "description": "Captive profile for The Wild Parrots of Telegraph Hill.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_world_parrot_trust",
+    "name": "World Parrot Trust",
+    "category": "Birds",
+    "description": "Captive profile for World Parrot Trust.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_xenopsitta",
+    "name": "Xenopsitta",
+    "category": "Birds",
+    "description": "Captive profile for Xenopsitta.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "2:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 14.0,
+      "crudeFat": 6.0,
+      "crudeFiber": 5.0,
+      "calcium": 1.0,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_small_mammals_as_pets",
+    "name": "Small mammals as pets",
+    "category": "Rodents",
+    "description": "Captive profile for Small mammals as pets.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.8:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 16.0,
+      "crudeFat": 4.0,
+      "crudeFiber": 18.0,
+      "calcium": 0.8,
+      "phosphorus": 0.4
+    }
+  },
+  {
+    "id": "spec_british_cavy_council",
+    "name": "British Cavy Council",
+    "category": "Rodents",
+    "description": "Captive profile for British Cavy Council.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.8:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 16.0,
+      "crudeFat": 4.0,
+      "crudeFiber": 18.0,
+      "calcium": 0.8,
+      "phosphorus": 0.4
+    }
+  },
+  {
+    "id": "spec_common_degu",
+    "name": "Common degu",
+    "category": "Rodents",
+    "description": "Captive profile for Common degu.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.8:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 16.0,
+      "crudeFat": 4.0,
+      "crudeFiber": 18.0,
+      "calcium": 0.8,
+      "phosphorus": 0.4
+    }
+  },
+  {
+    "id": "spec_fancy_mouse",
+    "name": "Fancy mouse",
+    "category": "Rodents",
+    "description": "Captive profile for Fancy mouse.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.8:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 16.0,
+      "crudeFat": 4.0,
+      "crudeFiber": 18.0,
+      "calcium": 0.8,
+      "phosphorus": 0.4
+    }
+  },
+  {
+    "id": "spec_golden_hamster",
+    "name": "Golden hamster",
+    "category": "Rodents",
+    "description": "Captive profile for Golden hamster.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.8:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 16.0,
+      "crudeFat": 4.0,
+      "crudeFiber": 18.0,
+      "calcium": 0.8,
+      "phosphorus": 0.4
+    }
+  },
+  {
+    "id": "spec_mongolian_gerbil",
+    "name": "Mongolian gerbil",
+    "category": "Rodents",
+    "description": "Captive profile for Mongolian gerbil.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.8:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 16.0,
+      "crudeFat": 4.0,
+      "crudeFiber": 18.0,
+      "calcium": 0.8,
+      "phosphorus": 0.4
+    }
+  },
+  {
+    "id": "spec_natal_multimammate_mouse",
+    "name": "Natal multimammate mouse",
+    "category": "Rodents",
+    "description": "Captive profile for Natal multimammate mouse.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.8:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 16.0,
+      "crudeFat": 4.0,
+      "crudeFiber": 18.0,
+      "calcium": 0.8,
+      "phosphorus": 0.4
+    }
+  },
+  {
+    "id": "spec_peromyscus_leucopus_linville",
+    "name": "Peromyscus leucopus linville",
+    "category": "Rodents",
+    "description": "Captive profile for Peromyscus leucopus linville.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.8:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 16.0,
+      "crudeFat": 4.0,
+      "crudeFiber": 18.0,
+      "calcium": 0.8,
+      "phosphorus": 0.4
+    }
+  },
+  {
+    "id": "spec_pet_gerbil",
+    "name": "Pet gerbil",
+    "category": "Rodents",
+    "description": "Captive profile for Pet gerbil.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.8:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 16.0,
+      "crudeFat": 4.0,
+      "crudeFiber": 18.0,
+      "calcium": 0.8,
+      "phosphorus": 0.4
+    }
+  },
+  {
+    "id": "spec_pet_hamster",
+    "name": "Pet hamster",
+    "category": "Rodents",
+    "description": "Captive profile for Pet hamster.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.8:1",
+    "vitaminD3IU": 1000.0,
+    "requirements": {
+      "crudeProtein": 16.0,
+      "crudeFat": 4.0,
+      "crudeFiber": 18.0,
+      "calcium": 0.8,
+      "phosphorus": 0.4
+    }
+  },
+  {
+    "id": "spec_exotic_pet",
+    "name": "Exotic pet",
+    "category": "Exotic Mammals",
+    "description": "Captive profile for Exotic pet.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.5:1",
+    "vitaminD3IU": 1200.0,
+    "requirements": {
+      "crudeProtein": 22.0,
+      "crudeFat": 8.0,
+      "crudeFiber": 10.0,
+      "calcium": 1.0,
+      "phosphorus": 0.6
+    }
+  },
+  {
+    "id": "spec_exotic_felids_as_pets",
+    "name": "Exotic felids as pets",
+    "category": "Exotic Mammals",
+    "description": "Captive profile for Exotic felids as pets.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.5:1",
+    "vitaminD3IU": 1200.0,
+    "requirements": {
+      "crudeProtein": 22.0,
+      "crudeFat": 8.0,
+      "crudeFiber": 10.0,
+      "calcium": 1.0,
+      "phosphorus": 0.6
+    }
+  },
+  {
+    "id": "spec_forbidden_creatures",
+    "name": "Forbidden Creatures",
+    "category": "Exotic Mammals",
+    "description": "Captive profile for Forbidden Creatures.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.5:1",
+    "vitaminD3IU": 1200.0,
+    "requirements": {
+      "crudeProtein": 22.0,
+      "crudeFat": 8.0,
+      "crudeFiber": 10.0,
+      "calcium": 1.0,
+      "phosphorus": 0.6
+    }
+  },
+  {
+    "id": "spec_gracie",
+    "name": "Gracie",
+    "category": "Exotic Mammals",
+    "description": "Captive profile for Gracie.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.5:1",
+    "vitaminD3IU": 1200.0,
+    "requirements": {
+      "crudeProtein": 22.0,
+      "crudeFat": 8.0,
+      "crudeFiber": 10.0,
+      "calcium": 1.0,
+      "phosphorus": 0.6
+    }
+  },
+  {
+    "id": "spec_hippopotamuses_in_colombia",
+    "name": "Hippopotamuses in Colombia",
+    "category": "Exotic Mammals",
+    "description": "Captive profile for Hippopotamuses in Colombia.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.5:1",
+    "vitaminD3IU": 1200.0,
+    "requirements": {
+      "crudeProtein": 22.0,
+      "crudeFat": 8.0,
+      "crudeFiber": 10.0,
+      "calcium": 1.0,
+      "phosphorus": 0.6
+    }
+  },
+  {
+    "id": "spec_messi",
+    "name": "Messi",
+    "category": "Exotic Mammals",
+    "description": "Captive profile for Messi.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.5:1",
+    "vitaminD3IU": 1200.0,
+    "requirements": {
+      "crudeProtein": 22.0,
+      "crudeFat": 8.0,
+      "crudeFiber": 10.0,
+      "calcium": 1.0,
+      "phosphorus": 0.6
+    }
+  },
+  {
+    "id": "spec_ravachol",
+    "name": "Ravachol",
+    "category": "Exotic Mammals",
+    "description": "Captive profile for Ravachol.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.5:1",
+    "vitaminD3IU": 1200.0,
+    "requirements": {
+      "crudeProtein": 22.0,
+      "crudeFat": 8.0,
+      "crudeFiber": 10.0,
+      "calcium": 1.0,
+      "phosphorus": 0.6
+    }
+  },
+  {
+    "id": "spec_screamer",
+    "name": "Screamer",
+    "category": "Exotic Mammals",
+    "description": "Captive profile for Screamer.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.5:1",
+    "vitaminD3IU": 1200.0,
+    "requirements": {
+      "crudeProtein": 22.0,
+      "crudeFat": 8.0,
+      "crudeFiber": 10.0,
+      "calcium": 1.0,
+      "phosphorus": 0.6
+    }
+  },
+  {
+    "id": "spec_wolves_as_pets_and_working_animals",
+    "name": "Wolves as pets and working animals",
+    "category": "Exotic Mammals",
+    "description": "Captive profile for Wolves as pets and working animals.",
+    "veterinarySource": "Wikipedia / AZA NAG Public Baseline",
+    "caToPRatio": "1.5:1",
+    "vitaminD3IU": 1200.0,
+    "requirements": {
+      "crudeProtein": 22.0,
+      "crudeFat": 8.0,
+      "crudeFiber": 10.0,
+      "calcium": 1.0,
+      "phosphorus": 0.6
+    }
+  }
+]

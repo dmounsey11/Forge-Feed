@@ -1,0 +1,66 @@
+[
+  {
+    "id": "spec_nutrition_in_rodents_and_lagomorphs",
+    "name": "Nutrition in Rodents and Lagomorphs",
+    "category": "Exotic Animals",
+    "description": "Captive profile for Nutrition in Rodents and Lagomorphs.",
+    "veterinarySource": "Merck Veterinary Manual",
+    "caToPRatio": "1.5:1",
+    "vitaminD3IU": null,
+    "requirements": {
+      "crudeProtein": null,
+      "crudeFat": null,
+      "crudeFiber": null,
+      "calcium": null,
+      "phosphorus": null
+    }
+  },
+  {
+    "id": "spec_nutrition_in_reptiles",
+    "name": "Nutrition in Reptiles",
+    "category": "Exotic Animals",
+    "description": "Captive profile for Nutrition in Reptiles.",
+    "veterinarySource": "Merck Veterinary Manual",
+    "caToPRatio": "1.5:1",
+    "vitaminD3IU": 500.0,
+    "requirements": {
+      "crudeProtein": 30.0,
+      "crudeFat": null,
+      "crudeFiber": null,
+      "calcium": 0.8,
+      "phosphorus": 0.5
+    }
+  },
+  {
+    "id": "spec_nutrition_in_alligators_crocodiles_and_other_crocodilians",
+    "name": "Nutrition in Alligators, Crocodiles, and Other Crocodilians",
+    "category": "Exotic Animals",
+    "description": "Captive profile for Nutrition in Alligators, Crocodiles, and Other Crocodilians.",
+    "veterinarySource": "Merck Veterinary Manual",
+    "caToPRatio": "1.5:1",
+    "vitaminD3IU": null,
+    "requirements": {
+      "crudeProtein": null,
+      "crudeFat": null,
+      "crudeFiber": null,
+      "calcium": null,
+      "phosphorus": null
+    }
+  },
+  {
+    "id": "spec_hand_rearing_zoo_mammals",
+    "name": "Hand-Rearing Zoo Mammals",
+    "category": "Exotic Animals",
+    "description": "Captive profile for Hand-Rearing Zoo Mammals.",
+    "veterinarySource": "Merck Veterinary Manual",
+    "caToPRatio": "1.5:1",
+    "vitaminD3IU": null,
+    "requirements": {
+      "crudeProtein": null,
+      "crudeFat": null,
+      "crudeFiber": null,
+      "calcium": null,
+      "phosphorus": null
+    }
+  }
+]

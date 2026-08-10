@@ -1,0 +1,56 @@
+[
+  {
+    "additiveId": "add_phytase_enzyme",
+    "additiveName": "Phytase Enzyme",
+    "category": "enzyme",
+    "inclusionRate": "0.01% - 0.05%",
+    "targetBenefit": "Releases phytate-bound phosphorus and phytate-bound minerals in grains, reducing need for inorganic dicalcium phosphate.",
+    "withdrawalPeriodDays": 0,
+    "notes": "Heat-sensitive. Add post-pelleting or into cold dry/wet mash mixes."
+  },
+  {
+    "additiveId": "add_amprolium",
+    "additiveName": "Amprolium 9.6% (Coccidiostat)",
+    "category": "coccidiostat",
+    "inclusionRate": "0.012% - 0.024%",
+    "targetBenefit": "Thiamine analog that blocks Eimeria schizont development to prevent coccidiosis in young brooders.",
+    "withdrawalPeriodDays": 0,
+    "notes": "Do not co-administer with high-dose Vitamin B1 (Thiamine) supplements as it counteracts the mechanism."
+  },
+  {
+    "additiveId": "add_probiotic_multi",
+    "additiveName": "Direct-Fed Microbials (Lactobacillus/Bacillus)",
+    "category": "probiotic",
+    "inclusionRate": "0.05% - 0.10%",
+    "targetBenefit": "Competitive exclusion of Salmonella and E. coli; supports gut villi integrity and nutrient absorption.",
+    "withdrawalPeriodDays": 0,
+    "notes": "Store in cool, dark location. Best incorporated in dry feeds or freshly mixed wet mashes."
+  },
+  {
+    "additiveId": "add_oyster_shell_coarse",
+    "additiveName": "Coarse Flake Oyster Shell",
+    "category": "mineral_supplement",
+    "inclusionRate": "Free Choice or 2.0% - 5.0%",
+    "targetBenefit": "Slow-release calcium source for nocturnal eggshell calcification in mature laying hens and waterfowl.",
+    "withdrawalPeriodDays": 0,
+    "notes": "Large particle size (>2mm) ensures retention in the gizzard overnight."
+  },
+  {
+    "additiveId": "add_granite_grit_medium",
+    "additiveName": "Insoluble Granite Grit (Grower/Layer Size)",
+    "category": "grit",
+    "inclusionRate": "Free Choice",
+    "targetBenefit": "Provides mechanical grinding action in the gizzard required for digesting whole or coarsely cracked grains.",
+    "withdrawalPeriodDays": 0,
+    "notes": "Does not solubilize or alter dietary mineral balances."
+  },
+  {
+    "additiveId": "add_organic_acids",
+    "additiveName": "Citric / Propionic Acid Blend",
+    "category": "acidifier",
+    "inclusionRate": "0.10% - 0.30%",
+    "targetBenefit": "Lowers gut pH, inhibiting pathogenic bacterial growth and suppressing feed mold/fungal spores.",
+    "withdrawalPeriodDays": 0,
+    "notes": "Improves protein digestibility by activating pepsinogen in the proventriculus."
+  }
+]

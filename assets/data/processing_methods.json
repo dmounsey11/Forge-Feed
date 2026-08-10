@@ -1,0 +1,52 @@
+[
+  {
+    "methodId": "proc_dry_mash",
+    "methodName": "Dry Mash (Unprocessed / Ground)",
+    "energyMultiplier": 1.0,
+    "phosphorusAvailMultiplier": 1.0,
+    "wasteFactorPerc": 8.0,
+    "requiresGrit": false,
+    "shelfLifeDays": 90,
+    "description": "Standard ground dry mix. Easy to prepare but higher selective sorting and feeder waste."
+  },
+  {
+    "methodId": "proc_pellet_crumble",
+    "methodName": "Steam Pelleted / Crumbled",
+    "energyMultiplier": 1.05,
+    "phosphorusAvailMultiplier": 1.02,
+    "wasteFactorPerc": 2.0,
+    "requiresGrit": false,
+    "shelfLifeDays": 120,
+    "description": "Heat/steam compaction gelatinizes starches, improving energy utilization and eliminating feed sorting."
+  },
+  {
+    "methodId": "proc_fermented",
+    "methodName": "Lactic Acid Fermented (Wet Mash)",
+    "energyMultiplier": 1.03,
+    "phosphorusAvailMultiplier": 1.25,
+    "wasteFactorPerc": 1.5,
+    "requiresGrit": false,
+    "shelfLifeDays": 2,
+    "description": "24-48 hour water soak activates phytase enzymes, unlocking bound phosphorus and adding probiotic gut support."
+  },
+  {
+    "methodId": "proc_sprouted_fodder",
+    "methodName": "Sprouted Grain / Green Fodder",
+    "energyMultiplier": 0.9,
+    "phosphorusAvailMultiplier": 1.15,
+    "wasteFactorPerc": 3.0,
+    "requiresGrit": false,
+    "shelfLifeDays": 3,
+    "description": "Converts starches into simple sugars and vitamins (A, E, B-complex). Higher moisture content drops dry-matter energy density."
+  },
+  {
+    "methodId": "proc_whole_coarse",
+    "methodName": "Whole Grain / Coarse Crack",
+    "energyMultiplier": 0.97,
+    "phosphorusAvailMultiplier": 1.0,
+    "wasteFactorPerc": 5.0,
+    "requiresGrit": true,
+    "shelfLifeDays": 180,
+    "description": "Stimulates gizzard muscle development and slower gut motility, but strictly requires insoluble granite grit for grinding."
+  }
+]

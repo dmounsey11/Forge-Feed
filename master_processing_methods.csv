@@ -1,0 +1,6 @@
+methodId,methodName,energyMultiplier,phosphorusAvailMultiplier,wasteFactorPerc,requiresGrit,shelfLifeDays,description
+proc_dry_mash,Dry Mash (Unprocessed / Ground),1.0,1.0,8.0,false,90,Standard ground dry mix. Easy to prepare but higher selective sorting and feeder waste.
+proc_pellet_crumble,Steam Pelleted / Crumbled,1.05,1.02,2.0,false,120,"Heat/steam compaction gelatinizes starches, improving energy utilization and eliminating feed sorting."
+proc_fermented,Lactic Acid Fermented (Wet Mash),1.03,1.25,1.5,false,2,"24-48 hour water soak activates phytase enzymes, unlocking bound phosphorus and adding probiotic gut support."
+proc_sprouted_fodder,Sprouted Grain / Green Fodder,0.9,1.15,3.0,false,3,"Converts starches into simple sugars and vitamins (A, E, B-complex). Higher moisture content drops dry-matter energy density."
+proc_whole_coarse,Whole Grain / Coarse Crack,0.97,1.0,5.0,true,180,"Stimulates gizzard muscle development and slower gut motility, but strictly requires insoluble granite grit for grinding."

@@ -1,0 +1,9 @@
+registryKey,fileName,status,recordCount,description
+ingredients,ingredients.json,VERIFIED,7793,"USDA SR Legacy & Custom Feed Ingredients"
+animal_requirements,animal_requirements.json,VERIFIED,8,"Species & Life-Stage Nutritional Profiles"
+safety_rules,safety_rules.json,VERIFIED,8,"Inclusion Limits & Toxicity Safety Guardrails"
+deficiency_matrix,deficiency_matrix.json,VERIFIED,7,"Symptom Diagnostic Engine Data"
+environmental_adjustments,environmental_adjustments.json,MISSING,0,"Seasonal & Environmental Intake Multipliers"
+processing_methods,processing_methods.json,VERIFIED,5,"Feed Physical Processing & Preparation Factors"
+feed_additives,feed_additives.json,VERIFIED,6,"Non-Nutritional Additives, Enzymes & Supplements"
+starter_recipes,starter_recipes.json,VERIFIED,4,"Benchmark Feed Rations & Formulations"

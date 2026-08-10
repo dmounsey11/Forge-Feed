@@ -1,0 +1,29 @@
+name: forge_feed
+description: "ForgeFeed - Livestock & Poultry Feed Ration Calculator & Pantry Manager"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.5.5
+  provider: ^6.1.2
+  http: ^1.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/data/usda_ingredients.json
+    - assets/data/livestock_feeds.json
+    - assets/data/pet_kibble.json
+    - assets/data/forge_feed_data.json

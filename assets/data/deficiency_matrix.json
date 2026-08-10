@@ -1,0 +1,72 @@
+[
+  {
+    "symptomId": "sym_curled_toe",
+    "symptomName": "Curled-Toe Paralysis",
+    "targetSpecies": "chicken,turkey",
+    "associatedNutrient": "riboflavin",
+    "severity": "HIGH",
+    "primaryCauses": "Vitamin B2 (Riboflavin) deficiency during early brooder stage.",
+    "remediationNotes": "Supplement with brewer's yeast, dairy byproducts, or synthetic riboflavin in water immediately.",
+    "diagnosticGroup": "neurological"
+  },
+  {
+    "symptomId": "sym_perosis",
+    "symptomName": "Perosis / Slipped Achilles Tendon",
+    "targetSpecies": "chicken,turkey,waterfowl",
+    "associatedNutrient": "manganese",
+    "severity": "CRITICAL",
+    "primaryCauses": "Manganese or Choline deficiency leading to hock joint enlargement and tendon slippage.",
+    "remediationNotes": "Ensure manganese sulfate levels meet minimum requirements; add wheat bran or choline supplements.",
+    "diagnosticGroup": "skeletal"
+  },
+  {
+    "symptomId": "sym_soft_shells",
+    "symptomName": "Soft Shells / Thin Eggshells",
+    "targetSpecies": "chicken,waterfowl",
+    "associatedNutrient": "calcium",
+    "severity": "HIGH",
+    "primaryCauses": "Inadequate dietary Calcium, unbuffered Calcium:Phosphorus ratio, or Vitamin D3 deficiency.",
+    "remediationNotes": "Provide free-choice coarse oyster shell or limestone grit; verify Vitamin D3 levels.",
+    "diagnosticGroup": "reproductive"
+  },
+  {
+    "symptomId": "sym_bowed_legs",
+    "symptomName": "Bowed Legs / Hock Joint Swelling",
+    "targetSpecies": "waterfowl",
+    "associatedNutrient": "niacin",
+    "severity": "CRITICAL",
+    "primaryCauses": "Niacin (Vitamin B3) deficiency during rapid waterfowl skeletal development.",
+    "remediationNotes": "Supplement waterfowl feed with 55-70 mg/kg Niacin or brewer's yeast. Standard chicken starter is insufficient.",
+    "diagnosticGroup": "skeletal"
+  },
+  {
+    "symptomId": "sym_feather_pecking",
+    "symptomName": "Feather Pecking & Cannibalism",
+    "targetSpecies": "chicken,turkey",
+    "associatedNutrient": "methionine",
+    "severity": "MEDIUM",
+    "primaryCauses": "Deficiency in sulfur-containing amino acids (Methionine/Cystine) or low dietary Crude Protein/Sodium.",
+    "remediationNotes": "Increase synthetic Methionine or high-protein meals (e.g., sunflower meal, fish meal); check salt levels.",
+    "diagnosticGroup": "behavioral"
+  },
+  {
+    "symptomId": "sym_crazy_chick",
+    "symptomName": "Encephalomalacia (Crazy Chick Disease)",
+    "targetSpecies": "chicken,turkey",
+    "associatedNutrient": "vitamin_e",
+    "severity": "CRITICAL",
+    "primaryCauses": "Vitamin E deficiency or rancid dietary fats oxidizing Vitamin E stores.",
+    "remediationNotes": "Add Tocopherol / Vitamin E supplements and evaluate feed storage age to prevent fatty oxidation.",
+    "diagnosticGroup": "neurological"
+  },
+  {
+    "symptomId": "sym_nutritional_roup",
+    "symptomName": "Nutritional Roup (Nasal/Eye Discharge)",
+    "targetSpecies": "chicken,turkey,waterfowl",
+    "associatedNutrient": "vitamin_a",
+    "severity": "HIGH",
+    "primaryCauses": "Vitamin A deficiency causing squamous metaplasia of respiratory mucosa.",
+    "remediationNotes": "Incorporate green forage, alfalfa meal, or stabilized Vitamin A premix.",
+    "diagnosticGroup": "respiratory"
+  }
+]

@@ -1,0 +1,28 @@
+# Flutter/Dart build artifacts
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+*.g.dart
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Bundled tool installers/binaries - these do not belong in the repo.
+# (Previously accidentally committed here; see cleanup commit.)
+Git/
+PortableGit/
+PortableGit-*.7z.exe
+Git-*.exe
+VSCodeUserSetup*.exe
+
+# Large raw data dumps - superseded by curated assets/data/*.json
+FoodData_Central_sr_legacy_food_csv_2018-04/

@@ -1,0 +1,98 @@
+[
+  {
+    "id": "kibble_mazuri_exotic_gamebird_maint",
+    "name": "Mazuri Exotic Gamebird Maintenance",
+    "brand": "Mazuri",
+    "catalogSource": "kibble",
+    "category": "Exotic & Specialized",
+    "subCategory": "Avian",
+    "description": "Extruded diet formulated for non-breeding adult exotic birds and wildfowl.",
+    "asFedMetrics": {
+      "moisturePct": 12.0,
+      "crudeProteinPct": 20.0,
+      "crudeFatPct": 4.5,
+      "crudeFiberPct": 6.0,
+      "calciumPct": 1.15,
+      "phosphorusPct": 0.75,
+      "metabolicEnergyKcal": 3000.0
+    },
+    "tags": [
+      "exotic",
+      "gamebird",
+      "mazuri",
+      "pellets"
+    ]
+  },
+  {
+    "id": "kibble_mazuri_insectivore_diet",
+    "name": "Mazuri Insectivore Diet",
+    "brand": "Mazuri",
+    "catalogSource": "kibble",
+    "category": "Exotic & Specialized",
+    "subCategory": "Mammals",
+    "description": "Simulates high-protein insect diets for hedgehogs, sugar gliders, and exotic insectivores.",
+    "asFedMetrics": {
+      "moisturePct": 10.0,
+      "crudeProteinPct": 28.0,
+      "crudeFatPct": 11.0,
+      "crudeFiberPct": 13.0,
+      "calciumPct": 1.2,
+      "phosphorusPct": 0.9,
+      "metabolicEnergyKcal": 3200.0
+    },
+    "tags": [
+      "exotic",
+      "insectivore",
+      "mazuri",
+      "hedgehog"
+    ]
+  },
+  {
+    "id": "kibble_repashy_calcium_plus",
+    "name": "Repashy Calcium Plus Powder",
+    "brand": "Repashy",
+    "catalogSource": "kibble",
+    "category": "Reptile & Amphibian",
+    "subCategory": "Supplement Powder",
+    "description": "All-in-one dusting powder with bioavailable calcium and essential vitamins.",
+    "asFedMetrics": {
+      "moisturePct": 6.0,
+      "crudeProteinPct": 0.0,
+      "crudeFatPct": 0.0,
+      "crudeFiberPct": 0.0,
+      "calciumPct": 20.0,
+      "phosphorusPct": 0.0,
+      "metabolicEnergyKcal": 0.0
+    },
+    "tags": [
+      "reptile",
+      "dusting",
+      "calcium",
+      "supplement"
+    ]
+  },
+  {
+    "id": "kibble_mazuri_tortoise_diet",
+    "name": "Mazuri Tortoise Diet 5M21",
+    "brand": "Mazuri",
+    "catalogSource": "kibble",
+    "category": "Reptile & Amphibian",
+    "subCategory": "Chelonian",
+    "description": "High-fiber diet designed for dry-land herbivorous tortoises.",
+    "asFedMetrics": {
+      "moisturePct": 12.0,
+      "crudeProteinPct": 15.0,
+      "crudeFatPct": 3.0,
+      "crudeFiberPct": 18.0,
+      "calciumPct": 1.1,
+      "phosphorusPct": 0.6,
+      "metabolicEnergyKcal": 2400.0
+    },
+    "tags": [
+      "tortoise",
+      "reptile",
+      "mazuri",
+      "high-fiber"
+    ]
+  }
+]

@@ -1,0 +1,9 @@
+ruleId,targetType,targetName,maxInclusionPerc,severity,warningMessage
+rule_inc_salt,ingredient_category,salt,0.5,CRITICAL,"Salt inclusion exceeding 0.5% causes electrolyte imbalance, severe wet droppings, and potential sodium toxicity."
+rule_inc_cottonseed,ingredient_keyword,cottonseed,5.0,HIGH,Cottonseed meal contains free gossypol which suppresses egg yolk quality and induces liver/heart toxicity at high levels.
+rule_inc_fishmeal,ingredient_keyword,fish meal,5.0,MEDIUM,"Fish meal above 5% risks causing off-flavors ('fishy taint') in eggs and poultry meat, and potential gizzerosine toxicity."
+rule_inc_barley,ingredient_keyword,barley,15.0,LOW,High barley levels contain beta-glucans which increase gut viscosity; requires enzyme supplementation if exceeded.
+rule_inc_bloodmeal,ingredient_keyword,blood meal,3.0,MEDIUM,Blood meal above 3% reduces feed palatability and can cause severe amino acid unbalance.
+rule_inc_meatbone,ingredient_keyword,meat and bone,5.0,HIGH,Meat and bone meal capped at 5% to prevent severe ash spikes and uncontrolled calcium/phosphorus distortion.
+rule_ratio_cap_grower,ratio,Ca:AvailP_grower,1.5,2.2,HIGH,Grower/Starter Ca:AvailP ratio must stay between 1.5:1 and 2.2:1 for optimal bone mineralization without tying up phosphorus.
+rule_ratio_cap_layer,ratio,Ca:AvailP_layer,7.0,11.0,CRITICAL,Active Layer Ca:AvailP ratio must stay between 7:1 and 11:1 to sustain shell quality without causing kidney failure.

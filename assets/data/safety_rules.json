@@ -1,0 +1,68 @@
+[
+  {
+    "ruleId": "rule_inc_salt",
+    "targetType": "ingredient_category",
+    "targetName": "salt",
+    "maxInclusionPerc": 0.5,
+    "severity": "CRITICAL",
+    "warningMessage": "Salt inclusion exceeding 0.5% causes electrolyte imbalance, severe wet droppings, and potential sodium toxicity."
+  },
+  {
+    "ruleId": "rule_inc_cottonseed",
+    "targetType": "ingredient_keyword",
+    "targetName": "cottonseed",
+    "maxInclusionPerc": 5.0,
+    "severity": "HIGH",
+    "warningMessage": "Cottonseed meal contains free gossypol which suppresses egg yolk quality and induces liver/heart toxicity at high levels."
+  },
+  {
+    "ruleId": "rule_inc_fishmeal",
+    "targetType": "ingredient_keyword",
+    "targetName": "fish meal",
+    "maxInclusionPerc": 5.0,
+    "severity": "MEDIUM",
+    "warningMessage": "Fish meal above 5% risks causing off-flavors ('fishy taint') in eggs and poultry meat, and potential gizzerosine toxicity."
+  },
+  {
+    "ruleId": "rule_inc_barley",
+    "targetType": "ingredient_keyword",
+    "targetName": "barley",
+    "maxInclusionPerc": 15.0,
+    "severity": "LOW",
+    "warningMessage": "High barley levels contain beta-glucans which increase gut viscosity; requires enzyme supplementation if exceeded."
+  },
+  {
+    "ruleId": "rule_inc_bloodmeal",
+    "targetType": "ingredient_keyword",
+    "targetName": "blood meal",
+    "maxInclusionPerc": 3.0,
+    "severity": "MEDIUM",
+    "warningMessage": "Blood meal above 3% reduces feed palatability and can cause severe amino acid unbalance."
+  },
+  {
+    "ruleId": "rule_inc_meatbone",
+    "targetType": "ingredient_keyword",
+    "targetName": "meat and bone",
+    "maxInclusionPerc": 5.0,
+    "severity": "HIGH",
+    "warningMessage": "Meat and bone meal capped at 5% to prevent severe ash spikes and uncontrolled calcium/phosphorus distortion."
+  },
+  {
+    "ruleId": "rule_ratio_cap_grower",
+    "targetType": "ratio",
+    "targetName": "Ca:AvailP_grower",
+    "minRatio": 1.5,
+    "maxRatio": 2.2,
+    "severity": "HIGH",
+    "warningMessage": "Grower/Starter Ca:AvailP ratio must stay between 1.5:1 and 2.2:1 for optimal bone mineralization without tying up phosphorus."
+  },
+  {
+    "ruleId": "rule_ratio_cap_layer",
+    "targetType": "ratio",
+    "targetName": "Ca:AvailP_layer",
+    "minRatio": 7.0,
+    "maxRatio": 11.0,
+    "severity": "CRITICAL",
+    "warningMessage": "Active Layer Ca:AvailP ratio must stay between 7:1 and 11:1 to sustain shell quality without causing kidney failure."
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "recipeId": "recipe_chick_starter_20",
+    "recipeName": "Classic Chick Starter (20% CP)",
+    "targetSpecies": "Chickens",
+    "lifeStage": "Chick / Starter",
+    "targetCrudeProteinPerc": 20.0,
+    "targetMeKcalKg": 2900,
+    "batchSizeLbs": 100.0,
+    "ingredientBreakdownJson": "{\"Yellow Corn (Ground)\": 56.0, \"Soybean Meal (48% CP)\": 36.0, \"Vegetable Oil\": 2.0, \"Dicalcium Phosphate\": 2.0, \"Limestone / Calcium Carbonate\": 1.5, \"Vitamin/Mineral Premix\": 0.5, \"DL-Methionine\": 0.2, \"Salt (NaCl)\": 0.3, \"Granite Grit (Chick Size)\": 1.5}",
+    "description": "Standard balanced starter mash or crumble for chicks from hatch to week 6."
+  },
+  {
+    "recipeId": "recipe_layer_mash_16",
+    "recipeName": "High-Yield Layer Mash (16% CP / 3.8% Ca)",
+    "targetSpecies": "Chickens",
+    "lifeStage": "Production Layer",
+    "targetCrudeProteinPerc": 16.5,
+    "targetMeKcalKg": 2750,
+    "batchSizeLbs": 100.0,
+    "ingredientBreakdownJson": "{\"Yellow Corn (Ground)\": 62.0, \"Soybean Meal (48% CP)\": 22.0, \"Wheat Bran\": 4.0, \"Coarse Flake Oyster Shell\": 7.0, \"Limestone / Calcium Carbonate\": 2.5, \"Dicalcium Phosphate\": 1.5, \"Vitamin/Mineral Premix\": 0.5, \"Salt (NaCl)\": 0.5}",
+    "description": "Formulated for peak egg production with sustained shell thickness."
+  },
+  {
+    "recipeId": "recipe_gamebird_starter_28",
+    "recipeName": "High-Protein Gamebird / Turkey Starter (28% CP)",
+    "targetSpecies": "Turkeys & Gamebirds",
+    "lifeStage": "Poult / Starter",
+    "targetCrudeProteinPerc": 28.0,
+    "targetMeKcalKg": 2950,
+    "batchSizeLbs": 100.0,
+    "ingredientBreakdownJson": "{\"Soybean Meal (48% CP)\": 48.0, \"Yellow Corn (Ground)\": 42.0, \"Menhaden Fish Meal\": 4.0, \"Vegetable Oil\": 2.0, \"Dicalcium Phosphate\": 2.0, \"Limestone\": 1.0, \"Vitamin/Mineral Premix\": 0.5, \"DL-Methionine\": 0.3, \"Salt (NaCl)\": 0.2}",
+    "description": "High-energy, amino-dense ration engineered for turkey poults and quail."
+  },
+  {
+    "recipeId": "recipe_waterfowl_grower_18",
+    "recipeName": "Niacin-Fortified Waterfowl Grower (18% CP)",
+    "targetSpecies": "Ducks & Geese",
+    "lifeStage": "Grower / Finisher",
+    "targetCrudeProteinPerc": 18.0,
+    "targetMeKcalKg": 2850,
+    "batchSizeLbs": 100.0,
+    "ingredientBreakdownJson": "{\"Yellow Corn (Ground)\": 58.0, \"Soybean Meal (48% CP)\": 28.0, \"Alfalfa Meal\": 5.0, \"Wheat Middlings\": 4.0, \"Dicalcium Phosphate\": 2.0, \"Limestone\": 1.5, \"Brewer's Yeast (Niacin Boost)\": 1.0, \"Salt (NaCl)\": 0.5}",
+    "description": "Fortified with extra B-complex vitamins to prevent leg weaknesses in rapid-growth waterfowl."
+  }
+]

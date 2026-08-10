@@ -1,0 +1,672 @@
+[
+  {
+    "name": "Auto-sexing chicken breeds",
+    "category": "Chickens",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Auto-sexing_chicken_breeds"
+  },
+  {
+    "name": "Bantam chicken breeds",
+    "category": "Chickens",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Bantam_chicken_breeds"
+  },
+  {
+    "name": "Chicken breeds by country of origin",
+    "category": "Chickens",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Chicken_breeds_by_country_of_origin"
+  },
+  {
+    "name": "Creeper chickens",
+    "category": "Chickens",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Creeper_chickens"
+  },
+  {
+    "name": "Chicken landraces",
+    "category": "Chickens",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Chicken_landraces"
+  },
+  {
+    "name": "Langshans",
+    "category": "Chickens",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Langshans"
+  },
+  {
+    "name": "Long-crowing chickens",
+    "category": "Chickens",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Long-crowing_chickens"
+  },
+  {
+    "name": "Duck breeds by country of origin",
+    "category": "Ducks",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Duck_breeds_by_country_of_origin"
+  },
+  {
+    "name": "Goose breeds by country of origin",
+    "category": "Geese",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Goose_breeds_by_country_of_origin"
+  },
+  {
+    "name": "Goose landraces",
+    "category": "Geese",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Goose_landraces"
+  },
+  {
+    "name": "Turkey breeds originating in the United States",
+    "category": "Turkeys",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Turkey_breeds_originating_in_the_United_States"
+  },
+  {
+    "name": "Poultry breeds",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Poultry_breeds"
+  },
+  {
+    "name": "Brand name poultry meats",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Brand_name_poultry_meats"
+  },
+  {
+    "name": "Poultry breeding",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Poultry_breeding"
+  },
+  {
+    "name": "Chickens",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Chickens"
+  },
+  {
+    "name": "Poultry diseases",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Poultry_diseases"
+  },
+  {
+    "name": "Poultry dishes",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Poultry_dishes"
+  },
+  {
+    "name": "Ducks",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Ducks"
+  },
+  {
+    "name": "Eggs as food",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Eggs_as_food"
+  },
+  {
+    "name": "Emus",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Emus"
+  },
+  {
+    "name": "Poultry farming",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Poultry_farming"
+  },
+  {
+    "name": "Game birds",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Game_birds"
+  },
+  {
+    "name": "Geese",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Geese"
+  },
+  {
+    "name": "Poultry organizations",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Poultry_organizations"
+  },
+  {
+    "name": "Ostriches",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Ostriches"
+  },
+  {
+    "name": "Poultry shows",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Poultry_shows"
+  },
+  {
+    "name": "Poultry products",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Poultry_products"
+  },
+  {
+    "name": "Poultry standards",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Poultry_standards"
+  },
+  {
+    "name": "Swans",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Swans"
+  },
+  {
+    "name": "Poultry stubs",
+    "category": "Poultry (General)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Poultry_stubs"
+  },
+  {
+    "name": "Goat breeds by country of origin",
+    "category": "Goats",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Goat_breeds_by_country_of_origin"
+  },
+  {
+    "name": "Dairy goat breeds",
+    "category": "Goats",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Dairy_goat_breeds"
+  },
+  {
+    "name": "Feral goats",
+    "category": "Goats",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Feral_goats"
+  },
+  {
+    "name": "Fiber-producing goat breeds",
+    "category": "Goats",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Fiber-producing_goat_breeds"
+  },
+  {
+    "name": "Goatskin-producing goat breeds",
+    "category": "Goats",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Goatskin-producing_goat_breeds"
+  },
+  {
+    "name": "Goat landraces",
+    "category": "Goats",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Goat_landraces"
+  },
+  {
+    "name": "Meat goat breeds",
+    "category": "Goats",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Meat_goat_breeds"
+  },
+  {
+    "name": "Extinct sheep breeds",
+    "category": "Sheep",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Extinct_sheep_breeds"
+  },
+  {
+    "name": "Sheep breeds by country of origin",
+    "category": "Sheep",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Sheep_breeds_by_country_of_origin"
+  },
+  {
+    "name": "Feral sheep",
+    "category": "Sheep",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Feral_sheep"
+  },
+  {
+    "name": "Extinct cattle breeds",
+    "category": "Cattle",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Extinct_cattle_breeds"
+  },
+  {
+    "name": "Cattle breeds by country of origin",
+    "category": "Cattle",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Cattle_breeds_by_country_of_origin"
+  },
+  {
+    "name": "Cattle crossbreeds",
+    "category": "Cattle",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Cattle_crossbreeds"
+  },
+  {
+    "name": "Beef cattle breeds",
+    "category": "Cattle",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Beef_cattle_breeds"
+  },
+  {
+    "name": "Dairy cattle breeds",
+    "category": "Cattle",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Dairy_cattle_breeds"
+  },
+  {
+    "name": "Draught cattle breeds",
+    "category": "Cattle",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Draught_cattle_breeds"
+  },
+  {
+    "name": "Feral cattle",
+    "category": "Cattle",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Feral_cattle"
+  },
+  {
+    "name": "Grey cattle",
+    "category": "Cattle",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Grey_cattle"
+  },
+  {
+    "name": "Pig breeds by country of origin",
+    "category": "Swine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Pig_breeds_by_country_of_origin"
+  },
+  {
+    "name": "Feral pigs",
+    "category": "Swine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Feral_pigs"
+  },
+  {
+    "name": "Pig landraces",
+    "category": "Swine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Pig_landraces"
+  },
+  {
+    "name": "Horse breeds by country of origin",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Horse_breeds_by_country_of_origin"
+  },
+  {
+    "name": "Akhal-Teke horses",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Akhal-Teke_horses"
+  },
+  {
+    "name": "American Quarter Horses",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:American_Quarter_Horses"
+  },
+  {
+    "name": "Andalusian horse",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Andalusian_horse"
+  },
+  {
+    "name": "Appaloosa horses",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Appaloosa_horses"
+  },
+  {
+    "name": "Arabian and part-Arabian horses",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Arabian_and_part-Arabian_horses"
+  },
+  {
+    "name": "Color breeds",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Color_breeds"
+  },
+  {
+    "name": "Draft horses",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Draft_horses"
+  },
+  {
+    "name": "Extinct horse breeds",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Extinct_horse_breeds"
+  },
+  {
+    "name": "Feral horses",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Feral_horses"
+  },
+  {
+    "name": "Irish Sport Horses",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Irish_Sport_Horses"
+  },
+  {
+    "name": "Meat horses",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Meat_horses"
+  },
+  {
+    "name": "Miniature horses",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Miniature_horses"
+  },
+  {
+    "name": "Morgan horses",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Morgan_horses"
+  },
+  {
+    "name": "Part-Arabian breeds of horses and ponies",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Part-Arabian_breeds_of_horses_and_ponies"
+  },
+  {
+    "name": "Racking Horses",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Racking_Horses"
+  },
+  {
+    "name": "Horse breed registries",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Horse_breed_registries"
+  },
+  {
+    "name": "Saddlebreds",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Saddlebreds"
+  },
+  {
+    "name": "Standardbreds",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Standardbreds"
+  },
+  {
+    "name": "Tennessee Walking Horses",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Tennessee_Walking_Horses"
+  },
+  {
+    "name": "Thoroughbred horses",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Thoroughbred_horses"
+  },
+  {
+    "name": "Warmbloods",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Warmbloods"
+  },
+  {
+    "name": "Horse breed stubs",
+    "category": "Equine",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Horse_breed_stubs"
+  },
+  {
+    "name": "Rabbit breeds by country of origin",
+    "category": "Rabbits",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Rabbit_breeds_by_country_of_origin"
+  },
+  {
+    "name": "Lop rabbits",
+    "category": "Rabbits",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Lop_rabbits"
+  },
+  {
+    "name": "Cat breeds by country of origin",
+    "category": "Cats",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Cat_breeds_by_country_of_origin"
+  },
+  {
+    "name": "Cat breeds by physical characteristic",
+    "category": "Cats",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Cat_breeds_by_physical_characteristic"
+  },
+  {
+    "name": "Experimental cat breeds",
+    "category": "Cats",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Experimental_cat_breeds"
+  },
+  {
+    "name": "Extinct cat breeds",
+    "category": "Cats",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Extinct_cat_breeds"
+  },
+  {
+    "name": "Natural cat breeds",
+    "category": "Cats",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Natural_cat_breeds"
+  },
+  {
+    "name": "Rare cat breeds",
+    "category": "Cats",
+    "wiki_url": "https://en.wikipedia.org/wiki/Category:Rare_cat_breeds"
+  },
+  {
+    "name": "Alapaha Blue Blood Bulldog",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Alapaha_Blue_Blood_Bulldog"
+  },
+  {
+    "name": "Alaskan husky",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Alaskan_husky"
+  },
+  {
+    "name": "Alaskan Klee Kai",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Alaskan_Klee_Kai"
+  },
+  {
+    "name": "Alaskan Malamute",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Alaskan_Malamute"
+  },
+  {
+    "name": "American Bulldog",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/American_Bulldog"
+  },
+  {
+    "name": "American Bully",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/American_Bully"
+  },
+  {
+    "name": "American Cocker Spaniel",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/American_Cocker_Spaniel"
+  },
+  {
+    "name": "American English Coonhound",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/American_English_Coonhound"
+  },
+  {
+    "name": "American Foxhound",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/American_Foxhound"
+  },
+  {
+    "name": "American Hairless Terrier",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/American_Hairless_Terrier"
+  },
+  {
+    "name": "American Leopard Hound",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/American_Leopard_Hound"
+  },
+  {
+    "name": "American Pit Bull Terrier",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/American_Pit_Bull_Terrier"
+  },
+  {
+    "name": "American Staffordshire Terrier",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/American_Staffordshire_Terrier"
+  },
+  {
+    "name": "American Staghound",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/American_Staghound"
+  },
+  {
+    "name": "American Water Spaniel",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/American_Water_Spaniel"
+  },
+  {
+    "name": "Australian Shepherd",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Australian_Shepherd"
+  },
+  {
+    "name": "Black and Tan Coonhound",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Black_and_Tan_Coonhound"
+  },
+  {
+    "name": "Black Mouth Cur",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Black_Mouth_Cur"
+  },
+  {
+    "name": "Blue Lacy",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Blue_Lacy"
+  },
+  {
+    "name": "Bluetick Coonhound",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Bluetick_Coonhound"
+  },
+  {
+    "name": "Boston Terrier",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Boston_Terrier"
+  },
+  {
+    "name": "Boykin Spaniel",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Boykin_Spaniel"
+  },
+  {
+    "name": "Carolina Dog",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Carolina_Dog"
+  },
+  {
+    "name": "Catahoula Leopard Dog",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Catahoula_Leopard_Dog"
+  },
+  {
+    "name": "Chesapeake Bay Retriever",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Chesapeake_Bay_Retriever"
+  },
+  {
+    "name": "Chinook (dog breed)",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Chinook_(dog_breed)"
+  },
+  {
+    "name": "Denmark Feist",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Denmark_Feist"
+  },
+  {
+    "name": "English Shepherd",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/English_Shepherd"
+  },
+  {
+    "name": "Hare Indian Dog",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hare_Indian_Dog"
+  },
+  {
+    "name": "Havapoo",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Havapoo"
+  },
+  {
+    "name": "Hawaiian Poi Dog",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hawaiian_Poi_Dog"
+  },
+  {
+    "name": "Majestic Tree Hound",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Majestic_Tree_Hound"
+  },
+  {
+    "name": "McNab dog",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/McNab_dog"
+  },
+  {
+    "name": "Mi-Ki",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Mi-Ki"
+  },
+  {
+    "name": "Miniature American Shepherd",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Miniature_American_Shepherd"
+  },
+  {
+    "name": "Mountain Cur",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Mountain_Cur"
+  },
+  {
+    "name": "Olde English Bulldogge",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Olde_English_Bulldogge"
+  },
+  {
+    "name": "Pit bull",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Pit_bull"
+  },
+  {
+    "name": "Plott Hound",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Plott_Hound"
+  },
+  {
+    "name": "Rat Terrier",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Rat_Terrier"
+  },
+  {
+    "name": "Redbone Coonhound",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Redbone_Coonhound"
+  },
+  {
+    "name": "Salish Wool Dog",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Salish_Wool_Dog"
+  },
+  {
+    "name": "Silken Windhound",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Silken_Windhound"
+  },
+  {
+    "name": "Stephens Stock",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Stephens_Stock"
+  },
+  {
+    "name": "Teddy Roosevelt Terrier",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Teddy_Roosevelt_Terrier"
+  },
+  {
+    "name": "Toy Fox Terrier",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Toy_Fox_Terrier"
+  },
+  {
+    "name": "Toy Manchester Terrier",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Toy_Manchester_Terrier"
+  },
+  {
+    "name": "Treeing Cur",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Treeing_Cur"
+  },
+  {
+    "name": "Treeing Feist",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Treeing_Feist"
+  },
+  {
+    "name": "Treeing Tennessee Brindle",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Treeing_Tennessee_Brindle"
+  },
+  {
+    "name": "Treeing Walker Coonhound",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/Treeing_Walker_Coonhound"
+  },
+  {
+    "name": "White Shepherd",
+    "category": "Dogs",
+    "wiki_url": "https://en.wikipedia.org/wiki/White_Shepherd"
+  }
+]

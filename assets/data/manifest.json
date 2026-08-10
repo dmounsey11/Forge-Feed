@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-07-21T01:09:24.582205",
+  "totalModules": 8,
+  "totalDatabaseRecords": 7831,
+  "modules": [
+    {
+      "registryKey": "ingredients",
+      "fileName": "ingredients.json",
+      "assetPath": "assets/data/ingredients.json",
+      "description": "USDA SR Legacy & Custom Feed Ingredients",
+      "status": "VERIFIED",
+      "recordCount": 7793,
+      "lastUpdated": "2026-07-21T01:09:24.575205"
+    },
+    {
+      "registryKey": "animal_requirements",
+      "fileName": "animal_requirements.json",
+      "assetPath": "assets/data/animal_requirements.json",
+      "description": "Species & Life-Stage Nutritional Profiles",
+      "status": "VERIFIED",
+      "recordCount": 8,
+      "lastUpdated": "2026-07-21T01:09:24.578204"
+    },
+    {
+      "registryKey": "safety_rules",
+      "fileName": "safety_rules.json",
+      "assetPath": "assets/data/safety_rules.json",
+      "description": "Inclusion Limits & Toxicity Safety Guardrails",
+      "status": "VERIFIED",
+      "recordCount": 8,
+      "lastUpdated": "2026-07-21T01:09:24.579204"
+    },
+    {
+      "registryKey": "deficiency_matrix",
+      "fileName": "deficiency_matrix.json",
+      "assetPath": "assets/data/deficiency_matrix.json",
+      "description": "Symptom Diagnostic Engine Data",
+      "status": "VERIFIED",
+      "recordCount": 7,
+      "lastUpdated": "2026-07-21T01:09:24.579204"
+    },
+    {
+      "registryKey": "environmental_adjustments",
+      "fileName": "environmental_adjustments.json",
+      "assetPath": "assets/data/environmental_adjustments.json",
+      "description": "Seasonal & Environmental Intake Multipliers",
+      "status": "MISSING",
+      "recordCount": 0,
+      "lastUpdated": "2026-07-21T01:09:24.579204"
+    },
+    {
+      "registryKey": "processing_methods",
+      "fileName": "processing_methods.json",
+      "assetPath": "assets/data/processing_methods.json",
+      "description": "Feed Physical Processing & Preparation Factors",
+      "status": "VERIFIED",
+      "recordCount": 5,
+      "lastUpdated": "2026-07-21T01:09:24.580205"
+    },
+    {
+      "registryKey": "feed_additives",
+      "fileName": "feed_additives.json",
+      "assetPath": "assets/data/feed_additives.json",
+      "description": "Non-Nutritional Additives, Enzymes & Supplements",
+      "status": "VERIFIED",
+      "recordCount": 6,
+      "lastUpdated": "2026-07-21T01:09:24.581217"
+    },
+    {
+      "registryKey": "starter_recipes",
+      "fileName": "starter_recipes.json",
+      "assetPath": "assets/data/starter_recipes.json",
+      "description": "Benchmark Feed Rations & Formulations",
+      "status": "VERIFIED",
+      "recordCount": 4,
+      "lastUpdated": "2026-07-21T01:09:24.582205"
+    }
+  ]
+}
