@@ -5,6 +5,10 @@
   final double fatPct;
   final double fiberPct;
   final double energyKcalLb;
+  final double sodiumPct;
+  final double lysinePct;
+  final double methioninePct;
+  final double taurinePct;
 
   AsFedMetrics({
     this.crudeProteinPct = 0.0,
@@ -13,6 +17,10 @@
     this.fatPct = 0.0,
     this.fiberPct = 0.0,
     this.energyKcalLb = 0.0,
+    this.sodiumPct = 0.0,
+    this.lysinePct = 0.0,
+    this.methioninePct = 0.0,
+    this.taurinePct = 0.0,
   });
 
   // Expected getters in logic files
@@ -27,6 +35,10 @@
         'fatPct': fatPct,
         'fiberPct': fiberPct,
         'energyKcalLb': energyKcalLb,
+        'sodiumPct': sodiumPct,
+        'lysinePct': lysinePct,
+        'methioninePct': methioninePct,
+        'taurinePct': taurinePct,
       };
 
   factory AsFedMetrics.fromJson(Map<String, dynamic> json) => AsFedMetrics(
@@ -36,6 +48,10 @@
         fatPct: (json['fatPct'] as num?)?.toDouble() ?? (json['crudeFatPct'] as num?)?.toDouble() ?? 0.0,
         fiberPct: (json['fiberPct'] as num?)?.toDouble() ?? (json['crudeFiberPct'] as num?)?.toDouble() ?? 0.0,
         energyKcalLb: (json['energyKcalLb'] as num?)?.toDouble() ?? (json['metabolicEnergyKcal'] as num?)?.toDouble() ?? 0.0,
+        sodiumPct: (json['sodiumPct'] as num?)?.toDouble() ?? 0.0,
+        lysinePct: (json['lysinePct'] as num?)?.toDouble() ?? 0.0,
+        methioninePct: (json['methioninePct'] as num?)?.toDouble() ?? 0.0,
+        taurinePct: (json['taurinePct'] as num?)?.toDouble() ?? 0.0,
       );
 }
 
@@ -103,4 +119,31 @@ class Ingredient {
             ? AsFedMetrics.fromJson(json['asFedMetrics'])
             : AsFedMetrics(),
       );
+
+  /// Maps a raw record from the USDA SR-Legacy derived `ingredients.json`
+  /// (flat schema: crudeProteinPerc, calciumPerc, totalPhosphorusPerc, etc.,
+  /// with metabolizableEnergyKcal expressed per kg) onto this app's model.
+  factory Ingredient.fromUsdaJson(Map<String, dynamic> json, {String? categoryOverride}) {
+    double n(String key) => (json[key] as num?)?.toDouble() ?? 0.0;
+    const kgToLb = 2.20462;
+    return Ingredient(
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      category: categoryOverride ?? json['category']?.toString() ?? 'General',
+      catalogSource: 'USDA',
+      subCategory: json['storageForm']?.toString() ?? 'General',
+      asFedMetrics: AsFedMetrics(
+        crudeProteinPct: n('crudeProteinPerc'),
+        calciumPct: n('calciumPerc'),
+        phosphorusPct: n('totalPhosphorusPerc'),
+        fatPct: n('crudeFatPerc'),
+        fiberPct: n('crudeFiberPerc'),
+        energyKcalLb: n('metabolizableEnergyKcal') / kgToLb,
+        sodiumPct: n('sodiumPerc'),
+        lysinePct: n('lysinePerc'),
+        methioninePct: n('methioninePerc'),
+        taurinePct: n('taurinePerc'),
+      ),
+    );
+  }
 }
