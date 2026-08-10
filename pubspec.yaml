@@ -26,5 +26,4 @@ flutter:
     - assets/data/usda_ingredients.json
     - assets/data/livestock_feeds.json
     - assets/data/pet_kibble.json
-    - assets/data/animal_requirements.json
-    - assets/data/ingredients.json
+    - assets/data/forge_feed_data.json

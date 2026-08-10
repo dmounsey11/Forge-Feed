@@ -1,5 +1,4 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../services/database_service.dart';
 import '../models/ingredient.dart';
 
@@ -25,15 +24,13 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
     'All USDA Groups',
     'Grains & Cereals',
     'Proteins & Meal',
-    'Produce',
-    'Natural Supplements',
     'Vitamins & Minerals',
     'Probiotics & Digestive',
   ];
 
   @override
   Widget build(BuildContext context) {
-    final db = context.watch<DatabaseService>();
+    final db = DatabaseService.instance;
     final allIngredients = db.masterIngredients;
 
     final filteredIngredients = allIngredients.where((item) {
