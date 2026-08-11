@@ -1,14 +1,18 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'services/database_service.dart';
+import 'services/tier_service.dart';
 import 'screens/main_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   runApp(
-    ChangeNotifierProvider<DatabaseService>(
-      create: (_) => DatabaseService(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<DatabaseService>(create: (_) => DatabaseService()),
+        ChangeNotifierProvider<TierService>(create: (_) => TierService()),
+      ],
       child: const ForgeFeedApp(),
     ),
   );
@@ -23,9 +27,9 @@ class ForgeFeedApp extends StatelessWidget {
       title: 'ForgeFeed',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF0D1117),
+        scaffoldBackgroundColor: const Color(0xFF1A1A1C),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF84CC16),
+          seedColor: const Color(0xFFF97316),
           brightness: Brightness.dark,
         ),
       ),
@@ -47,7 +51,10 @@ class _AppStartupState extends State<AppStartup> {
   @override
   void initState() {
     super.initState();
-    _initFuture = context.read<DatabaseService>().initialize();
+    _initFuture = Future.wait([
+      context.read<DatabaseService>().initialize(),
+      context.read<TierService>().initialize(),
+    ]);
   }
 
   @override
@@ -57,9 +64,9 @@ class _AppStartupState extends State<AppStartup> {
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const Scaffold(
-            backgroundColor: Color(0xFF0D1117),
+            backgroundColor: Color(0xFF1A1A1C),
             body: Center(
-              child: CircularProgressIndicator(color: Color(0xFF84CC16)),
+              child: CircularProgressIndicator(color: Color(0xFFF97316)),
             ),
           );
         }

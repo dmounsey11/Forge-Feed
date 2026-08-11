@@ -1,0 +1,366 @@
+{
+  "categories": [
+    {
+      "name": "Mammal",
+      "subgroups": [
+        {
+          "name": "Exotic Mammals",
+          "species": [
+            "Ferret",
+            "Fennec Fox",
+            "African Pygmy Hedgehog",
+            "Lesser Hedgehog Tenrec",
+            "Striped Skunk",
+            "Coatimundi",
+            "Kinkajou",
+            "Meerkat",
+            "Spotted Genet",
+            "Serval",
+            "Caracal",
+            "Asian Small-Clawed Otter",
+            "Raccoon",
+            "Alpaca",
+            "Llama",
+            "Sheep",
+            "Reindeer"
+          ]
+        },
+        {
+          "name": "Primates & Prosimians",
+          "species": [
+            "Capuchin Monkey",
+            "Squirrel Monkey",
+            "Pygmy Marmoset",
+            "Cotton-Top Tamarin",
+            "Senegal Bushbaby (Galago)",
+            "Ring-Tailed Lemur"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Marsupial",
+      "subgroups": [
+        {
+          "name": "Marsupials",
+          "species": [
+            "Sugar Glider",
+            "Short-Tailed Opossum",
+            "Bennett's Wallaby",
+            "Red-Necked Pademelon",
+            "Wallaroo",
+            "Virginia Opossum",
+            "Bettong",
+            "Kowari"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rodent",
+      "subgroups": [
+        {
+          "name": "Rodents",
+          "species": [
+            "Syrian Hamster",
+            "Dwarf Hamster",
+            "Fancy Rat",
+            "Fancy Mouse",
+            "Guinea Pig",
+            "Chinchilla",
+            "Degu",
+            "Mongolian Gerbil",
+            "Duprasi Gerbil (Fat-Tailed Gerbil)",
+            "African Pygmy Dormouse",
+            "Capybara",
+            "Black-Tailed Prairie Dog",
+            "Southern Flying Squirrel",
+            "Gambian Pouched Rat",
+            "Eurasian Chipmunk",
+            "Spiny Mouse",
+            "Acacia Rat",
+            "Patagonian Mara"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bird",
+      "subgroups": [
+        {
+          "name": "Companion Birds",
+          "species": [
+            "Parrot",
+            "Finch",
+            "Canary",
+            "Cockatiel",
+            "Budgerigar"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reptile",
+      "subgroups": [
+        {
+          "name": "Lizards",
+          "species": [
+            "Bearded Dragon",
+            "Leopard Gecko",
+            "Crested Gecko",
+            "Gargoyle Gecko",
+            "African Fat-Tailed Gecko",
+            "Tokay Gecko",
+            "Day Gecko",
+            "Blue-Tongued Skink",
+            "Veiled Chameleon",
+            "Jackson's Chameleon",
+            "Uromastyx",
+            "Ackie Monitor",
+            "Savannah Monitor",
+            "Argentine Tegu",
+            "Green Anole",
+            "Chinese Water Dragon",
+            "Argentine Black and White Tegu",
+            "Asian Water Monitor",
+            "Black Roughneck Monitor",
+            "Black Tree Monitor",
+            "Blue Tegu",
+            "Cave Gecko",
+            "Chahoua Gecko",
+            "Crocodile Skink",
+            "Desert Iguana",
+            "Egyptian Uromastyx",
+            "Electric Blue Day Gecko",
+            "Emerald Tree Monitor",
+            "Fire Skink",
+            "Flying Gecko",
+            "Frilled Dragon",
+            "Giant Madagascar Day Gecko",
+            "Gold Tegu",
+            "Green Iguana",
+            "Leachianus Gecko",
+            "Nile Monitor",
+            "Ocellated Uromastyx",
+            "Ornate Uromastyx",
+            "Panther Chameleon",
+            "Peach-Throat Monitor",
+            "Pygmy Chameleon",
+            "Red Tegu",
+            "Rhinoceros Iguana",
+            "Saharan Uromastyx",
+            "Sailfin Dragon",
+            "Schneider's Skink",
+            "Spiny-Tailed Iguana"
+          ]
+        },
+        {
+          "name": "Snakes",
+          "species": [
+            "Ball Python",
+            "Corn Snake",
+            "Milk Snake",
+            "Kingsnake",
+            "Western Hognose Snake",
+            "Emerald Tree Boa",
+            "Carpet Python",
+            "African House Snake",
+            "Amazon Tree Boa",
+            "Argentine Boa",
+            "Asian Vine Snake",
+            "Baron's Racer",
+            "Black Rat Snake",
+            "Blood Python",
+            "Brazilian Rainbow Boa",
+            "Bullsnake",
+            "California Kingsnake",
+            "Children's Python",
+            "Colombian Rainbow Boa",
+            "Colombian Red-Tailed Boa",
+            "Eastern Hognose Snake",
+            "Eastern Kingsnake",
+            "False Water Cobra",
+            "Florida Kingsnake",
+            "Garter Snake",
+            "Gopher Snake",
+            "Green Tree Python",
+            "Honduran Milk Snake",
+            "Kenyan Sand Boa",
+            "Mangrove Snake",
+            "Mexican Black Kingsnake",
+            "Nelson's Milk Snake",
+            "Puebloan Milk Snake",
+            "Reticulated Python",
+            "Rosy Boa",
+            "Saharan Sand Boa",
+            "Sinaloan Milk Snake",
+            "Speckled Kingsnake",
+            "Spotted Python",
+            "Texas Rat Snake",
+            "Woma Python",
+            "Yellow Rat Snake"
+          ]
+        },
+        {
+          "name": "Turtles & Tortoises",
+          "species": [
+            "Russian Tortoise",
+            "Hermann's Tortoise",
+            "Sulcata Tortoise",
+            "Eastern Box Turtle",
+            "Red-Eared Slider",
+            "African Sideneck Turtle",
+            "Aldabra Giant Tortoise",
+            "Alligator Snapping Turtle",
+            "Common Musk Turtle",
+            "Common Snapping Turtle",
+            "Diamondback Terrapin",
+            "Eastern Mud Turtle",
+            "Egyptian Tortoise",
+            "Elongated Tortoise",
+            "Florida Cooter",
+            "Florida Softshell Turtle",
+            "Greek Tortoise",
+            "Leopard Tortoise",
+            "Marginated Tortoise",
+            "Mata Mata Turtle",
+            "Pancake Tortoise",
+            "Pig-Nosed Turtle",
+            "Red-Footed Tortoise",
+            "River Cooter",
+            "Smooth Softshell Turtle",
+            "Spiny Softshell Turtle",
+            "Striped Mud Turtle",
+            "Three-Toed Box Turtle",
+            "Yellow-Bellied Slider",
+            "Yellow-Footed Tortoise"
+          ]
+        },
+        {
+          "name": "Crocodilians",
+          "species": [
+            "American Alligator",
+            "Cuvier's Dwarf Caiman",
+            "Smooth-Fronted Caiman",
+            "Spectacled Caiman"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Amphibian",
+      "subgroups": [
+        {
+          "name": "Frogs & Toads",
+          "species": [
+            "Pacman Frog",
+            "African Clawed Frog",
+            "African Dwarf Frog",
+            "Oriental Fire-Bellied Toad",
+            "Red-Eyed Tree Frog",
+            "Poison Dart Frog",
+            "White's Tree Frog (Dumpy Tree Frog)",
+            "Tomato Frog",
+            "Amazon Milk Frog",
+            "Green Tree Frog",
+            "American Bullfrog",
+            "Cane Toad",
+            "African Bullfrog",
+            "Colorado River Toad",
+            "Cuban Tree Frog",
+            "Golden Poison Dart Frog",
+            "Green and Black Poison Dart Frog",
+            "Ornate Horned Frog"
+          ]
+        },
+        {
+          "name": "Salamanders, Newts & Caecilians",
+          "species": [
+            "Axolotl",
+            "Tiger Salamander",
+            "Fire Salamander",
+            "Marbled Salamander",
+            "Great Crested Newt",
+            "Spanish Ribbed Newt",
+            "Aquatic Caecilian",
+            "Eastern Newt",
+            "Kaiser Mountain Newt",
+            "Mudpuppy",
+            "Spotted Salamander"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Livestock",
+      "subgroups": [
+        {
+          "name": "Poultry & Waterfowl",
+          "species": [
+            "Chicken (Layer)",
+            "Chicken (Broiler)",
+            "Chicken (Heritage Breed)",
+            "Chicken (Bantam)",
+            "Chicken - Orpington",
+            "Chicken - Rhode Island Red",
+            "Chicken - Serama",
+            "Chicken - Jersey Giant",
+            "Chicken - Indio Gigante",
+            "Chicken - Leghorn/Grey Law Cross",
+            "Duck - Pekin (Waterfowl)",
+            "Duck - Muscovy (Waterfowl)",
+            "Duck - Indian Runner (Waterfowl)",
+            "Duck - Mallard Derivative (Waterfowl)",
+            "Goose - Saddleback Pomeranian (Waterfowl)",
+            "Goose - Toulouse (Waterfowl)",
+            "Goose - Embden (Waterfowl)",
+            "Turkey - Bourbon Red",
+            "Turkey - Broad Breasted White",
+            "Coturnix Quail",
+            "Bobwhite Quail",
+            "Pheasant",
+            "Guineafowl",
+            "Pigeon",
+            "Emu",
+            "Ostrich",
+            "Rhea"
+          ]
+        },
+        {
+          "name": "Livestock & Ruminants",
+          "species": [
+            "Goat - Boer",
+            "Goat - Kiko",
+            "Goat - Nubian",
+            "Goat - Saanen",
+            "Goat - Nigerian Dwarf",
+            "Goat - Pygmy",
+            "Sheep - Katahdin",
+            "Sheep - Dorper",
+            "Cattle - Angus",
+            "Cattle - Hereford",
+            "Cattle - Brahman",
+            "Cattle - Holstein",
+            "Cattle - Jersey",
+            "Swine - Berkshire",
+            "Swine - Tamworth",
+            "Swine - Kunekune",
+            "Swine - Potbellied/Miniature",
+            "Horse (Light)",
+            "Horse (Draft)",
+            "Pony",
+            "Donkey",
+            "Mule"
+          ]
+        },
+        {
+          "name": "Companion Mammals",
+          "species": [
+            "Dog",
+            "Cat"
+          ]
+        }
+      ]
+    }
+  ]
+}

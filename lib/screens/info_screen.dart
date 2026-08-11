@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class InfoScreen extends StatelessWidget {
   const InfoScreen({super.key});
@@ -11,8 +11,8 @@ class InfoScreen extends StatelessWidget {
         children: [
           const TabBar(
             isScrollable: true,
-            indicatorColor: Colors.greenAccent,
-            labelColor: Colors.greenAccent,
+            indicatorColor: Color(0xFFF97316),
+            labelColor: Color(0xFFF97316),
             unselectedLabelColor: Colors.grey,
             tabs: [
               Tab(icon: Icon(Icons.battery_charging_full), text: 'Body Battery'),
@@ -50,7 +50,7 @@ class InfoScreen extends StatelessWidget {
               children: [
                 Text(
                   'The "Body Battery" & "Clock Speed" Concept',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.greenAccent),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFFF97316)),
                 ),
                 SizedBox(height: 8),
                 Text(
@@ -124,7 +124,7 @@ class InfoScreen extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
       child: ListTile(
-        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.greenAccent)),
+        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFF97316))),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -162,7 +162,7 @@ class InfoScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                const Icon(Icons.build_circle_outlined, color: Colors.greenAccent),
+                const Icon(Icons.build_circle_outlined, color: Color(0xFFF97316)),
                 const SizedBox(width: 10),
                 Expanded(child: Text('Corrective Action: $fix', style: const TextStyle(color: Colors.white70))),
               ],
@@ -197,7 +197,7 @@ class InfoScreen extends StatelessWidget {
             Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
             Chip(
               label: Text(protein, style: const TextStyle(fontSize: 10, color: Colors.white)),
-              backgroundColor: Colors.green.shade800,
+              backgroundColor: const Color(0xFFC2410C),
               padding: EdgeInsets.zero,
             ),
           ],
@@ -205,7 +205,7 @@ class InfoScreen extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Category: $type', style: const TextStyle(color: Colors.greenAccent, fontSize: 12)),
+            Text('Category: $type', style: const TextStyle(color: Color(0xFFF97316), fontSize: 12)),
             const SizedBox(height: 4),
             Text(desc, style: const TextStyle(color: Colors.white70)),
           ],

@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -55,7 +55,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Request submitted directly to our roadmap! Thank you.'),
-            backgroundColor: Color(0xFF84CC16),
+            backgroundColor: Color(0xFFF97316),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -81,10 +81,10 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: const Color(0xFF161F1A),
+      backgroundColor: const Color(0xFF242426),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFF84CC16), width: 1.5),
+        side: const BorderSide(color: Color(0xFFF97316), width: 1.5),
       ),
       child: Container(
         padding: const EdgeInsets.all(24),
@@ -102,7 +102,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                   children: [
                     const Row(
                       children: [
-                        Icon(Icons.lightbulb_outline, color: Color(0xFF84CC16), size: 24),
+                        Icon(Icons.lightbulb_outline, color: Color(0xFFF97316), size: 24),
                         SizedBox(width: 8),
                         Text(
                           'Feedback & Requests',
@@ -125,13 +125,13 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                 // Request Category Dropdown
                 DropdownButtonFormField<String>(
                   initialValue: _selectedType,
-                  dropdownColor: const Color(0xFF161F1A),
+                  dropdownColor: const Color(0xFF242426),
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: 'Request Type',
                     labelStyle: const TextStyle(color: Colors.white60),
                     filled: true,
-                    fillColor: const Color(0xFF0D1117),
+                    fillColor: const Color(0xFF1A1A1C),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide.none,
@@ -161,7 +161,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                     alignLabelWithHint: true,
                     labelStyle: const TextStyle(color: Colors.white60),
                     filled: true,
-                    fillColor: const Color(0xFF0D1117),
+                    fillColor: const Color(0xFF1A1A1C),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide.none,
@@ -181,7 +181,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                     labelText: 'Your Email (Optional - for follow-ups)',
                     labelStyle: const TextStyle(color: Colors.white60),
                     filled: true,
-                    fillColor: const Color(0xFF0D1117),
+                    fillColor: const Color(0xFF1A1A1C),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide.none,
@@ -196,7 +196,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                   height: 48,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF84CC16),
+                      backgroundColor: const Color(0xFFF97316),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -207,14 +207,14 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                             width: 24,
                             height: 24,
                             child: CircularProgressIndicator(
-                              color: Color(0xFF0D1117),
+                              color: Color(0xFF1A1A1C),
                               strokeWidth: 2.5,
                             ),
                           )
                         : const Text(
                             'Submit Request',
                             style: TextStyle(
-                              color: Color(0xFF0D1117),
+                              color: Color(0xFF1A1A1C),
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),

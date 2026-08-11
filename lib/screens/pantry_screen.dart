@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/database_service.dart';
 import '../widgets/master_ingredient_picker.dart';
@@ -27,7 +27,7 @@ class _PantryScreenState extends State<PantryScreen> {
     final supplementItems = db.getSupplementIngredients();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117),
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -75,7 +75,7 @@ class _PantryScreenState extends State<PantryScreen> {
   }) {
     return Row(
       children: [
-        Icon(icon, color: const Color(0xFF10B981), size: 26),
+        Icon(icon, color: const Color(0xFFF97316), size: 26),
         const SizedBox(width: 10),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,7 +87,7 @@ class _PantryScreenState extends State<PantryScreen> {
         const Spacer(),
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: const Color(0xFFF97316),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -105,7 +105,7 @@ class _PantryScreenState extends State<PantryScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
-        color: const Color(0xFF161C24),
+        color: const Color(0xFF242426),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white10),
       ),
@@ -123,12 +123,12 @@ class _PantryScreenState extends State<PantryScreen> {
       itemBuilder: (context, index) {
         final item = items[index];
         return Card(
-          color: const Color(0xFF1E293B),
+          color: const Color(0xFF2C2C2E),
           margin: const EdgeInsets.only(bottom: 10),
           child: ListTile(
             leading: Icon(
               isSupplement ? Icons.medical_services_outlined : Icons.grain,
-              color: const Color(0xFF10B981),
+              color: const Color(0xFFF97316),
             ),
             title: Text(item.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             subtitle: Text(

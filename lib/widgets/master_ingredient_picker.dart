@@ -18,36 +18,46 @@ class MasterIngredientPicker extends StatefulWidget {
 }
 
 class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
-  String _searchQuery = '';
-  String _selectedGroup = 'All USDA Groups';
-
-  final List<String> _groups = [
-    'All USDA Groups',
+  static const List<String> _foodCategories = [
     'Grains & Cereals',
     'Proteins & Meal',
     'Produce',
+  ];
+
+  static const List<String> _nutrientCategories = [
     'Natural Supplements',
     'Vitamins & Minerals',
     'Probiotics & Digestive',
   ];
 
+  String _searchQuery = '';
+  late String _selectedGroup = _allGroupLabel;
+
+  String get _allGroupLabel => widget.isSupplementMode ? 'All Nutrient Groups' : 'All USDA Groups';
+
+  List<String> get _groups => [
+        _allGroupLabel,
+        ...(widget.isSupplementMode ? _nutrientCategories : _foodCategories),
+      ];
+
   @override
   Widget build(BuildContext context) {
     final db = context.watch<DatabaseService>();
-    final allIngredients = db.masterIngredients;
+    final modeCategories = widget.isSupplementMode ? _nutrientCategories : _foodCategories;
+    final allIngredients = db.masterIngredients.where((item) => modeCategories.contains(item.category));
 
     final filteredIngredients = allIngredients.where((item) {
       final queryMatches = item.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           item.category.toLowerCase().contains(_searchQuery.toLowerCase());
-      final groupMatches = _selectedGroup == 'All USDA Groups' || item.category == _selectedGroup;
+      final groupMatches = _selectedGroup == _allGroupLabel || item.category == _selectedGroup;
       return queryMatches && groupMatches;
     }).toList();
 
     return Dialog(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: const Color(0xFF1E1E20),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFF10B981), width: 1.5),
+        side: const BorderSide(color: Color(0xFFF97316), width: 1.5),
       ),
       child: Container(
         width: 800,
@@ -61,12 +71,12 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                    color: const Color(0xFFF97316).withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     widget.isSupplementMode ? Icons.science : Icons.storage,
-                    color: const Color(0xFF10B981),
+                    color: const Color(0xFFF97316),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -107,7 +117,7 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
                       hintStyle: const TextStyle(color: Colors.grey),
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
                       filled: true,
-                      fillColor: const Color(0xFF1E293B),
+                      fillColor: const Color(0xFF2C2C2E),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide.none,
@@ -120,14 +130,14 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: const Color(0xFF2C2C2E),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFF10B981)),
+                    border: Border.all(color: const Color(0xFFF97316)),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: _selectedGroup,
-                      dropdownColor: const Color(0xFF1E293B),
+                      dropdownColor: const Color(0xFF2C2C2E),
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       items: _groups.map((g) {
                         return DropdownMenuItem(value: g, child: Text(g));
@@ -155,7 +165,7 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
                             : db.isInPantry(ing.id);
 
                         return Card(
-                          color: const Color(0xFF1E293B),
+                          color: const Color(0xFF2C2C2E),
                           margin: const EdgeInsets.only(bottom: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           child: Padding(
@@ -178,7 +188,7 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
                                       ),
                                       child: Text(
                                         ing.category,
-                                        style: const TextStyle(color: Color(0xFF10B981), fontSize: 11),
+                                        style: const TextStyle(color: Color(0xFFF97316), fontSize: 11),
                                       ),
                                     ),
                                   ],
@@ -201,7 +211,7 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
                                   alignment: Alignment.centerRight,
                                   child: ElevatedButton.icon(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: inStock ? Colors.red.shade900 : const Color(0xFF10B981),
+                                      backgroundColor: inStock ? Colors.red.shade900 : const Color(0xFFF97316),
                                       foregroundColor: Colors.white,
                                     ),
                                     icon: Icon(inStock ? Icons.remove_circle : Icons.add_circle),
@@ -241,7 +251,7 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: const Color(0xFF1E1E20),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: Colors.white12),
       ),

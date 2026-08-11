@@ -1,0 +1,237 @@
+﻿import 'package:flutter/material.dart';
+import '../models/animal_profile.dart';
+
+class HealthScreeningResult {
+  final bool pregnant;
+  final bool breeding;
+  final bool injured;
+  final String injuryNotes;
+  final bool hibernatingOrBrumating;
+
+  const HealthScreeningResult({
+    this.pregnant = false,
+    this.breeding = false,
+    this.injured = false,
+    this.injuryNotes = '',
+    this.hibernatingOrBrumating = false,
+  });
+
+  bool get hasAnyFlag => pregnant || breeding || injured || hibernatingOrBrumating;
+}
+
+/// Asks about the animal's current health/reproductive status. Only shows
+/// questions relevant to this specific profile (e.g. pregnancy only for
+/// females, hibernation/brumation only for Reptile/Exotic category animals).
+/// This does not change any numbers yet - answers are just captured for now,
+/// pending the diet/ratio calculator that will actually use them.
+class HealthScreeningDialog extends StatefulWidget {
+  final AnimalProfile profile;
+
+  const HealthScreeningDialog({super.key, required this.profile});
+
+  @override
+  State<HealthScreeningDialog> createState() => _HealthScreeningDialogState();
+}
+
+class _HealthScreeningDialogState extends State<HealthScreeningDialog> {
+  bool _pregnant = false;
+  bool _breeding = false;
+  bool _injured = false;
+  bool _hibernatingOrBrumating = false;
+  final _injuryController = TextEditingController();
+
+  bool get _showsPregnant => widget.profile.sex == 'Female' || widget.profile.sex == 'Mixed';
+  bool get _showsHibernation =>
+      widget.profile.species.startsWith('Reptiles') || widget.profile.species.startsWith('Exotic');
+
+  @override
+  void dispose() {
+    _injuryController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: const Color(0xFF242426),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Color(0xFFF97316), width: 1.5),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        constraints: const BoxConstraints(maxWidth: 460),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Health Screening',
+                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'For ${widget.profile.name} - ${widget.profile.ageGroup}',
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
+              ),
+              const SizedBox(height: 16),
+              if (_showsPregnant)
+                _ToggleRow(
+                  label: 'Currently pregnant?',
+                  value: _pregnant,
+                  onChanged: (v) => setState(() => _pregnant = v),
+                ),
+              _ToggleRow(
+                label: 'Currently breeding?',
+                value: _breeding,
+                onChanged: (v) => setState(() => _breeding = v),
+              ),
+              _ToggleRow(
+                label: 'Currently injured?',
+                value: _injured,
+                onChanged: (v) => setState(() => _injured = v),
+              ),
+              if (_injured) ...[
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _injuryController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'What kind of injury?',
+                    labelStyle: const TextStyle(color: Colors.white60),
+                    filled: true,
+                    fillColor: const Color(0xFF1A1A1C),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ],
+              if (_showsHibernation)
+                _ToggleRow(
+                  label: 'Hibernating / brumating?',
+                  value: _hibernatingOrBrumating,
+                  onChanged: (v) => setState(() => _hibernatingOrBrumating = v),
+                ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFF97316),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop(
+                      HealthScreeningResult(
+                        pregnant: _pregnant,
+                        breeding: _breeding,
+                        injured: _injured,
+                        injuryNotes: _injuryController.text.trim(),
+                        hibernatingOrBrumating: _hibernatingOrBrumating,
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    'Continue',
+                    style: TextStyle(color: Color(0xFF1A1A1C), fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ToggleRow extends StatelessWidget {
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _ToggleRow({required this.label, required this.value, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
+      value: value,
+      activeThumbColor: const Color(0xFFF97316),
+      onChanged: onChanged,
+    );
+  }
+}
+
+/// Shown to free-tier users instead of the health screening - explains the
+/// feature and lets them skip straight through.
+class HealthUpgradePromptDialog extends StatelessWidget {
+  const HealthUpgradePromptDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: const Color(0xFF242426),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Color(0xFFF97316), width: 1.5),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.auto_awesome, color: Color(0xFFF97316), size: 32),
+            const SizedBox(height: 12),
+            const Text(
+              'Health-Based Diet Adjustments',
+              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Upgrade to answer a quick health screening (pregnancy, breeding, injury, '
+              'hibernation/brumation) so your feed plan can account for it.',
+              style: TextStyle(color: Colors.white70, fontSize: 13),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white60,
+                      side: const BorderSide(color: Colors.white24),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('Skip'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF97316),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text(
+                      'Upgrade',
+                      style: TextStyle(color: Color(0xFF1A1A1C), fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

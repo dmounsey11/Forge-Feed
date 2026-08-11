@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/animal_profile.dart';
 import '../models/ingredient.dart';
 import '../models/pantry_item.dart';
+import '../models/safety_rule.dart';
+import '../models/species_catalog.dart';
 import '../models/species_requirement.dart';
 
 class DatabaseService extends ChangeNotifier {
@@ -14,6 +16,8 @@ class DatabaseService extends ChangeNotifier {
   final List<Ingredient> _ingredients = [];
   final List<SpeciesRequirement> _speciesRequirements = [];
   final List<AnimalProfile> _profiles = [];
+  final List<SafetyRule> _safetyRules = [];
+  final List<SpeciesCategory> _speciesCatalog = [];
 
   // Hand-picked allow-list of genuinely whole-food, feed-relevant records
   // out of assets/data/ingredients.json (a raw USDA SR-Legacy human-food
@@ -53,6 +57,12 @@ class DatabaseService extends ChangeNotifier {
     if (_speciesRequirements.isEmpty) {
       await _loadSpeciesRequirements();
     }
+    if (_safetyRules.isEmpty) {
+      await _loadSafetyRules();
+    }
+    if (_speciesCatalog.isEmpty) {
+      await _loadSpeciesCatalog();
+    }
 
     final prefs = await SharedPreferences.getInstance();
     _loadPersistedProfiles(prefs);
@@ -70,6 +80,17 @@ class DatabaseService extends ChangeNotifier {
         'supp_oyster_shell',
         'supp_dicalcium_phos',
         'supp_poultry_probiotic',
+        'supp_bone_meal',
+        'supp_brewers_yeast',
+        'supp_calcium_dusting_powder',
+        'supp_multivitamin_premix',
+        'supp_probiotic_enzyme_blend',
+        'supp_amino_acid_isolate',
+        'supp_liquid_vitamin_d3',
+        'supp_fish_oil',
+        'supp_mct_oil',
+        'supp_whole_egg_powder',
+        'supp_glycine_arginine',
         ..._curatedUsdaIngredientCategories.keys,
       };
 
@@ -154,6 +175,31 @@ class DatabaseService extends ChangeNotifier {
     }
   }
 
+  Future<void> _loadSafetyRules() async {
+    try {
+      final raw = await rootBundle.loadString('assets/data/safety_rules.json');
+      final List<dynamic> decoded = jsonDecode(raw) as List<dynamic>;
+      _safetyRules.addAll(
+        decoded.map((e) => SafetyRule.fromJson(e as Map<String, dynamic>)),
+      );
+    } catch (e) {
+      debugPrint('Failed to load safety_rules.json: $e');
+    }
+  }
+
+  Future<void> _loadSpeciesCatalog() async {
+    try {
+      final raw = await rootBundle.loadString('assets/data/species_catalog.json');
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      final categories = decoded['categories'] as List<dynamic>? ?? [];
+      _speciesCatalog.addAll(
+        categories.map((e) => SpeciesCategory.fromJson(e as Map<String, dynamic>)),
+      );
+    } catch (e) {
+      debugPrint('Failed to load species_catalog.json: $e');
+    }
+  }
+
   void _seedInitialProfiles() {
     _profiles.addAll([
       AnimalProfile(
@@ -226,7 +272,7 @@ class DatabaseService extends ChangeNotifier {
       // Supplements & Additives
       Ingredient(
         id: 'supp_calcium_limestone',
-        name: 'Feed Grade Limestone (38% Ca)',
+        name: 'Calcium Carbonate / Ground Limestone (38% Ca)',
         category: 'Vitamins & Minerals',
         proteinPct: 0.0,
         calciumPctValue: 38.0,
@@ -268,6 +314,136 @@ class DatabaseService extends ChangeNotifier {
         fiberPctValue: 8.0,
         energyMeKcalLb: 500,
       ),
+
+      // Nutrient library additions - real macro data used where a real USDA
+      // record exists (fish oil, whole egg powder); the rest are hand-authored
+      // from standard published feed-supplement values, since these are
+      // manufactured products, not whole foods, and won't show up in a USDA
+      // SR-Legacy dataset. A few (vitamin D3, multivitamin premix, glycine/
+      // arginine) don't have a meaningful macro-nutrient profile in this
+      // app's model at all - they're included so they're selectable, with
+      // zeroed tracked fields rather than a fabricated number.
+      Ingredient(
+        id: 'supp_bone_meal',
+        name: 'Bone Meal (Naturally Sourced)',
+        category: 'Vitamins & Minerals',
+        proteinPct: 11.0,
+        calciumPctValue: 24.0,
+        phosphorusPctValue: 12.0,
+        fatPctValue: 2.0,
+        fiberPctValue: 0.0,
+        energyMeKcalLb: 400,
+      ),
+      Ingredient(
+        id: 'supp_brewers_yeast',
+        name: "Brewer's Yeast (Niacin / B-Vitamin Support)",
+        category: 'Natural Supplements',
+        proteinPct: 45.0,
+        calciumPctValue: 0.15,
+        phosphorusPctValue: 1.4,
+        fatPctValue: 1.5,
+        fiberPctValue: 3.0,
+        energyMeKcalLb: 1300,
+      ),
+      Ingredient(
+        id: 'supp_calcium_dusting_powder',
+        name: 'Calcium Dusting Powder (No D3)',
+        category: 'Vitamins & Minerals',
+        proteinPct: 0.0,
+        calciumPctValue: 38.0,
+        phosphorusPctValue: 0.0,
+        fatPctValue: 0.0,
+        fiberPctValue: 0.0,
+        energyMeKcalLb: 0,
+      ),
+      Ingredient(
+        id: 'supp_multivitamin_premix',
+        name: 'Commercial Multivitamin Premix',
+        category: 'Vitamins & Minerals',
+        proteinPct: 0.0,
+        calciumPctValue: 0.0,
+        phosphorusPctValue: 0.0,
+        fatPctValue: 0.0,
+        fiberPctValue: 0.0,
+        energyMeKcalLb: 0,
+      ),
+      Ingredient(
+        id: 'supp_probiotic_enzyme_blend',
+        name: 'Probiotic / Enzyme Blend',
+        category: 'Probiotics & Digestive',
+        proteinPct: 10.0,
+        calciumPctValue: 0.3,
+        phosphorusPctValue: 0.2,
+        fatPctValue: 1.0,
+        fiberPctValue: 5.0,
+        energyMeKcalLb: 400,
+      ),
+      Ingredient(
+        id: 'supp_amino_acid_isolate',
+        name: 'Amino Acid Isolate (Lysine + Methionine)',
+        category: 'Vitamins & Minerals',
+        asFedMetrics: AsFedMetrics(
+          lysinePct: 50.0,
+          methioninePct: 50.0,
+        ),
+      ),
+      Ingredient(
+        id: 'supp_liquid_vitamin_d3',
+        name: 'Liquid Vitamin D3',
+        category: 'Vitamins & Minerals',
+        proteinPct: 0.0,
+        calciumPctValue: 0.0,
+        phosphorusPctValue: 0.0,
+        fatPctValue: 0.0,
+        fiberPctValue: 0.0,
+        energyMeKcalLb: 0,
+      ),
+      Ingredient(
+        id: 'supp_fish_oil',
+        name: 'Fish Oil',
+        category: 'Natural Supplements',
+        proteinPct: 0.0,
+        calciumPctValue: 0.0,
+        phosphorusPctValue: 0.0,
+        fatPctValue: 100.0,
+        fiberPctValue: 0.0,
+        energyMeKcalLb: 4092,
+      ),
+      Ingredient(
+        id: 'supp_mct_oil',
+        name: 'MCT Oil',
+        category: 'Natural Supplements',
+        proteinPct: 0.0,
+        calciumPctValue: 0.0,
+        phosphorusPctValue: 0.0,
+        fatPctValue: 100.0,
+        fiberPctValue: 0.0,
+        energyMeKcalLb: 4092,
+      ),
+      Ingredient(
+        id: 'supp_whole_egg_powder',
+        name: 'Whole Egg Powder',
+        category: 'Natural Supplements',
+        asFedMetrics: AsFedMetrics(
+          crudeProteinPct: 48.05,
+          fatPct: 43.9,
+          calciumPct: 0.244,
+          phosphorusPct: 0.629,
+          sodiumPct: 0.476,
+          energyKcalLb: 2685,
+        ),
+      ),
+      Ingredient(
+        id: 'supp_glycine_arginine',
+        name: 'Glycine & L-Arginine',
+        category: 'Vitamins & Minerals',
+        proteinPct: 0.0,
+        calciumPctValue: 0.0,
+        phosphorusPctValue: 0.0,
+        fatPctValue: 0.0,
+        fiberPctValue: 0.0,
+        energyMeKcalLb: 0,
+      ),
     ]);
 
     // Pre-populate default items in pantry stock
@@ -281,6 +457,8 @@ class DatabaseService extends ChangeNotifier {
   List<Ingredient> get masterIngredients => List.unmodifiable(_ingredients);
   List<SpeciesRequirement> get speciesRequirements => List.unmodifiable(_speciesRequirements);
   List<AnimalProfile> get profiles => List.unmodifiable(_profiles);
+  List<SafetyRule> get safetyRules => List.unmodifiable(_safetyRules);
+  List<SpeciesCategory> get speciesCatalog => List.unmodifiable(_speciesCatalog);
 
   void addProfile(AnimalProfile profile) {
     _profiles.add(profile);

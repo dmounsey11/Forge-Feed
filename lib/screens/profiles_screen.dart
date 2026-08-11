@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/animal_profile.dart';
 import '../services/database_service.dart';
@@ -44,7 +44,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
     final profiles = db.profiles;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117),
+      backgroundColor: Colors.transparent,
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -63,7 +63,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                 ),
                 IconButton(
                   onPressed: _openAddProfileDialog,
-                  icon: const Icon(Icons.add_circle, color: Color(0xFF84CC16), size: 36),
+                  icon: const Icon(Icons.add_circle, color: Color(0xFFF97316), size: 36),
                   tooltip: 'Add Animal Profile',
                 ),
               ],
@@ -87,9 +87,9 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                           margin: const EdgeInsets.only(bottom: 16),
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF161F1A),
+                            color: const Color(0xFF242426),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFF223127)),
+                            border: Border.all(color: const Color(0xFF3A3A3D)),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +100,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                                   Text(
                                     profile.name,
                                     style: const TextStyle(
-                                      color: Color(0xFF84CC16),
+                                      color: Color(0xFFF97316),
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -110,7 +110,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF223127),
+                                          color: const Color(0xFF3A3A3D),
                                           borderRadius: BorderRadius.circular(6),
                                         ),
                                         child: Text(
@@ -135,7 +135,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                '${profile.species} • ${profile.productionStage} • ${profile.environment}',
+                                '${profile.species} â€¢ ${profile.productionStage} â€¢ ${profile.environment}',
                                 style: const TextStyle(color: Colors.grey, fontSize: 14),
                               ),
                               const SizedBox(height: 10),
@@ -187,7 +187,7 @@ class _NutrientBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF0D1117),
+        color: const Color(0xFF1A1A1C),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: Colors.white12),
       ),
