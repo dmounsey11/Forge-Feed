@@ -64,5 +64,103 @@
     "maxRatio": 11.0,
     "severity": "CRITICAL",
     "warningMessage": "Active Layer Ca:AvailP ratio must stay between 7:1 and 11:1 to sustain shell quality without causing kidney failure."
+  },
+  {
+    "ruleId": "rule_sheep_copper_cattle_feed",
+    "targetType": "ingredient_keyword",
+    "targetName": "cattle",
+    "maxInclusionPerc": 0.01,
+    "severity": "CRITICAL",
+    "warningMessage": "This ration includes a cattle-formulated feed. Cattle mineral mixes carry far more copper than sheep can tolerate and are a common cause of fatal copper toxicity in sheep - do not share cattle feed with sheep.",
+    "appliesToSpecies": ["sheep"]
+  },
+  {
+    "ruleId": "rule_sheep_copper_goat_feed",
+    "targetType": "ingredient_keyword",
+    "targetName": "goat",
+    "maxInclusionPerc": 0.01,
+    "severity": "HIGH",
+    "warningMessage": "This ration includes a goat-formulated feed. Goats tolerate more copper than sheep do, so goat mineral mixes can still be too high in copper for sheep - check the label before sharing feed between the two.",
+    "appliesToSpecies": ["sheep"]
+  },
+  {
+    "ruleId": "rule_sheep_copper_trace_mineral",
+    "targetType": "ingredient_keyword",
+    "targetName": "trace mineral",
+    "maxInclusionPerc": 0.01,
+    "severity": "HIGH",
+    "warningMessage": "This ration includes a general trace mineral premix. Confirm it is labeled copper-free/sheep-safe before using it - most all-species and cattle/goat trace mineral packs carry more copper than sheep can safely handle.",
+    "appliesToSpecies": ["sheep"]
+  },
+  {
+    "ruleId": "rule_inc_canola",
+    "targetType": "ingredient_keyword",
+    "targetName": "canola meal",
+    "maxInclusionPerc": 10.0,
+    "severity": "MEDIUM",
+    "warningMessage": "Canola meal contains glucosinolates, which can suppress thyroid function and growth at high inclusion - keep it under roughly 10% of the ration, especially for poultry and swine."
+  },
+  {
+    "ruleId": "rule_inc_raw_soybeans",
+    "targetType": "ingredient_keyword",
+    "targetName": "raw soybean",
+    "maxInclusionPerc": 5.0,
+    "severity": "HIGH",
+    "warningMessage": "Raw/untoasted soybeans contain trypsin inhibitors that block protein digestion and stunt growth, especially in young monogastrics. Use toasted soybean meal instead unless this batch has been heat-processed."
+  },
+  {
+    "ruleId": "rule_ratio_cu_mo_sheep",
+    "targetType": "ratio",
+    "targetName": "Cu:Mo",
+    "minRatio": 3.0,
+    "maxRatio": 10.0,
+    "severity": "CRITICAL",
+    "warningMessage": "This ration's Copper:Molybdenum ratio is outside the safe range for sheep (roughly 3:1 to 10:1). Below 3:1 risks copper deficiency (swayback, poor wool); above 10:1 - especially with total dietary copper over 10-15 ppm DM - risks fatal copper toxicity, since molybdenum is what keeps copper from accumulating in the liver.",
+    "appliesToSpecies": ["sheep"]
+  },
+  {
+    "ruleId": "rule_ratio_ca_oxalate_grazers",
+    "targetType": "ratio",
+    "targetName": "Ca:Oxalate",
+    "minRatio": 0.5,
+    "severity": "CRITICAL",
+    "warningMessage": "This ration's Calcium:Oxalate ratio is below the safe minimum (0.5:1) - oxalates in the forage are binding dietary calcium faster than it's being supplied. In horses this causes 'Big Head' disease (nutritional secondary hyperparathyroidism); in ruminants it can cause hypocalcemia. Aim for a ratio above 1:1 by adding a calcium source or cutting back on high-oxalate grasses (Setaria, Buffel, Kikuyu, Pangola).",
+    "appliesToSpecies": ["horse", "cattle", "sheep", "goat"]
+  },
+  {
+    "ruleId": "rule_nitrate_risk_sorghum_sudangrass",
+    "targetType": "ingredient_keyword",
+    "targetName": "sorghum-sudangrass",
+    "maxInclusionPerc": 0.01,
+    "severity": "MEDIUM",
+    "warningMessage": "Sorghum-sudangrass is a nitrate accumulator - risk spikes after drought, frost, heavy nitrogen fertilization, or on lush new regrowth (conditions this app has no way to check). If any of those apply, get it lab-tested for nitrate-N before feeding: under ~700 ppm is generally safe, over ~2,500 ppm is acute-toxicity danger. Don't feed untested to pregnant ruminants.",
+    "appliesToSpecies": ["cattle", "sheep", "goat"]
+  },
+  {
+    "ruleId": "rule_nitrate_risk_johnsongrass",
+    "targetType": "ingredient_keyword",
+    "targetName": "johnsongrass",
+    "maxInclusionPerc": 0.01,
+    "severity": "MEDIUM",
+    "warningMessage": "Johnsongrass is a nitrate accumulator - risk spikes after drought, frost, heavy nitrogen fertilization, or on lush new regrowth (conditions this app has no way to check). If any of those apply, get it lab-tested for nitrate-N before feeding: under ~700 ppm is generally safe, over ~2,500 ppm is acute-toxicity danger. Don't feed untested to pregnant ruminants.",
+    "appliesToSpecies": ["cattle", "sheep", "goat"]
+  },
+  {
+    "ruleId": "rule_nitrate_risk_pearl_millet",
+    "targetType": "ingredient_keyword",
+    "targetName": "pearl millet",
+    "maxInclusionPerc": 0.01,
+    "severity": "MEDIUM",
+    "warningMessage": "Pearl millet forage is a nitrate accumulator - risk spikes after drought, frost, heavy nitrogen fertilization, or on lush new regrowth (conditions this app has no way to check). If any of those apply, get it lab-tested for nitrate-N before feeding: under ~700 ppm is generally safe, over ~2,500 ppm is acute-toxicity danger. Don't feed untested to pregnant ruminants.",
+    "appliesToSpecies": ["cattle", "sheep", "goat"]
+  },
+  {
+    "ruleId": "rule_nitrate_risk_corn_silage",
+    "targetType": "ingredient_keyword",
+    "targetName": "corn silage",
+    "maxInclusionPerc": 0.01,
+    "severity": "MEDIUM",
+    "warningMessage": "Corn silage made from drought-stressed, frosted, or heavily-nitrogen-fertilized plants can accumulate dangerous nitrate levels in the stalk, even though the app has no way to check the growing conditions behind this batch. If any of those applied, get it lab-tested for nitrate-N before feeding: under ~700 ppm is generally safe, over ~2,500 ppm is acute-toxicity danger. Don't feed untested to pregnant ruminants.",
+    "appliesToSpecies": ["cattle", "sheep", "goat"]
   }
 ]

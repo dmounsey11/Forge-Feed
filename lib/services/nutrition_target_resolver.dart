@@ -30,6 +30,21 @@ class NutritionTargetResolver {
     return candidates.first;
   }
 
+  /// True if the record [resolve] would return for this profile actually has
+  /// data specific to the selected life stage (or the stage is a plain
+  /// "maintenance" one, which is always covered). False means the caller
+  /// silently fell back to a generic/maintenance record - the UI should say
+  /// so rather than presenting it as stage-tuned.
+  static bool stageHasDedicatedData(
+    AnimalProfile profile,
+    List<SpeciesRequirement> catalog,
+  ) {
+    final requirement = resolve(profile, catalog);
+    if (requirement == null) return true;
+    final stageKeyword = _lifeStageKeyword(profile.productionStage);
+    return stageKeyword == 'maintenance' || requirement.lifeStage == stageKeyword;
+  }
+
   /// True if [key] appears in [text] as a whole word (or phrase), not as an
   /// incidental substring - e.g. "cat" must not match inside "Cattle" or
   /// "Sulcata".
@@ -43,6 +58,7 @@ class NutritionTargetResolver {
     if (p.contains('breeder')) return 'breeder';
     if (p.contains('layer')) return 'layer';
     if (p.contains('lactating') || p.contains('nursing')) return 'lactating';
+    if (p.contains('working') || p.contains('performance')) return 'performance';
     if (p.contains('juvenile') || p.contains('growth')) return 'starter';
     if (p.contains('molting') || p.contains('recovery')) return 'maintenance';
     return 'maintenance';

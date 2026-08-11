@@ -94,5 +94,155 @@
       "mazuri",
       "high-fiber"
     ]
+  },
+  {
+    "id": "kibble_purina_proplan_complete_essentials_chicken_rice",
+    "name": "Purina Pro Plan Complete Essentials Adult Shredded Blend - Chicken & Rice",
+    "brand": "Purina Pro Plan",
+    "catalogSource": "kibble",
+    "category": "Dog & Cat Food",
+    "subCategory": "Adult Maintenance",
+    "description": "Standard-tier grocery/pet-specialty dry dog food. Guaranteed Analysis from manufacturer product label (2026).",
+    "asFedMetrics": {
+      "moisturePct": 12.0,
+      "crudeProteinPct": 26.0,
+      "crudeFatPct": 16.0,
+      "crudeFiberPct": 3.0,
+      "calciumPct": 1.0,
+      "phosphorusPct": 0.8,
+      "metabolicEnergyKcal": 3790.0
+    },
+    "tags": ["dog", "purina", "pro plan", "adult", "dry", "grocery-tier"]
+  },
+  {
+    "id": "kibble_hills_science_diet_adult_chicken_barley",
+    "name": "Hill's Science Diet Adult Chicken & Barley Recipe",
+    "brand": "Hill's Science Diet",
+    "catalogSource": "kibble",
+    "category": "Dog & Cat Food",
+    "subCategory": "Adult Maintenance",
+    "description": "Standard-tier grocery/vet-clinic dry dog food. Guaranteed Analysis from manufacturer product label (2026).",
+    "asFedMetrics": {
+      "crudeProteinPct": 23.9,
+      "crudeFatPct": 14.7,
+      "crudeFiberPct": 2.1,
+      "calciumPct": 0.75,
+      "phosphorusPct": 0.56,
+      "metabolicEnergyKcal": 3657.0
+    },
+    "tags": ["dog", "hills", "science diet", "adult", "dry", "grocery-tier"]
+  },
+  {
+    "id": "kibble_royal_canin_medium_adult",
+    "name": "Royal Canin Size Health Nutrition Medium Adult",
+    "brand": "Royal Canin",
+    "catalogSource": "kibble",
+    "category": "Dog & Cat Food",
+    "subCategory": "Adult Maintenance",
+    "description": "Standard-tier grocery/pet-specialty dry dog food. Guaranteed Analysis from manufacturer product label (2026).",
+    "asFedMetrics": {
+      "moisturePct": 10.5,
+      "crudeProteinPct": 23.0,
+      "crudeFatPct": 12.0,
+      "crudeFiberPct": 3.4,
+      "calciumPct": 0.85,
+      "phosphorusPct": 0.56,
+      "metabolicEnergyKcal": 3616.0
+    },
+    "tags": ["dog", "royal canin", "adult", "dry", "grocery-tier"]
+  },
+  {
+    "id": "kibble_blue_buffalo_life_protection_chicken_rice",
+    "name": "Blue Buffalo Life Protection Formula Adult - Chicken & Brown Rice",
+    "brand": "Blue Buffalo",
+    "catalogSource": "kibble",
+    "category": "Dog & Cat Food",
+    "subCategory": "Adult Maintenance",
+    "description": "Standard-tier grocery/pet-specialty dry dog food. Guaranteed Analysis from manufacturer product label (2026).",
+    "asFedMetrics": {
+      "moisturePct": 10.0,
+      "crudeProteinPct": 24.0,
+      "crudeFatPct": 14.0,
+      "crudeFiberPct": 5.0,
+      "calciumPct": 1.0,
+      "phosphorusPct": 0.7,
+      "metabolicEnergyKcal": 3613.0
+    },
+    "tags": ["dog", "blue buffalo", "adult", "dry", "grocery-tier"]
+  },
+  {
+    "id": "kibble_taste_of_the_wild_high_prairie",
+    "name": "Taste of the Wild High Prairie Canine Formula",
+    "brand": "Taste of the Wild",
+    "catalogSource": "kibble",
+    "category": "Dog & Cat Food",
+    "subCategory": "Grain-Free Adult",
+    "description": "Premium grain-free dry dog food. Protein/fat/calcium/phosphorus/energy from manufacturer label (2026); fiber is a typical figure for this product line, not independently confirmed this pass.",
+    "asFedMetrics": {
+      "moisturePct": 10.0,
+      "crudeProteinPct": 32.0,
+      "crudeFatPct": 18.0,
+      "crudeFiberPct": 3.5,
+      "calciumPct": 2.1,
+      "phosphorusPct": 1.4,
+      "metabolicEnergyKcal": 3719.0
+    },
+    "tags": ["dog", "taste of the wild", "grain-free", "dry", "premium-tier"]
+  },
+  {
+    "id": "kibble_orijen_original",
+    "name": "Orijen Original Dry Dog Food",
+    "brand": "Orijen",
+    "catalogSource": "kibble",
+    "category": "Dog & Cat Food",
+    "subCategory": "Grain-Free / Biologically Appropriate",
+    "description": "Premium high-protein grain-free dry dog food. Guaranteed Analysis from manufacturer product label (2026).",
+    "asFedMetrics": {
+      "moisturePct": 12.0,
+      "crudeProteinPct": 38.0,
+      "crudeFatPct": 18.0,
+      "crudeFiberPct": 4.0,
+      "calciumPct": 1.2,
+      "phosphorusPct": 1.0,
+      "metabolicEnergyKcal": 3940.0
+    },
+    "tags": ["dog", "orijen", "grain-free", "dry", "premium-tier"]
+  },
+  {
+    "id": "kibble_stella_chewys_frozen_raw_chicken_patties",
+    "name": "Stella & Chewy's Frozen Raw Chicken Dinner Patties",
+    "brand": "Stella & Chewy's",
+    "catalogSource": "kibble",
+    "category": "Dog & Cat Food",
+    "subCategory": "Raw / Frozen",
+    "description": "Premium raw/fresh-tier frozen dog food. Guaranteed Analysis from manufacturer product label (2026); calcium/phosphorus not published in the source listing found, left at 0 rather than estimated.",
+    "asFedMetrics": {
+      "moisturePct": 72.0,
+      "crudeProteinPct": 15.5,
+      "crudeFatPct": 9.0,
+      "crudeFiberPct": 2.0,
+      "calciumPct": 0.0,
+      "phosphorusPct": 0.0,
+      "metabolicEnergyKcal": 1458.0
+    },
+    "tags": ["dog", "stella and chewys", "raw", "frozen", "raw-tier"]
+  },
+  {
+    "id": "kibble_hills_prescription_diet_wd",
+    "name": "Hill's Prescription Diet w/d Multi-Benefit (Digestive/Weight/Glucose/Urinary)",
+    "brand": "Hill's Prescription Diet",
+    "catalogSource": "kibble",
+    "category": "Dog & Cat Food",
+    "subCategory": "Veterinary / Prescription",
+    "description": "Veterinary therapeutic diet - requires a vet's supervision to feed appropriately. Guaranteed Analysis from manufacturer product label (2026).",
+    "asFedMetrics": {
+      "crudeProteinPct": 20.7,
+      "crudeFatPct": 13.0,
+      "crudeFiberPct": 16.0,
+      "calciumPct": 0.8,
+      "phosphorusPct": 0.66,
+      "metabolicEnergyKcal": 3100.0
+    },
+    "tags": ["dog", "hills", "prescription diet", "veterinary", "therapeutic"]
   }
 ]

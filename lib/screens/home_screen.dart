@@ -193,6 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
       pantryItems: pantryItems,
       supplementItems: db.getSupplementIngredients(),
       safetyRules: db.safetyRules,
+      stageHasDedicatedData: NutritionTargetResolver.stageHasDedicatedData(profile, db.speciesRequirements),
     );
 
     Navigator.of(context).push(

@@ -292,7 +292,7 @@
       ]
     },
     {
-      "name": "Livestock",
+      "name": "Livestock / Companion",
       "subgroups": [
         {
           "name": "Poultry & Waterfowl",
@@ -357,7 +357,8 @@
           "name": "Companion Mammals",
           "species": [
             "Dog",
-            "Cat"
+            "Cat",
+            "Rabbit"
           ]
         }
       ]

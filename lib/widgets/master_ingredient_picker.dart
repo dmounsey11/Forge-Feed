@@ -21,7 +21,10 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
   static const List<String> _foodCategories = [
     'Grains & Cereals',
     'Proteins & Meal',
+    'Forages & Roughage',
     'Produce',
+    'Whole Prey',
+    'Store Feed',
   ];
 
   static const List<String> _nutrientCategories = [
@@ -47,8 +50,11 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
     final allIngredients = db.masterIngredients.where((item) => modeCategories.contains(item.category));
 
     final filteredIngredients = allIngredients.where((item) {
-      final queryMatches = item.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          item.category.toLowerCase().contains(_searchQuery.toLowerCase());
+      final query = _searchQuery.toLowerCase();
+      final queryMatches = item.name.toLowerCase().contains(query) ||
+          item.category.toLowerCase().contains(query) ||
+          item.subCategory.toLowerCase().contains(query) ||
+          item.brand.toLowerCase().contains(query);
       final groupMatches = _selectedGroup == _allGroupLabel || item.category == _selectedGroup;
       return queryMatches && groupMatches;
     }).toList();
@@ -86,13 +92,13 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
                     Text(
                       widget.isSupplementMode
                           ? 'Supplement & Additive Library'
-                          : 'USDA FoodData Central Catalog',
+                          : 'Ingredient Catalog',
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     Text(
                       widget.isSupplementMode
                           ? 'Select vitamins, minerals, and probiotics for on-hand stock'
-                          : 'Browse USDA Standard Reference items with analytical values',
+                          : 'Browse USDA Standard Reference items and commercial store feed products',
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                   ],
@@ -176,9 +182,21 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      ing.name,
-                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            ing.name,
+                                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                                          ),
+                                          if (ing.category == 'Store Feed')
+                                            Text(
+                                              '${ing.brand} · ${ing.subCategory}',
+                                              style: const TextStyle(color: Colors.grey, fontSize: 12),
+                                            ),
+                                        ],
+                                      ),
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

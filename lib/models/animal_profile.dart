@@ -7,6 +7,7 @@ class AnimalProfile {
   final String environment;
   final String sex;
   final String ageGroup;
+  final String feedingSystem;
 
   AnimalProfile({
     required this.id,
@@ -18,6 +19,7 @@ class AnimalProfile {
     this.environment = 'Outdoor',
     this.sex = 'Unknown',
     this.ageGroup = 'Adult',
+    this.feedingSystem = 'Total Mixed Ration (TMR)',
   }) : productionStage = productionStage ?? stage ?? 'Healthy / Normal';
 
   // --- ALIAS GETTERS ---
@@ -33,6 +35,7 @@ class AnimalProfile {
       environment: json['environment'] as String? ?? 'Outdoor',
       sex: json['sex'] as String? ?? 'Unknown',
       ageGroup: json['ageGroup'] as String? ?? 'Adult',
+      feedingSystem: json['feedingSystem'] as String? ?? 'Total Mixed Ration (TMR)',
     );
   }
 
@@ -46,6 +49,7 @@ class AnimalProfile {
       'environment': environment,
       'sex': sex,
       'ageGroup': ageGroup,
+      'feedingSystem': feedingSystem,
     };
   }
 
@@ -58,6 +62,7 @@ class AnimalProfile {
     String? environment,
     String? sex,
     String? ageGroup,
+    String? feedingSystem,
   }) {
     return AnimalProfile(
       id: id ?? this.id,
@@ -68,6 +73,7 @@ class AnimalProfile {
       environment: environment ?? this.environment,
       sex: sex ?? this.sex,
       ageGroup: ageGroup ?? this.ageGroup,
+      feedingSystem: feedingSystem ?? this.feedingSystem,
     );
   }
 }

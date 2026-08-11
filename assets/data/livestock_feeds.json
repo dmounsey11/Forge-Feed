@@ -164,7 +164,9 @@
       "crudeFiberPct": 10.0,
       "calciumPct": 1.8,
       "phosphorusPct": 0.8,
-      "metabolicEnergyKcal": 2950.0
+      "metabolicEnergyKcal": 2950.0,
+      "copperPpm": 18.0,
+      "molybdenumPpm": 1.0
     },
     "tags": [
       "goat",

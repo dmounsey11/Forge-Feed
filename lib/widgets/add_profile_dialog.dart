@@ -33,15 +33,23 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
   late String _selectedProductionStage;
   late String _selectedSex;
   late String _selectedAgeGroup;
+  late String _selectedFeedingSystem;
   bool _initialized = false;
 
   final List<String> _sexes = ['Unknown', 'Male', 'Female', 'Mixed'];
   final List<String> _ageGroups = ['Baby', 'Juvenile', 'Adult', 'Geriatric'];
   final List<String> _environments = ['Outdoor', 'Indoor', 'Hybrid / Pasture'];
+  final List<String> _feedingSystems = [
+    'Total Mixed Ration (TMR)',
+    'Pasture / Forage-First',
+    'Free-Choice Grain + Supplement',
+    'Raw / Whole Food + Premix',
+  ];
   final List<String> _productionStages = [
     'Healthy / Normal',
     'Active Layer',
     'Breeder / Production',
+    'Working / Performance',
     'Molting / Recovery 🔒',
     'Lactating / Nursing 🔒',
     'Breeder / High Output 🔒',
@@ -63,6 +71,7 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
     }
     _selectedSex = edit?.sex ?? 'Unknown';
     _selectedAgeGroup = edit?.ageGroup ?? 'Adult';
+    _selectedFeedingSystem = edit?.feedingSystem ?? 'Total Mixed Ration (TMR)';
   }
 
   void _initFromCatalog(List<SpeciesCategory> catalog) {
@@ -329,6 +338,14 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                   items: _productionStages,
                   onChanged: (val) => setState(() => _selectedProductionStage = val),
                 ),
+                const SizedBox(height: 12),
+
+                _buildDropdown(
+                  label: 'Feeding System',
+                  value: _selectedFeedingSystem,
+                  items: _feedingSystems,
+                  onChanged: (val) => setState(() => _selectedFeedingSystem = val),
+                ),
                 const SizedBox(height: 24),
 
                 SizedBox(
@@ -350,6 +367,7 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                           environment: _selectedEnvironment,
                           sex: _selectedSex,
                           ageGroup: _selectedAgeGroup,
+                          feedingSystem: _selectedFeedingSystem,
                         );
                         widget.onProfileSaved(savedProfile);
                         Navigator.of(context).pop();

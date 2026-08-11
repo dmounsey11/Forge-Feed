@@ -6,7 +6,7 @@ class InfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Column(
         children: [
           const TabBar(
@@ -19,6 +19,7 @@ class InfoScreen extends StatelessWidget {
               Tab(icon: Icon(Icons.science), text: 'Vitamins & Minerals'),
               Tab(icon: Icon(Icons.health_and_safety), text: 'Symptom Matrix'),
               Tab(icon: Icon(Icons.menu_book), text: 'Ingredients'),
+              Tab(icon: Icon(Icons.kitchen), text: 'Kitchen Tools'),
             ],
           ),
           Expanded(
@@ -28,6 +29,7 @@ class InfoScreen extends StatelessWidget {
                 _buildNutrientsTab(),
                 _buildSymptomsTab(),
                 _buildIngredientsTab(),
+                _buildKitchenToolsTab(),
               ],
             ),
           ),
@@ -184,6 +186,73 @@ class InfoScreen extends StatelessWidget {
         _buildIngredientInfo('Limestone / Oyster Shell', 'Mineral Supplement', '0% Protein (38% Ca)', 'Primary source of coarse-particle calcium for persistent eggshell synthesis.'),
         _buildIngredientInfo('Alfalfa Meal', 'Forage / Fiber', '17.0% Protein', 'Provides natural carotenoids for yolk color and digestive fiber.'),
       ],
+    );
+  }
+
+  // 5. KITCHEN TOOLS TAB
+  Widget _buildKitchenToolsTab() {
+    return ListView(
+      padding: const EdgeInsets.all(16.0),
+      children: [
+        const Card(
+          color: Colors.black45,
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Getting the Right Texture',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFFF97316)),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'When a batch includes fresh or frozen meat and produce, ForgeFeed tells you which of '
+                  "these simple tools to use - and how fine to go - right in that recipe's How to Prep steps.",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        _buildToolCard(
+          'Knife',
+          'Cutting & Chopping',
+          'The default for adult and larger animals that can handle bite-sized chunks: raw meat cut into pieces, fresh produce chopped small.',
+          Icons.content_cut,
+        ),
+        _buildToolCard(
+          'Meat Grinder',
+          'Fine Grinding',
+          'Grinds fresh or frozen meat down to a fine, uniform texture. Recommended for small-bodied animals (rodents, birds, amphibians, marsupials) and babies of any species.',
+          Icons.blender,
+        ),
+        _buildToolCard(
+          'Blender',
+          'Pureeing',
+          'Purees fresh produce into a smooth texture that mixes evenly into small or young animals\' food - pairs with the meat grinder for the smallest or youngest eaters.',
+          Icons.local_drink,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildToolCard(String name, String purpose, String notes, IconData icon) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      child: ListTile(
+        leading: Icon(icon, color: const Color(0xFFF97316), size: 32),
+        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Used for: $purpose', style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+            const SizedBox(height: 2),
+            Text(notes, style: const TextStyle(color: Colors.grey)),
+          ],
+        ),
+      ),
     );
   }
 

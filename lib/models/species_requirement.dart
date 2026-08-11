@@ -16,6 +16,8 @@ class SpeciesRequirement {
   final double maxSodiumPerc;
   final double minLysinePerc;
   final double minMethioninePerc;
+  final double minTaurinePerc;
+  final double minNiacinMgKg;
   final String notes;
 
   SpeciesRequirement({
@@ -36,6 +38,8 @@ class SpeciesRequirement {
     required this.maxSodiumPerc,
     required this.minLysinePerc,
     required this.minMethioninePerc,
+    this.minTaurinePerc = 0.0,
+    this.minNiacinMgKg = 0.0,
     this.notes = '',
   });
 
@@ -58,6 +62,8 @@ class SpeciesRequirement {
       maxSodiumPerc: (json['maxSodiumPerc'] as num?)?.toDouble() ?? 0.0,
       minLysinePerc: (json['minLysinePerc'] as num?)?.toDouble() ?? 0.0,
       minMethioninePerc: (json['minMethioninePerc'] as num?)?.toDouble() ?? 0.0,
+      minTaurinePerc: (json['minTaurinePerc'] as num?)?.toDouble() ?? 0.0,
+      minNiacinMgKg: (json['minNiacinMgKg'] as num?)?.toDouble() ?? 0.0,
       notes: json['notes'] as String? ?? '',
     );
   }

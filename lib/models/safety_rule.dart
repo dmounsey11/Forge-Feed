@@ -9,6 +9,10 @@ class SafetyRule {
   final double? maxRatio;
   final String severity;
   final String warningMessage;
+  /// Species keywords (matched the same way [NutritionTargetResolver] matches
+  /// a profile's species text) this rule is restricted to. Empty means it
+  /// applies to every species - e.g. the salt/gossypol caps below.
+  final List<String> appliesToSpecies;
 
   SafetyRule({
     required this.ruleId,
@@ -19,6 +23,7 @@ class SafetyRule {
     this.maxRatio,
     required this.severity,
     required this.warningMessage,
+    this.appliesToSpecies = const [],
   });
 
   factory SafetyRule.fromJson(Map<String, dynamic> json) {
@@ -31,6 +36,7 @@ class SafetyRule {
       maxRatio: (json['maxRatio'] as num?)?.toDouble(),
       severity: json['severity'] as String? ?? 'LOW',
       warningMessage: json['warningMessage'] as String? ?? '',
+      appliesToSpecies: (json['appliesToSpecies'] as List<dynamic>? ?? []).map((e) => e.toString()).toList(),
     );
   }
 }

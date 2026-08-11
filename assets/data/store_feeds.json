@@ -1,0 +1,232 @@
+[
+  {
+    "id": "store_nutrena_naturewise_layer_16",
+    "name": "Nutrena NatureWise 16-17% Layer Pellets/Crumbles",
+    "brand": "Nutrena",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Poultry",
+    "asFedMetrics": {
+      "crudeProteinPct": 16.5,
+      "calciumPct": 4.3,
+      "phosphorusPct": 0.5,
+      "fatPct": 2.5,
+      "fiberPct": 6.0,
+      "energyKcalLb": 1400
+    }
+  },
+  {
+    "id": "store_nutrena_allflock_18_20",
+    "name": "Nutrena NatureWise/Country Feeds All Flock 18-20%",
+    "brand": "Nutrena",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Poultry",
+    "asFedMetrics": {
+      "crudeProteinPct": 19.0,
+      "calciumPct": 1.0,
+      "phosphorusPct": 0.6,
+      "fatPct": 2.75,
+      "fiberPct": 6.5,
+      "energyKcalLb": 1430
+    }
+  },
+  {
+    "id": "store_producers_pride_layer_16",
+    "name": "Producer's Pride 16% Layer Pellets/Crumbles",
+    "brand": "Producer's Pride",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Poultry",
+    "asFedMetrics": {
+      "crudeProteinPct": 16.0,
+      "calciumPct": 4.0,
+      "phosphorusPct": 0.5,
+      "fatPct": 2.5,
+      "fiberPct": 7.0,
+      "energyKcalLb": 1400
+    }
+  },
+  {
+    "id": "store_dumor_gamebird_maintenance_14",
+    "name": "DuMOR 14-17% Game Bird Maintenance/Multi-Flock",
+    "brand": "DuMOR",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Poultry",
+    "asFedMetrics": {
+      "crudeProteinPct": 15.5,
+      "calciumPct": 1.0,
+      "phosphorusPct": 0.6,
+      "fatPct": 2.5,
+      "fiberPct": 7.0,
+      "energyKcalLb": 1400
+    }
+  },
+  {
+    "id": "store_producers_pride_allstock_12",
+    "name": "Producer's Pride 12% All-Stock Sweet/Pelleted Feed",
+    "brand": "Producer's Pride",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Multi-Species",
+    "asFedMetrics": {
+      "crudeProteinPct": 12.0,
+      "calciumPct": 0.8,
+      "phosphorusPct": 0.4,
+      "fatPct": 2.75,
+      "fiberPct": 15.0,
+      "energyKcalLb": 1350
+    }
+  },
+  {
+    "id": "store_purina_natures_match_sow_pig",
+    "name": "Purina Nature's Match Sow & Pig Complete Feed",
+    "brand": "Purina",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Swine",
+    "asFedMetrics": {
+      "crudeProteinPct": 16.0,
+      "calciumPct": 0.75,
+      "phosphorusPct": 0.6,
+      "fatPct": 3.25,
+      "fiberPct": 5.0,
+      "energyKcalLb": 1550,
+      "lysinePct": 0.85
+    }
+  },
+  {
+    "id": "store_nutrena_country_feeds_pig_16",
+    "name": "Nutrena Country Feeds 16% Whole Life Pig Feed",
+    "brand": "Nutrena",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Swine",
+    "asFedMetrics": {
+      "crudeProteinPct": 16.0,
+      "calciumPct": 0.75,
+      "phosphorusPct": 0.6,
+      "fatPct": 3.0,
+      "fiberPct": 6.0,
+      "energyKcalLb": 1540,
+      "lysinePct": 0.85
+    }
+  },
+  {
+    "id": "store_dumor_hog_grower",
+    "name": "DuMOR Hog Grower Pelleted Feed",
+    "brand": "DuMOR",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Swine",
+    "asFedMetrics": {
+      "crudeProteinPct": 16.0,
+      "calciumPct": 0.7,
+      "phosphorusPct": 0.55,
+      "fatPct": 3.0,
+      "fiberPct": 5.0,
+      "energyKcalLb": 1530
+    }
+  },
+  {
+    "id": "store_nutrena_safechoice_special_care",
+    "name": "Nutrena SafeChoice Special Care/All Life Stages Horse Feed",
+    "brand": "Nutrena",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Horse",
+    "asFedMetrics": {
+      "crudeProteinPct": 14.0,
+      "calciumPct": 0.7,
+      "phosphorusPct": 0.45,
+      "fatPct": 7.5,
+      "fiberPct": 18.0,
+      "energyKcalLb": 1350
+    }
+  },
+  {
+    "id": "store_nutrena_triumph_12_8",
+    "name": "Nutrena Triumph 12-8 Pelleted Horse Feed",
+    "brand": "Nutrena",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Horse",
+    "asFedMetrics": {
+      "crudeProteinPct": 12.0,
+      "calciumPct": 0.6,
+      "phosphorusPct": 0.4,
+      "fatPct": 8.0,
+      "fiberPct": 12.0,
+      "energyKcalLb": 1400
+    }
+  },
+  {
+    "id": "store_purina_ultium_strategy",
+    "name": "Purina Ultium/Strategy Professional Horse Feed",
+    "brand": "Purina",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Horse",
+    "asFedMetrics": {
+      "crudeProteinPct": 14.0,
+      "calciumPct": 0.8,
+      "phosphorusPct": 0.6,
+      "fatPct": 9.2,
+      "fiberPct": 15.25,
+      "energyKcalLb": 1500
+    }
+  },
+  {
+    "id": "store_purina_goat_grower_16",
+    "name": "Purina Goat Grower 16",
+    "brand": "Purina",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Goat & Cattle",
+    "asFedMetrics": {
+      "crudeProteinPct": 16.0,
+      "calciumPct": 1.2,
+      "phosphorusPct": 0.6,
+      "fatPct": 2.5,
+      "fiberPct": 13.5,
+      "energyKcalLb": 1350
+    }
+  },
+  {
+    "id": "store_nutrena_goat_feed_17",
+    "name": "Nutrena Country Feeds 17% Textured/Pelleted Goat Feed",
+    "brand": "Nutrena",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Goat & Cattle",
+    "asFedMetrics": {
+      "crudeProteinPct": 17.0,
+      "calciumPct": 1.2,
+      "phosphorusPct": 0.6,
+      "fatPct": 3.0,
+      "fiberPct": 11.0,
+      "energyKcalLb": 1370,
+      "copperPpm": 22.0,
+      "molybdenumPpm": 1.0
+    }
+  },
+  {
+    "id": "store_nutrebeef_cattle_15",
+    "name": "NutreBeef 15% Commodity Cattle Feed",
+    "brand": "Purina/Nutrena",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Goat & Cattle",
+    "asFedMetrics": {
+      "crudeProteinPct": 13.5,
+      "calciumPct": 0.8,
+      "phosphorusPct": 0.4,
+      "fatPct": 2.75,
+      "fiberPct": 17.5,
+      "energyKcalLb": 1300,
+      "copperPpm": 45.0,
+      "molybdenumPpm": 1.0
+    }
+  }
+]

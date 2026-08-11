@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/tier_service.dart';
+import '../widgets/ad_banner_widget.dart';
 import '../widgets/feedback_dialog.dart';
 import '../widgets/upgrade_dialog.dart';
 import 'home_screen.dart';
@@ -63,37 +64,45 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF1A1A1C),
-        selectedItemColor: const Color(0xFFF97316),
-        unselectedItemColor: Colors.white54,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calculate_outlined),
-            activeIcon: Icon(Icons.calculate),
-            label: 'Create Feed',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.pets_outlined),
-            activeIcon: Icon(Icons.pets),
-            label: 'Profiles',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_outlined),
-            activeIcon: Icon(Icons.inventory_2),
-            label: 'Pantry',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info_outline),
-            activeIcon: Icon(Icons.info),
-            label: 'Info',
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Shown to every tier - see [[project_payments_and_roadmap]]:
+          // revenue doesn't come from gating ads behind free tier.
+          const AdBannerWidget(),
+          BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: const Color(0xFF1A1A1C),
+            selectedItemColor: const Color(0xFFF97316),
+            unselectedItemColor: Colors.white54,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.calculate_outlined),
+                activeIcon: Icon(Icons.calculate),
+                label: 'Create Feed',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.pets_outlined),
+                activeIcon: Icon(Icons.pets),
+                label: 'Profiles',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.inventory_2_outlined),
+                activeIcon: Icon(Icons.inventory_2),
+                label: 'Pantry',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.info_outline),
+                activeIcon: Icon(Icons.info),
+                label: 'Info',
+              ),
+            ],
           ),
         ],
       ),

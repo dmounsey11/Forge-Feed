@@ -9,6 +9,10 @@
   final double lysinePct;
   final double methioninePct;
   final double taurinePct;
+  final double niacinMgKg;
+  final double copperPpm;
+  final double molybdenumPpm;
+  final double oxalatePct;
 
   AsFedMetrics({
     this.crudeProteinPct = 0.0,
@@ -21,6 +25,10 @@
     this.lysinePct = 0.0,
     this.methioninePct = 0.0,
     this.taurinePct = 0.0,
+    this.niacinMgKg = 0.0,
+    this.copperPpm = 0.0,
+    this.molybdenumPpm = 0.0,
+    this.oxalatePct = 0.0,
   });
 
   // Expected getters in logic files
@@ -39,6 +47,10 @@
         'lysinePct': lysinePct,
         'methioninePct': methioninePct,
         'taurinePct': taurinePct,
+        'niacinMgKg': niacinMgKg,
+        'copperPpm': copperPpm,
+        'molybdenumPpm': molybdenumPpm,
+        'oxalatePct': oxalatePct,
       };
 
   factory AsFedMetrics.fromJson(Map<String, dynamic> json) => AsFedMetrics(
@@ -52,6 +64,10 @@
         lysinePct: (json['lysinePct'] as num?)?.toDouble() ?? 0.0,
         methioninePct: (json['methioninePct'] as num?)?.toDouble() ?? 0.0,
         taurinePct: (json['taurinePct'] as num?)?.toDouble() ?? 0.0,
+        niacinMgKg: (json['niacinMgKg'] as num?)?.toDouble() ?? 0.0,
+        copperPpm: (json['copperPpm'] as num?)?.toDouble() ?? 0.0,
+        molybdenumPpm: (json['molybdenumPpm'] as num?)?.toDouble() ?? 0.0,
+        oxalatePct: (json['oxalatePct'] as num?)?.toDouble() ?? 0.0,
       );
 }
 
@@ -143,6 +159,7 @@ class Ingredient {
         lysinePct: n('lysinePerc'),
         methioninePct: n('methioninePerc'),
         taurinePct: n('taurinePerc'),
+        niacinMgKg: n('niacinMgKg'),
       ),
     );
   }

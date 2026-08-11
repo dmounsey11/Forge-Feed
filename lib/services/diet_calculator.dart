@@ -38,6 +38,7 @@ class DietCalculator {
     required List<Ingredient> pantryItems,
     required List<Ingredient> supplementItems,
     required List<SafetyRule> safetyRules,
+    bool stageHasDedicatedData = true,
   }) {
     final adjustments = _collectAdjustments(profile, health);
     final proteinMult = adjustments.fold(1.0, (m, a) => m * a.proteinMult);
@@ -59,7 +60,16 @@ class DietCalculator {
     // belong in the gap-fill supplement math below, not blended at equal
     // weight into the base, no matter which list the user happened to put
     // them in.
-    final foodCandidates = pantryItems.where((i) => !_isMineralLike(i)).toList();
+    var foodCandidates = pantryItems.where((i) => !_isMineralLike(i)).toList();
+    if (profile.feedingSystem == 'Raw / Whole Food + Premix') {
+      // Prefer genuinely fresh/whole ingredients over processed grains/meals
+      // when the pantry has any, since that's the point of this mode; if it
+      // doesn't, fall back to the full candidate list rather than returning
+      // an empty ration.
+      final wholeFoodItems =
+          foodCandidates.where((i) => _isFreshOrFrozenProtein(i) || _isFreshProduce(i)).toList();
+      if (wholeFoodItems.isNotEmpty) foodCandidates = wholeFoodItems;
+    }
     final mineralPantryItems = pantryItems.where(_isMineralLike).toList();
     final supplementPool = [
       ...supplementItems,
@@ -150,12 +160,51 @@ class DietCalculator {
       return sum / finalTotalLbs;
     }
 
+    double finalNiacinMgKg() {
+      if (finalTotalLbs <= 0) return 0;
+      double sum = 0;
+      for (final i in allItems) {
+        sum += (allLbs[i.id] ?? 0) * i.asFedMetrics.niacinMgKg;
+      }
+      return sum / finalTotalLbs;
+    }
+
+    double finalCopperPpm() {
+      if (finalTotalLbs <= 0) return 0;
+      double sum = 0;
+      for (final i in allItems) {
+        sum += (allLbs[i.id] ?? 0) * i.asFedMetrics.copperPpm;
+      }
+      return sum / finalTotalLbs;
+    }
+
+    double finalMolybdenumPpm() {
+      if (finalTotalLbs <= 0) return 0;
+      double sum = 0;
+      for (final i in allItems) {
+        sum += (allLbs[i.id] ?? 0) * i.asFedMetrics.molybdenumPpm;
+      }
+      return sum / finalTotalLbs;
+    }
+
     final finalProteinPct = finalPct((i) => i.asFedMetrics.crudeProteinPct);
     final finalFatPct = finalPct((i) => i.asFedMetrics.fatPct);
     final finalFiberPct = finalPct((i) => i.asFedMetrics.fiberPct);
     final finalCalciumPct = finalPct((i) => i.asFedMetrics.calciumPct);
     final finalPhosphorusPct = finalPct((i) => i.asFedMetrics.phosphorusPct);
     final finalEnergy = finalEnergyKcalLb();
+    final finalTaurinePct = finalPct((i) => i.asFedMetrics.taurinePct);
+    final finalNiacin = finalNiacinMgKg();
+    final finalCopper = finalCopperPpm();
+    final finalMolybdenum = finalMolybdenumPpm();
+    final finalOxalatePct = finalPct((i) => i.asFedMetrics.oxalatePct);
+
+    final speciesText = profile.species.toLowerCase();
+    final isSheep = speciesText.contains('sheep');
+    // Oxalate/"Big Head" and hypocalcemia risk is documented primarily in
+    // horses, with secondary relevance in ruminants that graze the same
+    // tropical/subtropical pastures.
+    final isOxalateRiskSpecies = ['horse', 'cattle', 'sheep', 'goat'].any((s) => speciesText.contains(s));
 
     final comparisons = [
       _compare('Protein', '%', adjMinProtein, adjMaxProtein, finalProteinPct),
@@ -164,6 +213,12 @@ class DietCalculator {
       _compare('Calcium', '%', adjMinCalcium, adjMaxCalcium, finalCalciumPct),
       _compare('Phosphorus', '%', target.minPhosphorusPerc, target.maxPhosphorusPerc, finalPhosphorusPct),
       _compare('Energy', 'kcal/lb', adjMinEnergyKcalLb, adjMaxEnergyKcalLb, finalEnergy),
+      if (target.minTaurinePerc > 0) _compare('Taurine', '%', target.minTaurinePerc, null, finalTaurinePct),
+      if (target.minNiacinMgKg > 0) _compare('Niacin', 'mg/kg', target.minNiacinMgKg, null, finalNiacin),
+      if (isSheep && finalMolybdenum > 0)
+        _compare('Cu:Mo Ratio', ':1', 3.0, 10.0, finalCopper / finalMolybdenum),
+      if (isOxalateRiskSpecies && finalOxalatePct > 0)
+        _compare('Ca:Oxalate Ratio', ':1', 0.5, null, finalCalciumPct / finalOxalatePct),
     ];
 
     // 4. Safety rule checks against the final blend.
@@ -174,8 +229,33 @@ class DietCalculator {
       finalTotalLbs: finalTotalLbs,
       finalCalciumPct: finalCalciumPct,
       finalPhosphorusPct: finalPhosphorusPct,
+      finalCopperPpm: finalCopper,
+      finalMolybdenumPpm: finalMolybdenum,
+      finalOxalatePct: finalOxalatePct,
       safetyRules: safetyRules,
     );
+    if (!stageHasDedicatedData) {
+      warnings.insert(
+        0,
+        'No dedicated nutrition data yet for the "${profile.productionStage}" stage of this species - '
+        'this ration uses general/maintenance-level targets instead. Treat it as a rough starting point, '
+        'not a stage-tuned recipe.',
+      );
+    }
+    if (profile.feedingSystem == 'Pasture / Forage-First' && prep.mode == PrepMode.days) {
+      warnings.insert(
+        0,
+        'Assuming grazing covers about ${(_assumedPastureCoverageFraction * 100).round()}% of daily intake - '
+        'a flat default, not a real assessment of your pasture. This batch is sized to cover the rest. If your '
+        'grazing coverage is better or worse than that, enter a direct lbs amount instead of a number of days.',
+      );
+    }
+    if (profile.feedingSystem == 'Pasture / Forage-First' && profile.environment == 'Indoor') {
+      warnings.add(
+        'This profile is set to "Pasture / Forage-First" but the environment is "Indoor" - '
+        'double check that\'s intentional.',
+      );
+    }
 
     final finalBaseItems = selectedFoodItems
         .where((i) => (baseLbs[i.id] ?? 0) > 0)
@@ -187,6 +267,7 @@ class DietCalculator {
         .toList();
 
     final instructions = _buildInstructions(
+      profile: profile,
       baseItems: finalBaseItems,
       supplementItems: finalSupplementItems,
       prep: prep,
@@ -210,36 +291,59 @@ class DietCalculator {
   static const double _lbToOz = 16.0;
 
   static ({List<String> steps, int? portionCount, double? portionSizeOz}) _buildInstructions({
+    required AnimalProfile profile,
     required List<RationLineItem> baseItems,
     required List<RationLineItem> supplementItems,
     required PrepAmountResult prep,
     required double totalWeightLbs,
   }) {
-    final steps = <String>[];
+    final steps = <String>[
+      ..._equipmentSteps(profile: profile, baseItems: baseItems, supplementItems: supplementItems),
+    ];
+
+    final isFreeChoice = profile.feedingSystem == 'Free-Choice Grain + Supplement';
+    final isRaw = profile.feedingSystem == 'Raw / Whole Food + Premix';
 
     if (baseItems.isEmpty) {
       steps.add('No base pantry items in this batch.');
     } else if (baseItems.length == 1) {
       steps.add('Prepare ${baseItems.first.ingredient.name}.');
+    } else if (isFreeChoice) {
+      steps.add(
+        'Offer these separately rather than mixing them into one ration - keep each available '
+        'free-choice so the animal can self-balance intake: ${baseItems.map((i) => i.ingredient.name).join(', ')}.',
+      );
     } else {
       final sorted = [...baseItems]..sort((a, b) => a.lbs.compareTo(b.lbs));
       final lighter = sorted.sublist(0, sorted.length - 1);
       final heaviest = sorted.last;
+      final verb = isRaw ? 'Combine' : 'Blend';
       steps.add(
-        'Blend ${lighter.map((i) => i.ingredient.name).join(', ')} together, '
+        '$verb ${lighter.map((i) => i.ingredient.name).join(', ')} together, '
         'then mix in ${heaviest.ingredient.name}.',
       );
     }
 
     if (supplementItems.isNotEmpty) {
       steps.add(
-        'Add supplements: ${supplementItems.map((i) => i.ingredient.name).join(', ')}, and mix well.',
+        isFreeChoice
+            ? 'Provide free-choice: ${supplementItems.map((i) => i.ingredient.name).join(', ')} '
+                '(e.g. a mineral block or top-dress station), separate from the base feed.'
+            : isRaw
+                ? 'Mix in a vitamin/mineral premix to close the gap: '
+                    '${supplementItems.map((i) => i.ingredient.name).join(', ')}, and mix well.'
+                : 'Add supplements: ${supplementItems.map((i) => i.ingredient.name).join(', ')}, and mix well.',
       );
     }
 
     int? portionCount;
     double? portionSizeOz;
-    if (prep.mode == PrepMode.days && prep.value > 0) {
+    if (isFreeChoice) {
+      steps.add(
+        'Total to have on hand: ~${totalWeightLbs.toStringAsFixed(2)} lb. Restock the free-choice '
+        'station(s) as they run low rather than doling out fixed daily portions.',
+      );
+    } else if (prep.mode == PrepMode.days && prep.value > 0) {
       portionCount = prep.value.round();
       portionSizeOz = (totalWeightLbs / prep.value) * _lbToOz;
       steps.add(
@@ -251,6 +355,51 @@ class DietCalculator {
     }
 
     return (steps: steps, portionCount: portionCount, portionSizeOz: portionSizeOz);
+  }
+
+  /// Species catalog categories (the part of [AnimalProfile.species] before
+  /// the colon) whose members are typically small/young enough to need food
+  /// ground or pureed rather than just cut into pieces.
+  static const _fineTextureCategories = {'rodent', 'amphibian', 'marsupial', 'bird'};
+
+  static bool _needsFineTexture(AnimalProfile profile) {
+    if (profile.ageGroup == 'Baby') return true;
+    final category = profile.species.split(':').first.trim().toLowerCase();
+    return _fineTextureCategories.contains(category);
+  }
+
+  static bool _isFreshOrFrozenProtein(Ingredient i) =>
+      i.category == 'Proteins & Meal' && (i.subCategory == 'fresh' || i.subCategory == 'frozen');
+
+  static bool _isFreshProduce(Ingredient i) => i.category == 'Produce' && i.subCategory == 'fresh';
+
+  /// Recommends the kitchen tools needed to get this batch's fresh/frozen
+  /// ingredients to the right texture before blending. Dry, grain, mineral,
+  /// and forage items don't need any prep tools - only raw meat and fresh
+  /// produce do, and how fine they need to be depends on the animal's size.
+  static List<String> _equipmentSteps({
+    required AnimalProfile profile,
+    required List<RationLineItem> baseItems,
+    required List<RationLineItem> supplementItems,
+  }) {
+    final allIngredients = [...baseItems, ...supplementItems].map((li) => li.ingredient);
+    final hasFreshProtein = allIngredients.any(_isFreshOrFrozenProtein);
+    final hasFreshProduce = allIngredients.any(_isFreshProduce);
+    if (!hasFreshProtein && !hasFreshProduce) return [];
+
+    final needsFine = _needsFineTexture(profile);
+    final steps = <String>[];
+    if (hasFreshProtein) {
+      steps.add(needsFine
+          ? 'Use a meat grinder (or food processor) to grind the meat into a fine texture.'
+          : 'Use a sharp knife to cut the meat into bite-sized pieces.');
+    }
+    if (hasFreshProduce) {
+      steps.add(needsFine
+          ? 'Use a blender to puree the fresh produce into a smooth texture.'
+          : 'Use a knife to chop the fresh produce into small pieces.');
+    }
+    return steps;
   }
 
   /// A large calcium+phosphorus contribution with almost no protein/fat/
@@ -333,6 +482,15 @@ class DietCalculator {
     };
   }
 
+  /// Rough default share of daily dry matter intake assumed to come from
+  /// grazing on a "Pasture / Forage-First" profile - a flat, clearly-
+  /// caveated estimate (surfaced in the ration's warnings), not a real
+  /// pasture-quality assessment. Only applied when the batch size itself is
+  /// being estimated from body weight (prep.mode == days); if the user
+  /// enters a direct lbs amount, that's already the supplemental amount
+  /// they want prepared and is used as-is.
+  static const double _assumedPastureCoverageFraction = 0.5;
+
   static double _estimateBatchWeightLbs({
     required PrepAmountResult prep,
     required AnimalProfile profile,
@@ -342,7 +500,10 @@ class DietCalculator {
 
     final bodyWeightLb = target.targetWeightKg * _kgToLb;
     final intakeRate = _dailyIntakeRateByCategory(profile.species);
-    final dailyIntakeLbs = bodyWeightLb > 0 ? bodyWeightLb * intakeRate : 0.5;
+    var dailyIntakeLbs = bodyWeightLb > 0 ? bodyWeightLb * intakeRate : 0.5;
+    if (profile.feedingSystem == 'Pasture / Forage-First') {
+      dailyIntakeLbs *= (1 - _assumedPastureCoverageFraction);
+    }
     return dailyIntakeLbs * profile.headCount * prep.value;
   }
 
@@ -461,20 +622,44 @@ class DietCalculator {
     required double finalTotalLbs,
     required double finalCalciumPct,
     required double finalPhosphorusPct,
+    required double finalCopperPpm,
+    required double finalMolybdenumPpm,
+    required double finalOxalatePct,
     required List<SafetyRule> safetyRules,
   }) {
     final warnings = <String>[];
     if (finalTotalLbs <= 0) return warnings;
 
+    final speciesText = profile.species.toLowerCase();
     for (final rule in safetyRules) {
+      if (rule.appliesToSpecies.isNotEmpty &&
+          !rule.appliesToSpecies.any((s) => speciesText.contains(s.toLowerCase()))) {
+        continue;
+      }
       if (rule.targetType == 'ratio') {
-        final stage = profile.productionStage.toLowerCase();
-        final appliesToGrower = rule.targetName == 'Ca:AvailP_grower' &&
-            (stage.contains('grower') || stage.contains('starter') || stage.contains('juvenile'));
-        final appliesToLayer = rule.targetName == 'Ca:AvailP_layer' && stage.contains('layer');
-        if (!appliesToGrower && !appliesToLayer) continue;
-        if (finalPhosphorusPct <= 0) continue;
-        final ratio = finalCalciumPct / finalPhosphorusPct;
+        double? ratio;
+        switch (rule.targetName) {
+          case 'Ca:AvailP_grower':
+          case 'Ca:AvailP_layer':
+            final stage = profile.productionStage.toLowerCase();
+            final appliesToGrower = rule.targetName == 'Ca:AvailP_grower' &&
+                (stage.contains('grower') || stage.contains('starter') || stage.contains('juvenile'));
+            final appliesToLayer = rule.targetName == 'Ca:AvailP_layer' && stage.contains('layer');
+            if (!appliesToGrower && !appliesToLayer) continue;
+            if (finalPhosphorusPct <= 0) continue;
+            ratio = finalCalciumPct / finalPhosphorusPct;
+            break;
+          case 'Cu:Mo':
+            if (finalMolybdenumPpm <= 0) continue;
+            ratio = finalCopperPpm / finalMolybdenumPpm;
+            break;
+          case 'Ca:Oxalate':
+            if (finalOxalatePct <= 0) continue;
+            ratio = finalCalciumPct / finalOxalatePct;
+            break;
+          default:
+            continue;
+        }
         if ((rule.minRatio != null && ratio < rule.minRatio!) ||
             (rule.maxRatio != null && ratio > rule.maxRatio!)) {
           warnings.add(rule.warningMessage);

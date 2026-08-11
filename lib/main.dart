@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'services/ad_service.dart';
 import 'services/database_service.dart';
 import 'services/purchase_service.dart';
 import 'services/tier_service.dart';
@@ -59,6 +60,7 @@ class _AppStartupState extends State<AppStartup> {
       context.read<DatabaseService>().initialize(),
       context.read<TierService>().initialize(),
       context.read<PurchaseService>().initialize(),
+      initializeAds(),
     ]);
   }
 
