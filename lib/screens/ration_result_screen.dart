@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/ration_result.dart';
 import '../services/recipe_file_saver.dart';
 import '../services/tier_service.dart';
+import '../widgets/upgrade_dialog.dart';
 
 class RationResultScreen extends StatelessWidget {
   final RationResult result;
@@ -248,8 +249,9 @@ class RationResultScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Upgrades are coming soon!')),
+                  showDialog(
+                    context: context,
+                    builder: (context) => const UpgradeDialog(),
                   );
                 },
                 icon: const Icon(Icons.upgrade, size: 18),

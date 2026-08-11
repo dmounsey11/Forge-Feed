@@ -4,6 +4,7 @@ import '../models/animal_profile.dart';
 import '../models/species_catalog.dart';
 import '../services/database_service.dart';
 import '../services/tier_service.dart';
+import 'upgrade_dialog.dart';
 
 class AddProfileDialog extends StatefulWidget {
   final Function(AnimalProfile) onProfileSaved;
@@ -281,8 +282,9 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                             ),
                             TextButton(
                               onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Upgrades are coming soon!')),
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => const UpgradeDialog(),
                                 );
                               },
                               child: const Text(

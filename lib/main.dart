@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'services/database_service.dart';
+import 'services/purchase_service.dart';
 import 'services/tier_service.dart';
 import 'screens/main_screen.dart';
 
@@ -12,6 +13,9 @@ void main() {
       providers: [
         ChangeNotifierProvider<DatabaseService>(create: (_) => DatabaseService()),
         ChangeNotifierProvider<TierService>(create: (_) => TierService()),
+        ChangeNotifierProvider<PurchaseService>(
+          create: (ctx) => PurchaseService(ctx.read<TierService>()),
+        ),
       ],
       child: const ForgeFeedApp(),
     ),
@@ -54,6 +58,7 @@ class _AppStartupState extends State<AppStartup> {
     _initFuture = Future.wait([
       context.read<DatabaseService>().initialize(),
       context.read<TierService>().initialize(),
+      context.read<PurchaseService>().initialize(),
     ]);
   }
 

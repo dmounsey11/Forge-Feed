@@ -8,6 +8,7 @@ import '../services/tier_service.dart';
 import '../widgets/add_profile_dialog.dart';
 import '../widgets/health_screening_dialog.dart';
 import '../widgets/prep_amount_dialog.dart';
+import '../widgets/upgrade_dialog.dart';
 import 'ration_result_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -61,9 +62,11 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       if (!mounted) return;
       if (wantsUpgrade == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Upgrades are coming soon!')),
+        await showDialog(
+          context: context,
+          builder: (context) => const UpgradeDialog(),
         );
+        if (!mounted) return;
       }
       setState(() => _healthSkipped = true);
     }

@@ -1,7 +1,9 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/tier_service.dart';
 import '../widgets/feedback_dialog.dart';
+import '../widgets/upgrade_dialog.dart';
 import 'home_screen.dart';
 import 'pantry_screen.dart';
 import 'profiles_screen.dart';
@@ -256,13 +258,20 @@ class HeaderBar extends StatelessWidget {
               ),
               const SizedBox(width: 12),
 
-              // Tier Badge - tap to cycle Free / Tier 1 / Pro (local
-              // stand-in until real payments are wired up)
+              // Tier Badge - in debug builds, tap cycles Free / Tier 1 / Pro
+              // as a stand-in for testing tier-gated UI without a real
+              // store purchase. In release builds, tap opens the real
+              // upgrade flow.
               Consumer<TierService>(
                 builder: (context, tierService, _) {
                   final tier = tierService.tier;
                   return GestureDetector(
-                    onTap: tierService.cycleTier,
+                    onTap: kDebugMode
+                        ? tierService.cycleTier
+                        : () => showDialog(
+                              context: context,
+                              builder: (context) => const UpgradeDialog(),
+                            ),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(

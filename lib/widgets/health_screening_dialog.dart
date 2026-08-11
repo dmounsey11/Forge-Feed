@@ -89,7 +89,17 @@ class _HealthScreeningDialogState extends State<HealthScreeningDialog> {
               _ToggleRow(
                 label: 'Currently injured?',
                 value: _injured,
-                onChanged: (v) => setState(() => _injured = v),
+                onChanged: (v) async {
+                  if (v) {
+                    final acknowledged = await showDialog<bool>(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => const _InjuryDisclaimerDialog(),
+                    );
+                    if (acknowledged != true || !mounted) return;
+                  }
+                  setState(() => _injured = v);
+                },
               ),
               if (_injured) ...[
                 const SizedBox(height: 8),
@@ -142,6 +152,92 @@ class _HealthScreeningDialogState extends State<HealthScreeningDialog> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Legal-protection gate shown before the injured flag can be turned on -
+/// makes clear ForgeFeed only adjusts nutrition, not a substitute for
+/// veterinary diagnosis or treatment. Must be explicitly acknowledged;
+/// dismissing or declining leaves the toggle off.
+class _InjuryDisclaimerDialog extends StatelessWidget {
+  const _InjuryDisclaimerDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: const Color(0xFF242426),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Color(0xFFF97316), width: 1.5),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        constraints: const BoxConstraints(maxWidth: 440),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              children: [
+                Icon(Icons.info_outline, color: Color(0xFFF97316), size: 26),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Before You Continue',
+                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            const Text(
+              'ForgeFeed is a nutritional formulation tool. It is not a diagnostic, '
+              'triage, or emergency service, and it is not a substitute for examination, '
+              'diagnosis, or treatment by a licensed veterinarian.',
+              style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'If this animal is injured, in pain, or showing signs of distress, please '
+              'seek guidance from a veterinarian or emergency animal care provider. Any '
+              'dietary suggestions generated here are intended to support, not replace, '
+              'professional veterinary care.',
+              style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+            ),
+            const SizedBox(height: 22),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white60,
+                      side: const BorderSide(color: Colors.white24),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('Cancel'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF97316),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text(
+                      'I Understand',
+                      style: TextStyle(color: Color(0xFF1A1A1C), fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
