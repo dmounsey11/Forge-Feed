@@ -122,6 +122,11 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
     }
   }
 
+  /// Hobby tier (and Free) only includes Dog and Cat; every other species
+  /// needs Pro.
+  bool _isSpeciesLocked(String species, bool isPro) =>
+      !isPro && species != 'Dog' && species != 'Cat';
+
   SpeciesCategory get _currentCategory => _catalog.firstWhere((c) => c.name == _selectedCategory);
 
   SpeciesSubgroup get _currentSubgroup =>
@@ -131,6 +136,10 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
   Widget build(BuildContext context) {
     final catalog = context.watch<DatabaseService>().speciesCatalog;
     _initFromCatalog(catalog);
+
+    final tier = context.watch<TierService>().tier;
+    final canHaveMultiple = tier.isPaid;
+    final isPro = tier == UserTier.pro;
 
     final isEditing = widget.profileToEdit != null;
 
@@ -234,13 +243,40 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                   label: 'Species',
                   value: _selectedSpecies,
                   items: availableSpecies,
-                  onChanged: (val) => setState(() => _selectedSpecies = val),
+                  lockedItems: availableSpecies.where((s) => _isSpeciesLocked(s, isPro)).toList(),
+                  onChanged: (val) {
+                    if (_isSpeciesLocked(val, isPro)) {
+                      showDialog(context: context, builder: (context) => const UpgradeDialog());
+                      return;
+                    }
+                    setState(() => _selectedSpecies = val);
+                  },
                 ),
+                if (!isPro) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Dog and Cat are included. Every other species needs Pro.',
+                          style: TextStyle(color: Colors.white54, fontSize: 12),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          showDialog(context: context, builder: (context) => const UpgradeDialog());
+                        },
+                        child: const Text(
+                          'Upgrade',
+                          style: TextStyle(color: Color(0xFFF97316), fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 12),
 
                 Builder(builder: (context) {
-                  final tier = context.watch<TierService>().tier;
-                  final canHaveMultiple = tier.isPaid;
                   if (!canHaveMultiple && _headCountController.text != '1') {
                     _headCountController.text = '1';
                   }
@@ -336,8 +372,36 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                   label: 'Animal Health / Production State',
                   value: _selectedProductionStage,
                   items: _productionStages,
-                  onChanged: (val) => setState(() => _selectedProductionStage = val),
+                  onChanged: (val) {
+                    if (val.contains('🔒') && !tier.isPaid) {
+                      showDialog(context: context, builder: (context) => const UpgradeDialog());
+                      return;
+                    }
+                    setState(() => _selectedProductionStage = val);
+                  },
                 ),
+                if (!tier.isPaid) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Molting/Recovery, Lactating/Nursing, Breeder/High Output & Growth Boost need Hobby Tier.',
+                          style: TextStyle(color: Colors.white54, fontSize: 12),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          showDialog(context: context, builder: (context) => const UpgradeDialog());
+                        },
+                        child: const Text(
+                          'Upgrade',
+                          style: TextStyle(color: Color(0xFFF97316), fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 12),
 
                 _buildDropdown(
@@ -357,6 +421,10 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     onPressed: () {
+                      if (_isSpeciesLocked(_selectedSpecies, isPro)) {
+                        showDialog(context: context, builder: (context) => const UpgradeDialog());
+                        return;
+                      }
                       if (_formKey.currentState!.validate()) {
                         final savedProfile = AnimalProfile(
                           id: widget.profileToEdit?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
@@ -396,6 +464,7 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
     required String value,
     required List<String> items,
     required ValueChanged<String> onChanged,
+    List<String> lockedItems = const [],
   }) {
     return DropdownButtonFormField<String>(
       initialValue: value,
@@ -412,7 +481,20 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
           borderSide: BorderSide.none,
         ),
       ),
-      items: items.map((i) => DropdownMenuItem(value: i, child: Text(i, overflow: TextOverflow.ellipsis))).toList(),
+      items: items
+          .map((i) => DropdownMenuItem(
+                value: i,
+                child: Row(
+                  children: [
+                    Expanded(child: Text(i, overflow: TextOverflow.ellipsis)),
+                    if (lockedItems.contains(i)) ...[
+                      const SizedBox(width: 6),
+                      const Icon(Icons.lock, size: 14, color: Colors.white38),
+                    ],
+                  ],
+                ),
+              ))
+          .toList(),
       onChanged: (val) {
         if (val != null) onChanged(val);
       },

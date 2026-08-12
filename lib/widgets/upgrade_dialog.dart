@@ -59,7 +59,7 @@ class UpgradeDialog extends StatelessWidget {
                     productId: PurchaseProductIds.proMonthly,
                     title: 'Pro',
                     fallbackPrice: '\$9.99/mo',
-                    description: 'Everything in Hobby, plus email & download recipes.',
+                    description: 'Everything in Hobby, plus every species, email & download recipes.',
                   ),
                 ],
                 if (purchaseService.lastError != null) ...[
