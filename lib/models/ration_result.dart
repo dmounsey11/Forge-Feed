@@ -27,6 +27,16 @@ class NutrientComparison {
   });
 }
 
+/// A pantry/supplement item that was available for this batch but didn't
+/// make it into the final blend, plus a plain-language reason why - so the
+/// UI can explain the omission instead of just naming it.
+class ExcludedItem {
+  final String name;
+  final String reason;
+
+  const ExcludedItem({required this.name, required this.reason});
+}
+
 class RationResult {
   final double totalWeightLbs;
   final List<RationLineItem> baseItems;
@@ -34,7 +44,7 @@ class RationResult {
   final List<NutrientComparison> nutrientComparisons;
   final List<String> warnings;
   final List<String> healthNotes;
-  final List<String> excludedItemNames;
+  final List<ExcludedItem> excludedItems;
   final List<String> instructionSteps;
   final int? portionCount;
   final double? portionSizeOz;
@@ -46,7 +56,7 @@ class RationResult {
     required this.nutrientComparisons,
     required this.warnings,
     required this.healthNotes,
-    this.excludedItemNames = const [],
+    this.excludedItems = const [],
     this.instructionSteps = const [],
     this.portionCount,
     this.portionSizeOz,

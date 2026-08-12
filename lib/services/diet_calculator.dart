@@ -61,6 +61,7 @@ class DietCalculator {
     // weight into the base, no matter which list the user happened to put
     // them in.
     var foodCandidates = pantryItems.where((i) => !_isMineralLike(i)).toList();
+    var feedingSystemFilteredIds = <String>{};
     if (profile.feedingSystem == 'Raw / Whole Food + Premix') {
       // Prefer genuinely fresh/whole ingredients over processed grains/meals
       // when the pantry has any, since that's the point of this mode; if it
@@ -68,7 +69,13 @@ class DietCalculator {
       // an empty ration.
       final wholeFoodItems =
           foodCandidates.where((i) => _isFreshOrFrozenProtein(i) || _isFreshProduce(i)).toList();
-      if (wholeFoodItems.isNotEmpty) foodCandidates = wholeFoodItems;
+      if (wholeFoodItems.isNotEmpty) {
+        feedingSystemFilteredIds = foodCandidates
+            .where((i) => !wholeFoodItems.any((w) => w.id == i.id))
+            .map((i) => i.id)
+            .toSet();
+        foodCandidates = wholeFoodItems;
+      }
     }
     final mineralPantryItems = pantryItems.where(_isMineralLike).toList();
     final supplementPool = [
@@ -79,10 +86,20 @@ class DietCalculator {
     // 2. Pick a small, sensible base blend instead of using everything:
     // the highest- and lowest-protein selected foods as balancing anchors
     // (a classic "Pearson square" ration-balancing technique), plus a
-    // couple of extras for variety, capped so a handful of pantry items
-    // aren't drowned out by a dozen others.
+    // couple of extras chosen for their overall nutrient fit (protein,
+    // calcium, phosphorus, fat - not protein alone), capped so a handful
+    // of pantry items aren't drowned out by a dozen others.
     final targetProteinMidpoint = (adjMinProtein + adjMaxProtein) / 2;
-    final selectedFoodItems = _selectBaseItems(foodCandidates, targetProteinMidpoint: targetProteinMidpoint);
+    final targetCalciumMidpoint = (adjMinCalcium + adjMaxCalcium) / 2;
+    final targetPhosphorusMidpoint = (target.minPhosphorusPerc + target.maxPhosphorusPerc) / 2;
+    final targetFatMidpoint = ((target.minFatPerc ?? 0) + (target.maxFatPerc ?? 0)) / 2;
+    final selectedFoodItems = _selectBaseItems(
+      foodCandidates,
+      targetProteinMidpoint: targetProteinMidpoint,
+      targetCalciumMidpoint: targetCalciumMidpoint,
+      targetPhosphorusMidpoint: targetPhosphorusMidpoint,
+      targetFatMidpoint: targetFatMidpoint,
+    );
     final baseLbs = _pearsonBlend(selectedFoodItems, totalWeightLbs, targetProteinMidpoint);
 
     double baseNutrientLbs(double Function(Ingredient) pctOf) {
@@ -136,11 +153,21 @@ class DietCalculator {
     final finalTotalLbs = allLbs.values.fold(0.0, (sum, v) => sum + v);
 
     final usedIds = allItems.map((i) => i.id).toSet();
-    final excludedItemNames = [...pantryItems, ...supplementItems]
-        .where((i) => !usedIds.contains(i.id))
-        .map((i) => i.name)
-        .toSet()
-        .toList();
+    final unselectedFoodIds =
+        foodCandidates.where((i) => !selectedFoodItems.any((s) => s.id == i.id)).map((i) => i.id).toSet();
+    final excludedItems = <ExcludedItem>[];
+    final seenExcludedIds = <String>{};
+    for (final i in [...pantryItems, ...supplementItems]) {
+      if (usedIds.contains(i.id) || !seenExcludedIds.add(i.id)) continue;
+      excludedItems.add(ExcludedItem(
+        name: i.name,
+        reason: _explainExclusion(
+          item: i,
+          feedingSystemFilteredIds: feedingSystemFilteredIds,
+          unselectedFoodIds: unselectedFoodIds,
+        ),
+      ));
+    }
 
     double finalPct(double Function(Ingredient) pctOf) {
       if (finalTotalLbs <= 0) return 0;
@@ -308,7 +335,7 @@ class DietCalculator {
       nutrientComparisons: comparisons,
       warnings: warnings,
       healthNotes: healthNotes,
-      excludedItemNames: excludedItemNames,
+      excludedItems: excludedItems,
       instructionSteps: instructions.steps,
       portionCount: instructions.portionCount,
       portionSizeOz: instructions.portionSizeOz,
@@ -371,12 +398,18 @@ class DietCalculator {
         'station(s) as they run low rather than doling out fixed daily portions.',
       );
     } else if (prep.mode == PrepMode.days && prep.value > 0) {
-      portionCount = prep.value.round();
-      portionSizeOz = (totalWeightLbs / prep.value) * _lbToOz;
-      steps.add(
-        'Divide into $portionCount even portion${portionCount == 1 ? '' : 's'} '
-        '(~${portionSizeOz.toStringAsFixed(1)} oz each) - one portion per day for $portionCount day${portionCount == 1 ? '' : 's'}.',
-      );
+      final days = prep.value.round();
+      final dailyOz = (totalWeightLbs / prep.value) * _lbToOz;
+      portionCount = days;
+      portionSizeOz = dailyOz;
+      final dayWord = 'day${days == 1 ? '' : 's'}';
+      final options = [1, 2, 3].map((feedingsPerDay) {
+        final count = days * feedingsPerDay;
+        final sizeOz = dailyOz / feedingsPerDay;
+        return '$count portions (~${sizeOz.toStringAsFixed(1)} oz each) for $feedingsPerDay '
+            'time${feedingsPerDay == 1 ? '' : 's'} a day';
+      }).join(', OR ');
+      steps.add('Divide into $options - pick whichever feeding frequency you\'re using for these $days $dayWord.');
     } else {
       steps.add('Store as a single ~${totalWeightLbs.toStringAsFixed(2)} lb batch.');
     }
@@ -398,7 +431,8 @@ class DietCalculator {
   static bool _isFreshOrFrozenProtein(Ingredient i) =>
       i.category == 'Proteins & Meal' && (i.subCategory == 'fresh' || i.subCategory == 'frozen');
 
-  static bool _isFreshProduce(Ingredient i) => i.category == 'Produce' && i.subCategory == 'fresh';
+  static bool _isFreshProduce(Ingredient i) =>
+      (i.category == 'Produce' || i.category == 'Fruits') && i.subCategory == 'fresh';
 
   /// Recommends the kitchen tools needed to get this batch's fresh/frozen
   /// ingredients to the right texture before blending. Dry, grain, mineral,
@@ -442,14 +476,20 @@ class DietCalculator {
 
   /// Picks a small, sensible set of base food items instead of using
   /// everything selected: the highest- and lowest-protein items as
-  /// balancing anchors, plus up to 3 more items whose protein is closest
-  /// to the target midpoint (for variety/micronutrients without drowning
-  /// the anchors out).
+  /// balancing anchors (needed for the Pearson-square protein blend below),
+  /// plus up to 3 more items chosen by overall nutrient fit - see
+  /// [_nutrientFitScore] - so an item that's a poor protein-midpoint match
+  /// but a strong calcium/phosphorus/fat contributor (e.g. whole egg,
+  /// organ meat) can still earn a spot instead of protein % being the only
+  /// axis that matters.
   static const int _maxExtrasCount = 3;
 
   static List<Ingredient> _selectBaseItems(
     List<Ingredient> candidates, {
     required double targetProteinMidpoint,
+    required double targetCalciumMidpoint,
+    required double targetPhosphorusMidpoint,
+    required double targetFatMidpoint,
   }) {
     if (candidates.length <= 2) return candidates;
 
@@ -459,12 +499,76 @@ class DietCalculator {
     final proteinAnchor = sorted.last; // highest protein
 
     final remaining = candidates.where((i) => i.id != proteinAnchor.id && i.id != energyAnchor.id).toList()
-      ..sort((a, b) => (a.asFedMetrics.crudeProteinPct - targetProteinMidpoint)
-          .abs()
-          .compareTo((b.asFedMetrics.crudeProteinPct - targetProteinMidpoint).abs()));
+      ..sort((a, b) => _nutrientFitScore(
+            b,
+            targetProteinMidpoint: targetProteinMidpoint,
+            targetCalciumMidpoint: targetCalciumMidpoint,
+            targetPhosphorusMidpoint: targetPhosphorusMidpoint,
+            targetFatMidpoint: targetFatMidpoint,
+          ).compareTo(_nutrientFitScore(
+            a,
+            targetProteinMidpoint: targetProteinMidpoint,
+            targetCalciumMidpoint: targetCalciumMidpoint,
+            targetPhosphorusMidpoint: targetPhosphorusMidpoint,
+            targetFatMidpoint: targetFatMidpoint,
+          )));
     final extras = remaining.take(_maxExtrasCount).toList();
 
     return [proteinAnchor, energyAnchor, ...extras];
+  }
+
+  /// Scores a non-anchor candidate on how well-rounded a pick it would be:
+  /// protein close to the target midpoint (0.4 weight, keeping the extras
+  /// from skewing the anchors' protein balance), plus meaningful calcium
+  /// (0.25), phosphorus (0.15), and fat (0.2) relative to what the target
+  /// range calls for. Each nutrient term saturates at 1.0 once the item
+  /// alone would cover the full target midpoint, so a single ultra-
+  /// concentrated ingredient can't dominate purely on one axis. Weights are
+  /// a judgment call, not a derived optimum - protein still leads since
+  /// it's the axis the anchors are already tuned to.
+  static double _nutrientFitScore(
+    Ingredient item, {
+    required double targetProteinMidpoint,
+    required double targetCalciumMidpoint,
+    required double targetPhosphorusMidpoint,
+    required double targetFatMidpoint,
+  }) {
+    final m = item.asFedMetrics;
+    final proteinScore = targetProteinMidpoint > 0
+        ? 1.0 - ((m.crudeProteinPct - targetProteinMidpoint).abs() / targetProteinMidpoint).clamp(0.0, 1.0)
+        : 0.0;
+    final calciumScore =
+        targetCalciumMidpoint > 0 ? (m.calciumPct / targetCalciumMidpoint).clamp(0.0, 1.0) : 0.0;
+    final phosphorusScore =
+        targetPhosphorusMidpoint > 0 ? (m.phosphorusPct / targetPhosphorusMidpoint).clamp(0.0, 1.0) : 0.0;
+    final fatScore = targetFatMidpoint > 0 ? (m.fatPct / targetFatMidpoint).clamp(0.0, 1.0) : 0.0;
+    return proteinScore * 0.4 + calciumScore * 0.25 + phosphorusScore * 0.15 + fatScore * 0.2;
+  }
+
+  /// Plain-language reason a given pantry/supplement item didn't make it
+  /// into this batch, matching the actual selection logic above: the
+  /// feeding-system whole-food filter, the protein-driven base-item pick,
+  /// or the calcium/phosphorus/sodium supplement gap-fill.
+  static String _explainExclusion({
+    required Ingredient item,
+    required Set<String> feedingSystemFilteredIds,
+    required Set<String> unselectedFoodIds,
+  }) {
+    if (feedingSystemFilteredIds.contains(item.id)) {
+      return 'Your feeding system (Raw / Whole Food + Premix) prioritizes fresh/frozen protein and fresh '
+          'produce over this kind of item, so it was left out of the base blend.';
+    }
+    if (unselectedFoodIds.contains(item.id)) {
+      return "Not chosen as one of this batch's base foods - other items were a closer overall fit on "
+          'protein, calcium, phosphorus, and fat relative to your targets, and the base blend is capped '
+          'at a handful of items to keep portions practical.';
+    }
+    final m = item.asFedMetrics;
+    final contributesMinerals = m.calciumPct > 0 || m.phosphorusPct > 0 || m.sodiumPct > 0;
+    return contributesMinerals
+        ? 'Your calcium, phosphorus, and sodium targets were already met without needing this item this batch.'
+        : "Doesn't supply calcium, phosphorus, or sodium - the only nutrients this batch pulls in "
+            "supplements to close a gap on, so it wasn't needed.";
   }
 
   /// Blends the protein and energy anchors using a Pearson-square-style

@@ -156,7 +156,7 @@ class RationResultScreen extends StatelessWidget {
               children: result.nutrientComparisons.map((c) => _NutrientRow(comparison: c)).toList(),
             ),
           ),
-          if (result.excludedItemNames.isNotEmpty) ...[
+          if (result.excludedItems.isNotEmpty) ...[
             const SizedBox(height: 16),
             _SectionCard(
               title: 'Not Used This Batch',
@@ -166,16 +166,28 @@ class RationResultScreen extends StatelessWidget {
                   const Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: Text(
-                      'Not every pantry/supplement item needs to be in every batch - these '
-                      "weren't selected this time (either not needed to hit targets, or a "
-                      'better-fitting item was chosen instead).',
+                      "Not every pantry/supplement item needs to be in every batch - here's why each "
+                      "of these wasn't selected this time.",
                       style: TextStyle(color: Colors.white54, fontSize: 12),
                     ),
                   ),
-                  Text(
-                    result.excludedItemNames.join(', '),
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
-                  ),
+                  for (final excluded in result.excludedItems)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            excluded.name,
+                            style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            excluded.reason,
+                            style: const TextStyle(color: Colors.white54, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),

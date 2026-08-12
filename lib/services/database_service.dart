@@ -40,6 +40,24 @@ class DatabaseService extends ChangeNotifier {
     'ing_00951': 'Produce', // Spinach, raw
     'ing_02882': 'Produce', // Carrots, raw
     'ing_00971': 'Produce', // Sweet potato, raw, unprepared
+    'ing_02976': 'Produce', // Squash, summer, all varieties, raw
+    'ing_02978': 'Produce', // Squash, winter, all varieties, raw
+    'ing_01780': 'Produce', // Squash, summer, zucchini, includes skin, raw
+    'ing_00898': 'Produce', // Cucumber, with peel, raw
+    'ing_02946': 'Produce', // Tomatoes, red, ripe, raw, year round average
+    'ing_02515': 'Produce', // Potatoes, flesh and skin, raw
+    'ing_02477': 'Produce', // Celery, raw
+    'ing_01737': 'Produce', // Lettuce, iceberg (includes crisphead types), raw
+    'ing_01736': 'Produce', // Lettuce, cos or romaine, raw
+    'ing_04177': 'Fruits', // Apples, raw, with skin
+    'ing_06433': 'Fruits', // Bananas, raw
+    'ing_04200': 'Fruits', // Blueberries, raw
+    'ing_00251': 'Fruits', // Strawberries, raw
+    'ing_00254': 'Fruits', // Watermelon, raw
+    'ing_07172': 'Fruits', // Grapes, red or green (European type), raw
+    'ing_02408': 'Fruits', // Oranges, raw, with peel
+    'ing_01607': 'Fruits', // Pears, raw
+    'ing_04211': 'Fruits', // Cranberries, raw
     'ing_00946': 'Natural Supplements', // Seaweed, kelp, raw
     'ing_01903': 'Natural Supplements', // Seeds, flaxseed
     // Raw organ meats & butcher byproducts (prey-model / raw feeding) -
@@ -212,6 +230,7 @@ class DatabaseService extends ChangeNotifier {
         'supp_nutritional_yeast',
         'meal_shrimp_crab',
         'supp_ground_eggshell',
+        'ing_egg_whole_with_shell',
         'prey_mouse_pinky',
         'prey_mouse_adult',
         'prey_rat_pinky',
@@ -1237,6 +1256,32 @@ class DatabaseService extends ChangeNotifier {
         fatPctValue: 0.0,
         fiberPctValue: 0.0,
         energyMeKcalLb: 0,
+      ),
+      // Whole egg blended with its own finely ground shell, as an alternative
+      // to feeding the shell-off "Egg, whole, raw, fresh" (ing_03776) and a
+      // separate calcium supplement. Estimated as ~89% egg content / ~11%
+      // shell by weight (a chicken eggshell is commonly cited at roughly
+      // 9-12% of total egg weight) and ~37% calcium as calcium carbonate for
+      // the shell portion, blended against ing_03776's USDA SR Legacy values.
+      // The shell must be dried and pulverized to a fine powder before
+      // mixing in - coarse shell fragments are a choking/GI-injury risk.
+      Ingredient(
+        id: 'ing_egg_whole_with_shell',
+        name: 'Egg, whole, raw, with finely ground shell',
+        category: 'Proteins & Meal',
+        catalogSource: 'USDA (est., shell blended in)',
+        asFedMetrics: AsFedMetrics(
+          crudeProteinPct: 11.18,
+          calciumPct: 4.12,
+          phosphorusPct: 0.18,
+          fatPct: 8.46,
+          fiberPct: 0.0,
+          energyKcalLb: 577.3,
+          sodiumPct: 0.13,
+          lysinePct: 0.24,
+          methioninePct: 0.76,
+          dryMatterPct: 32.0,
+        ),
       ),
 
       // Whole prey (raptor/reptile feeding). Source values are the Merck/
