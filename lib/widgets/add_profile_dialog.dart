@@ -44,17 +44,33 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
     'Pasture / Forage-First',
     'Free-Choice Grain + Supplement',
     'Raw / Whole Food + Premix',
+    'Whole Prey / Feeder Animals',
   ];
   final List<String> _productionStages = [
     'Healthy / Normal',
     'Active Layer',
     'Breeder / Production',
     'Working / Performance',
-    'Molting / Recovery 🔒',
-    'Lactating / Nursing 🔒',
-    'Breeder / High Output 🔒',
-    'Growth Boost / Juvenile 🔒',
+    'Molting / Recovery',
+    'Lactating / Nursing',
+    'Breeder / High Output',
+    'Growth Boost / Juvenile',
   ];
+
+  static const Set<String> _lockedProductionStages = {
+    'Molting / Recovery',
+    'Lactating / Nursing',
+    'Breeder / High Output',
+    'Growth Boost / Juvenile',
+  };
+
+  static const _feedingSystemLabels = {
+    'Total Mixed Ration (TMR)': 'Total Mixed Ration (Your Pantry Items Only)',
+    'Pasture / Forage-First': 'Pasture / Forage-First (mostly grazing; feed fills the gap)',
+    'Free-Choice Grain + Supplement': 'Free-Choice Grain + Supplement (offered separately; animal self-regulates)',
+    'Raw / Whole Food + Premix': 'Raw / Whole Food + Premix (fresh ingredients + a vitamin/mineral premix)',
+    'Whole Prey / Feeder Animals': 'Whole Prey / Feeder Animals (e.g. reptiles fed whole prey)',
+  };
 
   @override
   void initState() {
@@ -122,15 +138,59 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
     }
   }
 
-  /// Hobby tier (and Free) only includes Dog and Cat; every other species
-  /// needs Pro.
-  bool _isSpeciesLocked(String species, bool isPro) =>
-      !isPro && species != 'Dog' && species != 'Cat';
+  /// Free tier: Dog and Cat only. Hobby tier adds Rabbit and any Chicken
+  /// breed. Every other species needs Pro.
+  bool _isSpeciesLocked(String species, UserTier tier) {
+    if (tier == UserTier.pro) return false;
+    if (species == 'Dog' || species == 'Cat') return false;
+    if (tier == UserTier.tier1) {
+      return !(species == 'Rabbit' || species.startsWith('Chicken'));
+    }
+    return true;
+  }
 
   SpeciesCategory get _currentCategory => _catalog.firstWhere((c) => c.name == _selectedCategory);
 
   SpeciesSubgroup get _currentSubgroup =>
       _currentCategory.subgroups.firstWhere((s) => s.name == _selectedSubgroup, orElse: () => _currentCategory.subgroups.first);
+
+  /// Filters out production stages that don't make biological sense for the
+  /// selected category/subgroup (e.g. "Active Layer" for a Dog) - stages not
+  /// called out here (Healthy/Normal, Breeder/Production, Breeder/High
+  /// Output, Growth Boost/Juvenile) are broadly applicable so stay
+  /// unrestricted rather than guessing per species.
+  bool _isProductionStageRelevant(String stage) {
+    final isPoultry = _selectedCategory == 'Livestock / Companion' && _selectedSubgroup == 'Poultry & Waterfowl';
+    final isRuminantOrEquine = _selectedCategory == 'Livestock / Companion' && _selectedSubgroup == 'Livestock & Ruminants';
+    final isCompanionMammal = _selectedCategory == 'Livestock / Companion' && _selectedSubgroup == 'Companion Mammals';
+    final isBird = _selectedCategory == 'Bird';
+    final isReptileOrAmphibian = _selectedCategory == 'Reptile' || _selectedCategory == 'Amphibian';
+    final isMammalLike =
+        _selectedCategory == 'Mammal' || _selectedCategory == 'Marsupial' || _selectedCategory == 'Rodent' || isRuminantOrEquine || isCompanionMammal;
+
+    switch (stage) {
+      case 'Active Layer':
+        return isPoultry;
+      case 'Lactating / Nursing':
+        return isMammalLike;
+      case 'Molting / Recovery':
+        return isBird || isReptileOrAmphibian || isPoultry;
+      case 'Working / Performance':
+        return isRuminantOrEquine || isCompanionMammal;
+      default:
+        return true;
+    }
+  }
+
+  /// Resets the selected production stage back to the default if switching
+  /// category/subgroup made it irrelevant (e.g. was "Active Layer", category
+  /// changed from Poultry to Dog) - mirrors the existing reset-on-change
+  /// pattern already used for subgroup/species below.
+  void _dropProductionStageIfIrrelevant() {
+    if (!_isProductionStageRelevant(_selectedProductionStage)) {
+      _selectedProductionStage = 'Healthy / Normal';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -158,6 +218,14 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
     final availableSpecies = _currentSubgroup.species;
     if (!availableSpecies.contains(_selectedSpecies) && availableSpecies.isNotEmpty) {
       _selectedSpecies = availableSpecies.first;
+    }
+
+    final visibleProductionStages = _productionStages
+        .where(_isProductionStageRelevant)
+        .where((s) => tier.isPaid || !_lockedProductionStages.contains(s))
+        .toList();
+    if (!visibleProductionStages.contains(_selectedProductionStage)) {
+      visibleProductionStages.add(_selectedProductionStage);
     }
 
     return Dialog(
@@ -221,6 +289,7 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                       _selectedCategory = val;
                       _selectedSubgroup = _currentCategory.subgroups.first.name;
                       _selectedSpecies = _currentCategory.subgroups.first.species.first;
+                      _dropProductionStageIfIrrelevant();
                     });
                   },
                 ),
@@ -234,6 +303,7 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                       setState(() {
                         _selectedSubgroup = val;
                         _selectedSpecies = _currentSubgroup.species.first;
+                        _dropProductionStageIfIrrelevant();
                       });
                     },
                   ),
@@ -243,9 +313,9 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                   label: 'Species',
                   value: _selectedSpecies,
                   items: availableSpecies,
-                  lockedItems: availableSpecies.where((s) => _isSpeciesLocked(s, isPro)).toList(),
+                  lockedItems: availableSpecies.where((s) => _isSpeciesLocked(s, tier)).toList(),
                   onChanged: (val) {
-                    if (_isSpeciesLocked(val, isPro)) {
+                    if (_isSpeciesLocked(val, tier)) {
                       showDialog(context: context, builder: (context) => const UpgradeDialog());
                       return;
                     }
@@ -256,10 +326,12 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Dog and Cat are included. Every other species needs Pro.',
-                          style: TextStyle(color: Colors.white54, fontSize: 12),
+                          tier == UserTier.tier1
+                              ? 'Dog, Cat, Rabbit & Chicken are included. Every other species needs Pro.'
+                              : 'Dog and Cat are included. Every other species needs Pro.',
+                          style: const TextStyle(color: Colors.white54, fontSize: 12),
                         ),
                       ),
                       TextButton(
@@ -371,14 +443,8 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                 _buildDropdown(
                   label: 'Animal Health / Production State',
                   value: _selectedProductionStage,
-                  items: _productionStages,
-                  onChanged: (val) {
-                    if (val.contains('🔒') && !tier.isPaid) {
-                      showDialog(context: context, builder: (context) => const UpgradeDialog());
-                      return;
-                    }
-                    setState(() => _selectedProductionStage = val);
-                  },
+                  items: visibleProductionStages,
+                  onChanged: (val) => setState(() => _selectedProductionStage = val),
                 ),
                 if (!tier.isPaid) ...[
                   const SizedBox(height: 8),
@@ -421,7 +487,7 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     onPressed: () {
-                      if (_isSpeciesLocked(_selectedSpecies, isPro)) {
+                      if (_isSpeciesLocked(_selectedSpecies, tier)) {
                         showDialog(context: context, builder: (context) => const UpgradeDialog());
                         return;
                       }
@@ -486,7 +552,12 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                 value: i,
                 child: Row(
                   children: [
-                    Expanded(child: Text(i, overflow: TextOverflow.ellipsis)),
+                    Expanded(
+                      child: Text(
+                        _feedingSystemLabels[i] ?? i,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     if (lockedItems.contains(i)) ...[
                       const SizedBox(width: 6),
                       const Icon(Icons.lock, size: 14, color: Colors.white38),

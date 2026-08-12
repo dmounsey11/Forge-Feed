@@ -1,15 +1,19 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/animal_profile.dart';
+import '../models/health_screening_result.dart';
+import '../models/ingredient.dart';
 import '../services/database_service.dart';
 import '../services/diet_calculator.dart';
 import '../services/nutrition_target_resolver.dart';
 import '../services/tier_service.dart';
 import '../widgets/add_profile_dialog.dart';
-import '../widgets/health_screening_dialog.dart';
+import '../widgets/health_options_section.dart';
 import '../widgets/prep_amount_dialog.dart';
 import '../widgets/upgrade_dialog.dart';
 import 'ration_result_screen.dart';
+
+enum _CreateFeedStage { closed, profilePicker, baseIngredients, supplements }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,18 +23,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _showPicker = false;
+  _CreateFeedStage _stage = _CreateFeedStage.closed;
   AnimalProfile? _selectedProfile;
   PrepAmountResult? _prepResult;
+  Set<String> _selectedPantryIds = {};
+  Set<String> _selectedSupplementIds = {};
   HealthScreeningResult? _healthResult;
-  bool _healthSkipped = false;
 
-  void _reset() {
+  void _resetToStart() {
     setState(() {
       _selectedProfile = null;
       _prepResult = null;
+      _selectedPantryIds = {};
+      _selectedSupplementIds = {};
       _healthResult = null;
-      _healthSkipped = false;
+      _stage = _CreateFeedStage.profilePicker;
     });
   }
 
@@ -44,37 +51,29 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedProfile = profile;
       _prepResult = prepResult;
+      _selectedPantryIds = {};
+      _selectedSupplementIds = {};
       _healthResult = null;
-      _healthSkipped = false;
+      _stage = _CreateFeedStage.baseIngredients;
     });
-
-    final tier = context.read<TierService>().tier;
-    if (tier.isPaid) {
-      final healthResult = await showDialog<HealthScreeningResult>(
-        context: context,
-        builder: (context) => HealthScreeningDialog(profile: profile),
-      );
-      if (!mounted) return;
-      setState(() => _healthResult = healthResult ?? const HealthScreeningResult());
-    } else {
-      final wantsUpgrade = await showDialog<bool>(
-        context: context,
-        builder: (context) => const HealthUpgradePromptDialog(),
-      );
-      if (!mounted) return;
-      if (wantsUpgrade == true) {
-        await showDialog(
-          context: context,
-          builder: (context) => const UpgradeDialog(),
-        );
-        if (!mounted) return;
-      }
-      setState(() => _healthSkipped = true);
-    }
   }
 
   void _openAddProfileDialog() {
     final db = context.read<DatabaseService>();
+    final tier = context.read<TierService>().tier;
+    final limit = tier.maxAnimalProfiles;
+    if (limit != null && db.profiles.length >= limit) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${tier.label} allows up to $limit animal profiles.'),
+          action: SnackBarAction(
+            label: 'Upgrade',
+            onPressed: () => showDialog(context: context, builder: (context) => const UpgradeDialog()),
+          ),
+        ),
+      );
+      return;
+    }
     showDialog(
       context: context,
       builder: (ctx) => AddProfileDialog(
@@ -85,18 +84,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final profiles = context.watch<DatabaseService>().profiles;
+    final db = context.watch<DatabaseService>();
+    final tier = context.watch<TierService>().tier;
+
+    Widget body;
+    switch (_stage) {
+      case _CreateFeedStage.closed:
+        body = _buildCreateFeedButton();
+      case _CreateFeedStage.profilePicker:
+        body = _buildProfilePicker(db.profiles);
+      case _CreateFeedStage.baseIngredients:
+        body = _buildBaseIngredientsStage(db.getPantryIngredients());
+      case _CreateFeedStage.supplements:
+        body = _buildSupplementsStage(db.getSupplementIngredients(), tier);
+    }
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: _selectedProfile != null
-              ? _buildSessionSummary()
-              : _showPicker
-                  ? _buildProfilePicker(profiles)
-                  : _buildCreateFeedButton(),
+          child: body,
         ),
       ),
     );
@@ -106,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Center(
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () => setState(() => _showPicker = true),
+        onTap: () => setState(() => _stage = _CreateFeedStage.profilePicker),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 340),
           child: Image.asset('assets/images/createbutton.png'),
@@ -120,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextButton.icon(
-          onPressed: () => setState(() => _showPicker = false),
+          onPressed: () => setState(() => _stage = _CreateFeedStage.closed),
           icon: const Icon(Icons.arrow_back, color: Colors.white60, size: 18),
           label: const Text('Back', style: TextStyle(color: Colors.white60)),
         ),
@@ -186,88 +194,131 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _calculateDiet() {
-    final profile = _selectedProfile!;
+  String get _prepLabel {
     final prep = _prepResult!;
-    final db = context.read<DatabaseService>();
-
-    final target = NutritionTargetResolver.resolve(profile, db.speciesRequirements);
-    if (target == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No nutrition data available yet for this species.')),
-      );
-      return;
-    }
-
-    final pantryItems = db.getPantryIngredients();
-    if (pantryItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Add at least one pantry item before calculating a diet.')),
-      );
-      return;
-    }
-
-    final result = DietCalculator.calculate(
-      profile: profile,
-      target: target,
-      health: _healthSkipped ? null : _healthResult,
-      prep: prep,
-      pantryItems: pantryItems,
-      supplementItems: db.getSupplementIngredients(),
-      safetyRules: db.safetyRules,
-      stageHasDedicatedData: NutritionTargetResolver.stageHasDedicatedData(profile, db.speciesRequirements),
-    );
-
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => RationResultScreen(result: result, profileName: profile.name),
-      ),
-    );
-  }
-
-  Widget _buildSessionSummary() {
-    final profile = _selectedProfile!;
-    final prep = _prepResult!;
-    final prepLabel = prep.mode == PrepMode.days
+    return prep.mode == PrepMode.days
         ? '${prep.value.toStringAsFixed(0)} day${prep.value == 1 ? '' : 's'}'
         : '${prep.value.toStringAsFixed(1)} lbs';
+  }
 
+  Widget _buildBaseIngredientsStage(List<Ingredient> pantryItems) {
+    final profile = _selectedProfile!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextButton.icon(
-          onPressed: _reset,
+          onPressed: _resetToStart,
           icon: const Icon(Icons.arrow_back, color: Colors.white60, size: 18),
           label: const Text('Change Animal', style: TextStyle(color: Colors.white60)),
         ),
-        const SizedBox(height: 8),
-        Container(
+        const SizedBox(height: 4),
+        const Text(
+          'Select Base Ingredients',
+          style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          'For ${profile.name} - prepping $_prepLabel. Pick which pantry items go in this batch.',
+          style: const TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 16),
+        Expanded(
+          child: pantryItems.isEmpty
+              ? _buildEmptyCard('No pantry items in stock yet. Head to the Pantry tab to add some.')
+              : _buildIngredientChecklist(
+                  items: pantryItems,
+                  selectedIds: _selectedPantryIds,
+                  onToggle: (id, selected) => setState(() {
+                    if (selected) {
+                      _selectedPantryIds.add(id);
+                    } else {
+                      _selectedPantryIds.remove(id);
+                    }
+                  }),
+                ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
           width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFF242426),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF3A3A3D)),
+          height: 48,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFF97316),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: _confirmBaseIngredients,
+            child: const Text(
+              'Create Base Feed',
+              style: TextStyle(color: Color(0xFF1A1A1C), fontWeight: FontWeight.bold),
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+      ],
+    );
+  }
+
+  void _confirmBaseIngredients() {
+    if (_selectedPantryIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Select at least one pantry item before creating a base feed.')),
+      );
+      return;
+    }
+    setState(() => _stage = _CreateFeedStage.supplements);
+  }
+
+  Widget _buildSupplementsStage(List<Ingredient> supplementItems, UserTier tier) {
+    final profile = _selectedProfile!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextButton.icon(
+          onPressed: () => setState(() => _stage = _CreateFeedStage.baseIngredients),
+          icon: const Icon(Icons.arrow_back, color: Colors.white60, size: 18),
+          label: const Text('Back', style: TextStyle(color: Colors.white60)),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          'Add Supplements',
+          style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        const Text(
+          'Optional - pick any supplements to add on top of the base feed.',
+          style: TextStyle(color: Colors.grey, fontSize: 13),
+        ),
+        const SizedBox(height: 16),
+        Expanded(
+          child: ListView(
             children: [
-              Text(
-                profile.name,
-                style: const TextStyle(color: Color(0xFFF97316), fontSize: 20, fontWeight: FontWeight.bold),
+              if (supplementItems.isEmpty)
+                const Text(
+                  "You haven't stocked any supplements - that's fine, this step is optional.",
+                  style: TextStyle(color: Colors.grey, fontSize: 13),
+                )
+              else
+                _buildIngredientChecklist(
+                  items: supplementItems,
+                  selectedIds: _selectedSupplementIds,
+                  onToggle: (id, selected) => setState(() {
+                    if (selected) {
+                      _selectedSupplementIds.add(id);
+                    } else {
+                      _selectedSupplementIds.remove(id);
+                    }
+                  }),
+                  shrinkWrap: true,
+                ),
+              const SizedBox(height: 20),
+              HealthOptionsSection(
+                key: ValueKey(profile.id),
+                profile: profile,
+                tier: tier,
+                initialResult: _healthResult,
+                onResultChanged: (result) => setState(() => _healthResult = result),
               ),
-              Text(
-                '${profile.species} - ${profile.sex} - ${profile.ageGroup}',
-                style: const TextStyle(color: Colors.grey, fontSize: 13),
-              ),
-              const SizedBox(height: 16),
-              _SummaryRow(label: 'Prepping for', value: prepLabel),
-              const SizedBox(height: 8),
-              _SummaryRow(label: 'Health notes', value: _healthSummaryText()),
             ],
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
         SizedBox(
           width: double.infinity,
           height: 48,
@@ -287,20 +338,98 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String _healthSummaryText() {
-    if (_healthSkipped) return 'Skipped (upgrade to add health details)';
-    final health = _healthResult;
-    if (health == null) return 'Not answered yet';
-    if (!health.hasAnyFlag) return 'No flags reported - healthy baseline';
+  Widget _buildIngredientChecklist({
+    required List<Ingredient> items,
+    required Set<String> selectedIds,
+    required void Function(String id, bool selected) onToggle,
+    bool shrinkWrap = false,
+  }) {
+    return ListView.builder(
+      shrinkWrap: shrinkWrap,
+      physics: shrinkWrap ? const NeverScrollableScrollPhysics() : null,
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return Card(
+          color: const Color(0xFF242426),
+          margin: const EdgeInsets.only(bottom: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: const BorderSide(color: Color(0xFF3A3A3D)),
+          ),
+          child: CheckboxListTile(
+            value: selectedIds.contains(item.id),
+            activeColor: const Color(0xFFF97316),
+            checkColor: const Color(0xFF1A1A1C),
+            title: Text(item.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            subtitle: Text(
+              '${item.category} | CP: ${item.asFedMetrics.crudeProteinPct}% | Ca: ${item.asFedMetrics.calciumPct}%',
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+            onChanged: (checked) => onToggle(item.id, checked ?? false),
+          ),
+        );
+      },
+    );
+  }
 
-    final notes = <String>[];
-    if (health.pregnant) notes.add('Pregnant');
-    if (health.breeding) notes.add('Breeding');
-    if (health.injured) {
-      notes.add(health.injuryNotes.isEmpty ? 'Injured' : 'Injured (${health.injuryNotes})');
+  Widget _buildEmptyCard(String message) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF242426),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Center(
+        child: Text(message, style: const TextStyle(color: Colors.grey), textAlign: TextAlign.center),
+      ),
+    );
+  }
+
+  void _calculateDiet() {
+    final profile = _selectedProfile!;
+    final prep = _prepResult!;
+    final db = context.read<DatabaseService>();
+
+    final target = NutritionTargetResolver.resolve(profile, db.speciesRequirements);
+    if (target == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No nutrition data available yet for this species.')),
+      );
+      return;
     }
-    if (health.hibernatingOrBrumating) notes.add('Hibernating/Brumating');
-    return notes.join(', ');
+
+    final selectedPantryItems =
+        db.getPantryIngredients().where((i) => _selectedPantryIds.contains(i.id)).toList();
+    final selectedSupplementItems =
+        db.getSupplementIngredients().where((i) => _selectedSupplementIds.contains(i.id)).toList();
+
+    if (selectedPantryItems.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Add at least one pantry item before calculating a diet.')),
+      );
+      setState(() => _stage = _CreateFeedStage.baseIngredients);
+      return;
+    }
+
+    final result = DietCalculator.calculate(
+      profile: profile,
+      target: target,
+      health: _healthResult,
+      prep: prep,
+      pantryItems: selectedPantryItems,
+      supplementItems: selectedSupplementItems,
+      safetyRules: db.safetyRules,
+      stageHasDedicatedData: NutritionTargetResolver.stageHasDedicatedData(profile, db.speciesRequirements),
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => RationResultScreen(result: result, profileName: profile.name),
+      ),
+    );
   }
 }
 
@@ -375,29 +504,6 @@ class _AddProfileCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _SummaryRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _SummaryRow({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 110,
-          child: Text(label, style: const TextStyle(color: Colors.white54, fontSize: 13)),
-        ),
-        Expanded(
-          child: Text(value, style: const TextStyle(color: Colors.white, fontSize: 13)),
-        ),
-      ],
     );
   }
 }

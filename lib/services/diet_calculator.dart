@@ -1,9 +1,9 @@
 import '../models/animal_profile.dart';
 import '../models/ingredient.dart';
 import '../models/ration_result.dart';
+import '../models/health_screening_result.dart';
 import '../models/safety_rule.dart';
 import '../models/species_requirement.dart';
-import '../widgets/health_screening_dialog.dart';
 import '../widgets/prep_amount_dialog.dart';
 
 const double _kgToLb = 2.20462;
@@ -225,8 +225,8 @@ class DietCalculator {
 
     final comparisons = [
       _compare('Protein', '%', adjMinProtein, adjMaxProtein, finalProteinPct),
-      _compare('Fat', '%', null, null, finalFatPct),
-      _compare('Fiber', '%', null, null, finalFiberPct),
+      _compare('Fat', '%', target.minFatPerc, target.maxFatPerc, finalFatPct),
+      _compare('Fiber', '%', target.minFiberPerc, target.maxFiberPerc, finalFiberPct),
       _compare('Calcium', '%', adjMinCalcium, adjMaxCalcium, finalCalciumPct),
       _compare('Phosphorus', '%', target.minPhosphorusPerc, target.maxPhosphorusPerc, finalPhosphorusPct),
       _compare('Energy', 'kcal/lb', adjMinEnergyKcalLb, adjMaxEnergyKcalLb, finalEnergy),
