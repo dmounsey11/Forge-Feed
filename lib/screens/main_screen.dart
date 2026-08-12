@@ -40,7 +40,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
           Positioned.fill(
-            child: Container(color: const Color(0xFF1A1A1C).withValues(alpha: 0.86)),
+            child: Container(color: const Color(0xFF2A2A2D).withValues(alpha: 0.78)),
           ),
           SafeArea(
             child: Column(
@@ -67,9 +67,13 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Shown to every tier - see [[project_payments_and_roadmap]]:
-          // revenue doesn't come from gating ads behind free tier.
-          const AdBannerWidget(),
+          // Shown to Free and Hobby tiers; Pro is ad-free.
+          Consumer<TierService>(
+            builder: (context, tierService, _) {
+              if (tierService.tier == UserTier.pro) return const SizedBox.shrink();
+              return const AdBannerWidget();
+            },
+          ),
           BottomNavigationBar(
             currentIndex: _currentIndex,
             onTap: (index) {
@@ -137,7 +141,7 @@ class HeaderBar extends StatelessWidget {
                   children: [
                     Image.asset(
                       'assets/images/logo.png',
-                      height: 40,
+                      height: 56,
                     ),
                     const SizedBox(width: 12),
                     Flexible(
@@ -145,34 +149,20 @@ class HeaderBar extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Row(
-                            children: [
-                              const Text(
-                                'FORGE FEED',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 1.2,
-                                ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF242426),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'V2.4',
+                              style: TextStyle(
+                                color: Color(0xFFF97316),
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
                               ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF242426),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: const Text(
-                                  'V2.4',
-                                  style: TextStyle(
-                                    color: Color(0xFFF97316),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                           if (!isNarrow)
                             const Text(

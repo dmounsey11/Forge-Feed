@@ -13,6 +13,10 @@
   final double copperPpm;
   final double molybdenumPpm;
   final double oxalatePct;
+  /// % dry matter (100 - moisture %). Null means unknown - callers treat
+  /// that as 100% (fully dry) rather than guessing, so an un-populated item
+  /// doesn't distort a blend's dry-matter-basis calculations.
+  final double? dryMatterPct;
 
   AsFedMetrics({
     this.crudeProteinPct = 0.0,
@@ -29,6 +33,7 @@
     this.copperPpm = 0.0,
     this.molybdenumPpm = 0.0,
     this.oxalatePct = 0.0,
+    this.dryMatterPct,
   });
 
   // Expected getters in logic files
@@ -51,6 +56,7 @@
         'copperPpm': copperPpm,
         'molybdenumPpm': molybdenumPpm,
         'oxalatePct': oxalatePct,
+        if (dryMatterPct != null) 'dryMatterPct': dryMatterPct,
       };
 
   factory AsFedMetrics.fromJson(Map<String, dynamic> json) => AsFedMetrics(
@@ -68,6 +74,11 @@
         copperPpm: (json['copperPpm'] as num?)?.toDouble() ?? 0.0,
         molybdenumPpm: (json['molybdenumPpm'] as num?)?.toDouble() ?? 0.0,
         oxalatePct: (json['oxalatePct'] as num?)?.toDouble() ?? 0.0,
+        // Some source files (livestock_feeds.json, pet_kibble.json,
+        // usda_ingredients.json) publish moisture % instead of dry matter %
+        // directly - derive DM from it when dryMatterPct itself isn't given.
+        dryMatterPct: (json['dryMatterPct'] as num?)?.toDouble() ??
+            ((json['moisturePct'] as num?) != null ? 100.0 - (json['moisturePct'] as num).toDouble() : null),
       );
 }
 
@@ -96,6 +107,7 @@ class Ingredient {
     double? crudeFatPct,
     double? crudeFiberPct,
     double? energyMeKcalLb,
+    double? dryMatterPct,
   }) : asFedMetrics = asFedMetrics ??
             AsFedMetrics(
               crudeProteinPct: proteinPct ?? 0.0,
@@ -104,6 +116,7 @@ class Ingredient {
               fatPct: crudeFatPct ?? fatPctValue ?? 0.0,
               fiberPct: crudeFiberPct ?? fiberPctValue ?? 0.0,
               energyKcalLb: energyMeKcalLb ?? 0.0,
+              dryMatterPct: dryMatterPct,
             );
 
   // Convenience getters
@@ -142,6 +155,7 @@ class Ingredient {
   factory Ingredient.fromUsdaJson(Map<String, dynamic> json, {String? categoryOverride}) {
     double n(String key) => (json[key] as num?)?.toDouble() ?? 0.0;
     const kgToLb = 2.20462;
+    final dryMatterPerc = (json['dryMatterPerc'] as num?)?.toDouble();
     return Ingredient(
       id: json['id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
@@ -160,6 +174,7 @@ class Ingredient {
         methioninePct: n('methioninePerc'),
         taurinePct: n('taurinePerc'),
         niacinMgKg: n('niacinMgKg'),
+        dryMatterPct: dryMatterPerc,
       ),
     );
   }

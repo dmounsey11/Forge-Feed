@@ -34,5 +34,6 @@ flutter:
     - assets/data/ingredients.json
     - assets/images/logo.png
     - assets/images/background.png
+    - assets/images/createbutton.png
     - assets/data/safety_rules.json
     - assets/data/species_catalog.json

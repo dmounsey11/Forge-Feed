@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../services/ad_service.dart';
 
-/// A bottom banner ad shown to every user regardless of subscription tier -
-/// ad revenue doesn't come from restricting ads to the free tier, so this
-/// widget is never wrapped in a tier check anywhere it's used.
+/// A bottom banner ad. Shown to Free and Hobby tiers; callers should skip
+/// rendering this for Pro users, who are ad-free.
 class AdBannerWidget extends StatefulWidget {
   const AdBannerWidget({super.key});
 

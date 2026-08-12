@@ -6,7 +6,7 @@ class InfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 5,
+      length: 4,
       child: Column(
         children: [
           const TabBar(
@@ -17,7 +17,6 @@ class InfoScreen extends StatelessWidget {
             tabs: [
               Tab(icon: Icon(Icons.battery_charging_full), text: 'Body Battery'),
               Tab(icon: Icon(Icons.science), text: 'Vitamins & Minerals'),
-              Tab(icon: Icon(Icons.health_and_safety), text: 'Symptom Matrix'),
               Tab(icon: Icon(Icons.menu_book), text: 'Ingredients'),
               Tab(icon: Icon(Icons.kitchen), text: 'Kitchen Tools'),
             ],
@@ -27,7 +26,6 @@ class InfoScreen extends StatelessWidget {
               children: [
                 _buildBodyBatteryTab(),
                 _buildNutrientsTab(),
-                _buildSymptomsTab(),
                 _buildIngredientsTab(),
                 _buildKitchenToolsTab(),
               ],
@@ -43,21 +41,27 @@ class InfoScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
-        const Card(
+        Card(
           color: Colors.black45,
-          child: Padding(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: Color(0xFFF97316), width: 1),
+          ),
+          child: const Padding(
             padding: EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'The "Body Battery" & "Clock Speed" Concept',
+                  'Think in Clock Speeds, Not Just "Nutrients"',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFFF97316)),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Livestock metabolisms function like a battery grid driven by biological "clock speeds". '
-                  'Different nutrients deplete at vastly different rates during stress, production, or environmental shift.',
+                  'Every animal runs on a biological battery grid. Some nutrients drain in hours under stress; '
+                  'others take months to run dry - and just as long to refill. ForgeFeed\'s safety checks are '
+                  'built around these three speeds: know which tier a symptom points to, and you know how fast '
+                  'you actually need to move.',
                   style: TextStyle(color: Colors.grey),
                 ),
               ],
@@ -66,23 +70,32 @@ class InfoScreen extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         _buildBatteryCard(
-          'High Clock Speed (Hours)',
+          'High Clock Speed · Hours',
           'Electrolytes & Hydration',
-          'Depletes rapidly in heat stress or sudden output. Must be replenished immediately before cellular damage occurs.',
+          'The fastest-draining tank in the body. Heat stress, diarrhea, or a sudden spike in activity can empty '
+          'it before you notice anything\'s wrong - cellular damage starts within hours, not days. It\'s why '
+          "ForgeFeed's safety engine caps added salt at 0.5% of a batch: too little drains fast, too much is "
+          'just as dangerous.',
           Colors.redAccent,
           Icons.flash_on,
         ),
         _buildBatteryCard(
-          'Medium Clock Speed (Days / Weeks)',
-          'Water-Soluble Vitamins & Protein',
-          'Vitamins B & C are not heavily stored in tissues. Deficiencies show quickly in feathering, energy, and egg production.',
+          'Medium Clock Speed · Days to Weeks',
+          'Water-Soluble Vitamins & Amino Acids',
+          "B-vitamins and amino acids like Lysine and Methionine aren't warehoused in tissue - the body uses what "
+          "it needs and flushes the rest. Skip a few days of proper intake and it shows: sluggish growth, patchy "
+          "feathering, dropped production. Waterfowl burn through Niacin especially fast - almost double a "
+          "chicken's requirement.",
           Colors.orangeAccent,
           Icons.timer,
         ),
         _buildBatteryCard(
-          'Slow Clock Speed (Months)',
-          'Fat-Soluble Vitamins & Bone Minerals',
-          'Calcium, Phosphorus, Vitamins A, D, E, K. Stored in bone structure and fatty tissue; takes longer to drain, but recovery takes months.',
+          'Slow Clock Speed · Months',
+          'Fat-Soluble Vitamins & Structural Minerals',
+          'Calcium, Phosphorus, Vitamins A/D/E/K, and trace minerals like Copper are banked in bone and fatty '
+          "tissue. That's good news and bad news: a short gap won't tank the animal, but rebuilding a real "
+          "deficit takes months, not one good meal. It also means overdoing a fat-soluble nutrient - like "
+          "Copper in sheep - can quietly build toward toxicity long before symptoms ever show.",
           Colors.blueAccent,
           Icons.battery_saver,
         ),
@@ -113,69 +126,154 @@ class InfoScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
-        _buildNutrientTile('Vitamin A', 'Mucous Membranes & Vision', 'Deficiency leads to eye discharge, respiratory vulnerability, and dropped production.'),
-        _buildNutrientTile('Vitamin D3', 'Calcium Absorption', 'Critical for eggshell strength and skeletal integrity. Synthetic or direct sunlight exposure required.'),
-        _buildNutrientTile('Vitamin E & Selenium', 'Muscle & Nerve Function', 'Prevents Wry Neck and Encephalomalacia. Crucial antioxidant pair.'),
-        _buildNutrientTile('Calcium (Ca)', 'Eggshell & Bone Health', 'High demand during active laying. Must be paired with D3 and proper Phosphorus ratio (~2:1 to 4:1).'),
-        _buildNutrientTile('Manganese (Mn)', 'Tendon & Bone Structure', 'Deficiency causes slipped tendon (perosis) in rapidly growing birds.'),
-      ],
-    );
-  }
-
-  Widget _buildNutrientTile(String name, String role, String notes) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      child: ListTile(
-        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFF97316))),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Role: $role', style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
-            const SizedBox(height: 2),
-            Text(notes, style: const TextStyle(color: Colors.grey)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // 3. SYMPTOM MATRIX TAB
-  Widget _buildSymptomsTab() {
-    return ListView(
-      padding: const EdgeInsets.all(16.0),
-      children: [
-        _buildSymptomCard('Soft / Thin Eggshells', 'Calcium / Vitamin D3 Deficiency', 'Provide free-choice coarse limestone or oyster shell. Ensure adequate D3 supplementation.'),
-        _buildSymptomCard('Wry Neck (Star Gazing)', 'Vitamin E / Selenium Deficiency', 'Supplement Vitamin E and Selenium immediately in water or direct liquid dose.'),
-        _buildSymptomCard('Slipped Tendon (Perosis)', 'Manganese or B-Vitamin Deficiency', 'Ensure chick starter has balanced trace mineral pack; difficult to reverse once joint deforms.'),
-        _buildSymptomCard('Feather Pecking / Cannibalism', 'Protein or Methionine Shortage', 'Increase overall crude protein % or check dietary amino acid profile (lysine/methionine).'),
-      ],
-    );
-  }
-
-  Widget _buildSymptomCard(String symptom, String cause, String fix) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      child: ExpansionTile(
-        leading: const Icon(Icons.warning_amber_rounded, color: Colors.amber),
-        title: Text(symptom, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('Possible Cause: $cause', style: const TextStyle(color: Colors.amberAccent, fontSize: 12)),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
+        const Card(
+          color: Colors.black45,
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.build_circle_outlined, color: Color(0xFFF97316)),
-                const SizedBox(width: 10),
-                Expanded(child: Text('Corrective Action: $fix', style: const TextStyle(color: Colors.white70))),
+                Text(
+                  'What ForgeFeed Actually Checks',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFFF97316)),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  "Every entry below is a nutrient ForgeFeed tracks on every ingredient and checks against every "
+                  "recipe you build - grouped by the same Body Battery clock speed, with the real Pantry items "
+                  "that supply it.",
+                  style: TextStyle(color: Colors.grey),
+                ),
               ],
             ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        _buildSpeedHeader('High Clock Speed · Hours', Colors.redAccent),
+        _buildNutrientTile(
+          'Sodium (Salt)',
+          'Electrolyte & fluid balance',
+          "Powers nerve signaling and hydration. Heat stress or scours can drain it in hours - but overshoot it "
+          "just as fast: ForgeFeed's safety engine flags any batch where added salt exceeds 0.5% of the total.",
+          'Salt (NaCl)',
+          Colors.redAccent,
+        ),
+        _buildSpeedHeader('Medium Clock Speed · Days to Weeks', Colors.orangeAccent),
+        _buildNutrientTile(
+          'Lysine & Methionine',
+          'Essential amino acids for growth & feathering',
+          "Not stockpiled - a shortfall shows up within days to weeks as slow growth or ragged feathering. Low "
+          "Methionine specifically is a known driver of feather-pecking and cannibalism.",
+          'L-Lysine HCl, DL-Methionine, Amino Acid Isolate',
+          Colors.orangeAccent,
+        ),
+        _buildNutrientTile(
+          'Niacin (Vitamin B3)',
+          'Nerve & leg development',
+          "Water-soluble and flushed out fast. Waterfowl need roughly double a chicken's Niacin (~55-70 mg/kg) - "
+          "standard chicken starter runs them short, and it shows up as bowed legs and hock swelling within weeks.",
+          "Niacin / Vitamin B3 Powder, Brewer's Yeast, Nutritional Yeast",
+          Colors.orangeAccent,
+        ),
+        _buildNutrientTile(
+          'Riboflavin (Vitamin B2)',
+          'Nerve function in young/growing animals',
+          "A gap during the brooder stage causes curled-toe paralysis within days - one of the fastest-onset "
+          "deficiencies ForgeFeed's symptom data tracks.",
+          'Commercial Multivitamin Premix',
+          Colors.orangeAccent,
+        ),
+        _buildNutrientTile(
+          'Taurine',
+          'Heart & vision support for obligate carnivores',
+          "Species like ferrets and small exotic carnivores can't synthesize it themselves - a plant-heavy or "
+          "taurine-free meat blend drains reserves over just a few weeks.",
+          'Taurine Powder',
+          Colors.orangeAccent,
+        ),
+        _buildSpeedHeader('Slow Clock Speed · Months', Colors.blueAccent),
+        _buildNutrientTile(
+          'Calcium & Phosphorus',
+          'Bone & eggshell structure',
+          "Banked in bone and drawn down slowly - but the ratio matters more than the raw amount. ForgeFeed "
+          "checks it automatically: roughly 1.5:1-2.2:1 for growing animals, up to 7:1-11:1 for actively laying "
+          "hens. High-oxalate forage can also strip calcium away before it's absorbed, which is why horses and "
+          "grazers get their own Calcium:Oxalate check.",
+          'Limestone, Oyster Shell, Dicalcium Phosphate, Ground Eggshell, Bone Meal',
+          Colors.blueAccent,
+        ),
+        _buildNutrientTile(
+          'Vitamin D3 & Vitamin E',
+          'Calcium uptake & antioxidant/nerve protection',
+          "Fat-soluble and stored in tissue for months. Low D3 undercuts calcium no matter how much you feed; low "
+          "E is linked to Encephalomalacia (\"Crazy Chick Disease\").",
+          'Liquid Vitamin D3, Vitamin E Oil, Cod Liver Oil',
+          Colors.blueAccent,
+        ),
+        _buildNutrientTile(
+          'Copper & Molybdenum',
+          'Enzyme cofactors - the narrowest safety margin ForgeFeed tracks',
+          "Copper accumulates in the liver over months. Sheep need the Cu:Mo ratio held between 3:1 and 10:1 - "
+          "ForgeFeed flags this automatically, since copper toxicity from a generic trace mineral mix is one of "
+          "the most common fatal mistakes in mixed-species setups.",
+          'Trace Mineral Premix (verify copper-safe before feeding sheep)',
+          Colors.blueAccent,
+        ),
+        _buildNutrientTile(
+          'Manganese',
+          'Tendon & bone structure in fast-growing birds',
+          "A structural mineral, slow to deplete - but a deficiency causes perosis (slipped tendon), and the "
+          "hock damage it leaves behind is permanent.",
+          'Trace Mineral Premix',
+          Colors.blueAccent,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSpeedHeader(String label, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12, bottom: 4, left: 4),
+      child: Row(
+        children: [
+          Icon(Icons.circle, size: 10, color: color),
+          const SizedBox(width: 8),
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 0.5),
           ),
         ],
       ),
     );
   }
 
-  // 4. INGREDIENT ENCYCLOPEDIA TAB
+  Widget _buildNutrientTile(String name, String role, String notes, String pantrySources, Color speedColor) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: ListTile(
+          leading: Icon(Icons.circle, color: speedColor, size: 14),
+          title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFF97316))),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Role: $role', style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
+              const SizedBox(height: 4),
+              Text(notes, style: const TextStyle(color: Colors.grey)),
+              const SizedBox(height: 6),
+              Text(
+                'In your Pantry: $pantrySources',
+                style: const TextStyle(color: Colors.white54, fontSize: 12, fontStyle: FontStyle.italic),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 3. INGREDIENT ENCYCLOPEDIA TAB
   Widget _buildIngredientsTab() {
     return ListView(
       padding: const EdgeInsets.all(16.0),
@@ -189,7 +287,7 @@ class InfoScreen extends StatelessWidget {
     );
   }
 
-  // 5. KITCHEN TOOLS TAB
+  // 4. KITCHEN TOOLS TAB
   Widget _buildKitchenToolsTab() {
     return ListView(
       padding: const EdgeInsets.all(16.0),

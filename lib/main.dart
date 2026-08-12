@@ -5,6 +5,7 @@ import 'services/database_service.dart';
 import 'services/purchase_service.dart';
 import 'services/tier_service.dart';
 import 'screens/main_screen.dart';
+import 'screens/onboarding_disclaimer_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,22 +52,28 @@ class AppStartup extends StatefulWidget {
 }
 
 class _AppStartupState extends State<AppStartup> {
-  late final Future<void> _initFuture;
+  late final Future<bool> _initFuture;
+  bool _disclaimerAccepted = false;
 
   @override
   void initState() {
     super.initState();
-    _initFuture = Future.wait([
+    _initFuture = _init();
+  }
+
+  Future<bool> _init() async {
+    await Future.wait([
       context.read<DatabaseService>().initialize(),
       context.read<TierService>().initialize(),
       context.read<PurchaseService>().initialize(),
       initializeAds(),
     ]);
+    return hasAcceptedDisclaimer();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
+    return FutureBuilder<bool>(
       future: _initFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
@@ -75,6 +82,11 @@ class _AppStartupState extends State<AppStartup> {
             body: Center(
               child: CircularProgressIndicator(color: Color(0xFFF97316)),
             ),
+          );
+        }
+        if (!(snapshot.data ?? false) && !_disclaimerAccepted) {
+          return OnboardingDisclaimerScreen(
+            onAccepted: () => setState(() => _disclaimerAccepted = true),
           );
         }
         return const MainScreen();

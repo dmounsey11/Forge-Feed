@@ -12,7 +12,8 @@
       "phosphorusPct": 0.5,
       "fatPct": 2.5,
       "fiberPct": 6.0,
-      "energyKcalLb": 1400
+      "energyKcalLb": 1400,
+      "dryMatterPct": 90.0
     }
   },
   {
@@ -28,7 +29,8 @@
       "phosphorusPct": 0.6,
       "fatPct": 2.75,
       "fiberPct": 6.5,
-      "energyKcalLb": 1430
+      "energyKcalLb": 1430,
+      "dryMatterPct": 90.0
     }
   },
   {
@@ -44,7 +46,8 @@
       "phosphorusPct": 0.5,
       "fatPct": 2.5,
       "fiberPct": 7.0,
-      "energyKcalLb": 1400
+      "energyKcalLb": 1400,
+      "dryMatterPct": 90.0
     }
   },
   {
@@ -60,7 +63,8 @@
       "phosphorusPct": 0.6,
       "fatPct": 2.5,
       "fiberPct": 7.0,
-      "energyKcalLb": 1400
+      "energyKcalLb": 1400,
+      "dryMatterPct": 90.0
     }
   },
   {
@@ -76,7 +80,8 @@
       "phosphorusPct": 0.4,
       "fatPct": 2.75,
       "fiberPct": 15.0,
-      "energyKcalLb": 1350
+      "energyKcalLb": 1350,
+      "dryMatterPct": 90.0
     }
   },
   {
@@ -93,7 +98,8 @@
       "fatPct": 3.25,
       "fiberPct": 5.0,
       "energyKcalLb": 1550,
-      "lysinePct": 0.85
+      "lysinePct": 0.85,
+      "dryMatterPct": 90.0
     }
   },
   {
@@ -110,7 +116,8 @@
       "fatPct": 3.0,
       "fiberPct": 6.0,
       "energyKcalLb": 1540,
-      "lysinePct": 0.85
+      "lysinePct": 0.85,
+      "dryMatterPct": 90.0
     }
   },
   {
@@ -126,7 +133,8 @@
       "phosphorusPct": 0.55,
       "fatPct": 3.0,
       "fiberPct": 5.0,
-      "energyKcalLb": 1530
+      "energyKcalLb": 1530,
+      "dryMatterPct": 90.0
     }
   },
   {
@@ -142,7 +150,8 @@
       "phosphorusPct": 0.45,
       "fatPct": 7.5,
       "fiberPct": 18.0,
-      "energyKcalLb": 1350
+      "energyKcalLb": 1350,
+      "dryMatterPct": 90.0
     }
   },
   {
@@ -158,7 +167,8 @@
       "phosphorusPct": 0.4,
       "fatPct": 8.0,
       "fiberPct": 12.0,
-      "energyKcalLb": 1400
+      "energyKcalLb": 1400,
+      "dryMatterPct": 90.0
     }
   },
   {
@@ -174,7 +184,8 @@
       "phosphorusPct": 0.6,
       "fatPct": 9.2,
       "fiberPct": 15.25,
-      "energyKcalLb": 1500
+      "energyKcalLb": 1500,
+      "dryMatterPct": 90.0
     }
   },
   {
@@ -190,7 +201,8 @@
       "phosphorusPct": 0.6,
       "fatPct": 2.5,
       "fiberPct": 13.5,
-      "energyKcalLb": 1350
+      "energyKcalLb": 1350,
+      "dryMatterPct": 90.0
     }
   },
   {
@@ -208,7 +220,8 @@
       "fiberPct": 11.0,
       "energyKcalLb": 1370,
       "copperPpm": 22.0,
-      "molybdenumPpm": 1.0
+      "molybdenumPpm": 1.0,
+      "dryMatterPct": 90.0
     }
   },
   {
@@ -226,7 +239,8 @@
       "fiberPct": 17.5,
       "energyKcalLb": 1300,
       "copperPpm": 45.0,
-      "molybdenumPpm": 1.0
+      "molybdenumPpm": 1.0,
+      "dryMatterPct": 90.0
     }
   }
 ]

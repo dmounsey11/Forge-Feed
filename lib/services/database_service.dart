@@ -427,6 +427,7 @@ class DatabaseService extends ChangeNotifier {
           niacinMgKg: 24,
           copperPpm: 3.0,
           molybdenumPpm: 0.5,
+          dryMatterPct: 86.0,
         ),
       ),
       Ingredient(
@@ -443,6 +444,7 @@ class DatabaseService extends ChangeNotifier {
           niacinMgKg: 55,
           copperPpm: 3.0,
           molybdenumPpm: 0.5,
+          dryMatterPct: 88.0,
         ),
       ),
       Ingredient(
@@ -457,6 +459,7 @@ class DatabaseService extends ChangeNotifier {
           fiberPct: 3.5,
           energyKcalLb: 1100,
           niacinMgKg: 30,
+          dryMatterPct: 90.0,
         ),
       ),
       Ingredient(
@@ -469,6 +472,7 @@ class DatabaseService extends ChangeNotifier {
         fatPctValue: 28.0,
         fiberPctValue: 6.0,
         energyMeKcalLb: 1800,
+        dryMatterPct: 92.0,
       ),
 
       // Supplements & Additives
@@ -663,6 +667,7 @@ class DatabaseService extends ChangeNotifier {
         fatPctValue: 2.8,
         fiberPctValue: 2.0,
         energyMeKcalLb: 1500,
+        dryMatterPct: 86.0,
       ),
       Ingredient(
         id: 'usda_rye',
@@ -676,6 +681,7 @@ class DatabaseService extends ChangeNotifier {
           fiberPct: 2.2,
           energyKcalLb: 1360,
           niacinMgKg: 18,
+          dryMatterPct: 88.0,
         ),
       ),
       Ingredient(
@@ -690,6 +696,7 @@ class DatabaseService extends ChangeNotifier {
           fiberPct: 8.0,
           energyKcalLb: 1220,
           niacinMgKg: 85,
+          dryMatterPct: 88.0,
         ),
       ),
       Ingredient(
@@ -704,6 +711,7 @@ class DatabaseService extends ChangeNotifier {
           fiberPct: 12.0,
           energyKcalLb: 1315,
           niacinMgKg: 300,
+          dryMatterPct: 88.0,
         ),
       ),
 
@@ -718,6 +726,7 @@ class DatabaseService extends ChangeNotifier {
         fatPctValue: 2.0,
         fiberPctValue: 12.0,
         energyMeKcalLb: 900,
+        dryMatterPct: 90.0,
       ),
       Ingredient(
         id: 'meal_sunflower',
@@ -729,6 +738,7 @@ class DatabaseService extends ChangeNotifier {
         fatPctValue: 2.5,
         fiberPctValue: 13.0,
         energyMeKcalLb: 860,
+        dryMatterPct: 90.0,
       ),
       Ingredient(
         id: 'meal_cottonseed',
@@ -740,6 +750,7 @@ class DatabaseService extends ChangeNotifier {
         fatPctValue: 4.0,
         fiberPctValue: 12.0,
         energyMeKcalLb: 900,
+        dryMatterPct: 90.0,
       ),
       Ingredient(
         id: 'meal_fish',
@@ -754,6 +765,7 @@ class DatabaseService extends ChangeNotifier {
           energyKcalLb: 1300,
           niacinMgKg: 60,
           taurinePct: 0.3,
+          dryMatterPct: 92.0,
         ),
       ),
       Ingredient(
@@ -768,6 +780,7 @@ class DatabaseService extends ChangeNotifier {
           fiberPct: 1.0,
           energyKcalLb: 1130,
           taurinePct: 0.05,
+          dryMatterPct: 92.0,
         ),
       ),
       Ingredient(
@@ -780,6 +793,7 @@ class DatabaseService extends ChangeNotifier {
         fatPctValue: 3.0,
         fiberPctValue: 1.0,
         energyMeKcalLb: 1000,
+        dryMatterPct: 92.0,
       ),
       Ingredient(
         id: 'raw_soybeans_whole',
@@ -791,6 +805,7 @@ class DatabaseService extends ChangeNotifier {
         fatPctValue: 18.0,
         fiberPctValue: 5.0,
         energyMeKcalLb: 1400,
+        dryMatterPct: 88.0,
       ),
       Ingredient(
         id: 'meal_mealworm',
@@ -802,6 +817,7 @@ class DatabaseService extends ChangeNotifier {
         fatPctValue: 28.0,
         fiberPctValue: 6.0,
         energyMeKcalLb: 1900,
+        dryMatterPct: 92.0,
       ),
 
       // Forages & roughage - the ration base that pasture/hay-dependent
@@ -823,6 +839,7 @@ class DatabaseService extends ChangeNotifier {
           niacinMgKg: 40,
           copperPpm: 9.0,
           molybdenumPpm: 2.0,
+          dryMatterPct: 88.0,
         ),
       ),
       Ingredient(
@@ -838,6 +855,7 @@ class DatabaseService extends ChangeNotifier {
           energyKcalLb: 850,
           copperPpm: 6.0,
           molybdenumPpm: 1.5,
+          dryMatterPct: 88.0,
         ),
       ),
       Ingredient(
@@ -853,6 +871,7 @@ class DatabaseService extends ChangeNotifier {
           energyKcalLb: 900,
           copperPpm: 6.0,
           molybdenumPpm: 1.2,
+          dryMatterPct: 88.0,
         ),
       ),
       Ingredient(
@@ -868,6 +887,7 @@ class DatabaseService extends ChangeNotifier {
           energyKcalLb: 800,
           copperPpm: 6.0,
           molybdenumPpm: 1.0,
+          dryMatterPct: 88.0,
         ),
       ),
       Ingredient(
@@ -880,6 +900,7 @@ class DatabaseService extends ChangeNotifier {
         fatPctValue: 1.2,
         fiberPctValue: 8.0,
         energyMeKcalLb: 350,
+        dryMatterPct: 35.0,
       ),
       Ingredient(
         id: 'forage_wheat_straw',
@@ -891,6 +912,7 @@ class DatabaseService extends ChangeNotifier {
         fatPctValue: 1.5,
         fiberPctValue: 38.0,
         energyMeKcalLb: 500,
+        dryMatterPct: 90.0,
       ),
       Ingredient(
         id: 'byprod_dried_citrus_pulp',
@@ -902,6 +924,7 @@ class DatabaseService extends ChangeNotifier {
         fatPctValue: 3.0,
         fiberPctValue: 12.0,
         energyMeKcalLb: 1250,
+        dryMatterPct: 90.0,
       ),
       Ingredient(
         id: 'byprod_spent_brewers_grain',
@@ -913,6 +936,7 @@ class DatabaseService extends ChangeNotifier {
         fatPctValue: 7.0,
         fiberPctValue: 15.0,
         energyMeKcalLb: 1150,
+        dryMatterPct: 90.0,
       ),
 
       // Tropical/subtropical pasture grasses - chronically high in soluble
@@ -933,6 +957,7 @@ class DatabaseService extends ChangeNotifier {
           fiberPct: 30.0,
           energyKcalLb: 800,
           oxalatePct: 3.0,
+          dryMatterPct: 88.0,
         ),
       ),
       Ingredient(
@@ -947,6 +972,7 @@ class DatabaseService extends ChangeNotifier {
           fiberPct: 32.0,
           energyKcalLb: 780,
           oxalatePct: 2.0,
+          dryMatterPct: 88.0,
         ),
       ),
       Ingredient(
@@ -961,6 +987,7 @@ class DatabaseService extends ChangeNotifier {
           fiberPct: 26.0,
           energyKcalLb: 820,
           oxalatePct: 3.2,
+          dryMatterPct: 88.0,
         ),
       ),
       Ingredient(
@@ -975,6 +1002,7 @@ class DatabaseService extends ChangeNotifier {
           fiberPct: 31.0,
           energyKcalLb: 770,
           oxalatePct: 1.8,
+          dryMatterPct: 88.0,
         ),
       ),
 
@@ -994,6 +1022,7 @@ class DatabaseService extends ChangeNotifier {
           fatPct: 1.8,
           fiberPct: 28.0,
           energyKcalLb: 830,
+          dryMatterPct: 88.0,
         ),
       ),
       Ingredient(
@@ -1007,6 +1036,7 @@ class DatabaseService extends ChangeNotifier {
           fatPct: 1.7,
           fiberPct: 29.0,
           energyKcalLb: 800,
+          dryMatterPct: 88.0,
         ),
       ),
       Ingredient(
@@ -1020,6 +1050,7 @@ class DatabaseService extends ChangeNotifier {
           fatPct: 2.0,
           fiberPct: 27.0,
           energyKcalLb: 850,
+          dryMatterPct: 88.0,
         ),
       ),
 

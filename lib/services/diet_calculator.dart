@@ -187,6 +187,22 @@ class DietCalculator {
       return sum / finalTotalLbs;
     }
 
+    // Weighted-average % dry matter of the blend, treating any item with no
+    // known dry matter % as fully dry (100%) rather than guessing - see
+    // AsFedMetrics.dryMatterPct. Used to convert as-fed concentrations onto
+    // a dry-matter basis for absolute toxicity thresholds that are
+    // published DM-basis (e.g. sheep copper, horse oxalate), since a wet
+    // ingredient's as-fed ppm/% understates how concentrated it really is
+    // once water is excluded.
+    double finalDryMatterPct() {
+      if (finalTotalLbs <= 0) return 100;
+      double sum = 0;
+      for (final i in allItems) {
+        sum += (allLbs[i.id] ?? 0) * (i.asFedMetrics.dryMatterPct ?? 100.0);
+      }
+      return sum / finalTotalLbs;
+    }
+
     final finalProteinPct = finalPct((i) => i.asFedMetrics.crudeProteinPct);
     final finalFatPct = finalPct((i) => i.asFedMetrics.fatPct);
     final finalFiberPct = finalPct((i) => i.asFedMetrics.fiberPct);
@@ -198,6 +214,7 @@ class DietCalculator {
     final finalCopper = finalCopperPpm();
     final finalMolybdenum = finalMolybdenumPpm();
     final finalOxalatePct = finalPct((i) => i.asFedMetrics.oxalatePct);
+    final finalDMPct = finalDryMatterPct();
 
     final speciesText = profile.species.toLowerCase();
     final isSheep = speciesText.contains('sheep');
@@ -232,6 +249,7 @@ class DietCalculator {
       finalCopperPpm: finalCopper,
       finalMolybdenumPpm: finalMolybdenum,
       finalOxalatePct: finalOxalatePct,
+      finalDMPct: finalDMPct,
       safetyRules: safetyRules,
     );
     if (!stageHasDedicatedData) {
@@ -254,6 +272,15 @@ class DietCalculator {
       warnings.add(
         'This profile is set to "Pasture / Forage-First" but the environment is "Indoor" - '
         'double check that\'s intentional.',
+      );
+    }
+    final hasPerishableItems = allItems.any((i) => _isFreshOrFrozenProtein(i) || _isFreshProduce(i));
+    if (hasPerishableItems && prep.mode == PrepMode.days && prep.value > _maxFrozenStorageDays) {
+      warnings.add(
+        'You\'re prepping ${prep.value.round()} days\' worth of portions containing fresh/frozen meat or '
+        'produce. That\'s beyond the roughly $_maxFrozenStorageDays-day (3-month) window recommended for '
+        'frozen raw ingredients before quality and safety start to degrade. Consider freezing this in two '
+        'or more smaller batches instead of one long-dated batch.',
       );
     }
 
@@ -491,6 +518,13 @@ class DietCalculator {
   /// they want prepared and is used as-is.
   static const double _assumedPastureCoverageFraction = 0.5;
 
+  /// Rough upper bound on how long portioned-and-frozen fresh/frozen meat or
+  /// produce should sit in a freezer before quality/safety are assumed to
+  /// start degrading - a conservative, general "3 months" home-freezer
+  /// guideline, not an ingredient-specific shelf-life figure (the app has no
+  /// per-ingredient freezer-life data to be more precise than that).
+  static const int _maxFrozenStorageDays = 90;
+
   static double _estimateBatchWeightLbs({
     required PrepAmountResult prep,
     required AnimalProfile profile,
@@ -625,6 +659,7 @@ class DietCalculator {
     required double finalCopperPpm,
     required double finalMolybdenumPpm,
     required double finalOxalatePct,
+    required double finalDMPct,
     required List<SafetyRule> safetyRules,
   }) {
     final warnings = <String>[];
@@ -636,16 +671,51 @@ class DietCalculator {
           !rule.appliesToSpecies.any((s) => speciesText.contains(s.toLowerCase()))) {
         continue;
       }
+      if (rule.targetType == 'dm_concentration') {
+        // Absolute concentration cap/floor expressed on a dry-matter basis
+        // (e.g. "copper must stay under 10 ppm DM for sheep") - converts
+        // this blend's as-fed concentration using finalDMPct, since a
+        // published DM-basis threshold isn't directly comparable to an
+        // as-fed number for anything with meaningful moisture content.
+        final dmFraction = finalDMPct / 100.0;
+        if (dmFraction <= 0) continue;
+        double value;
+        switch (rule.targetName) {
+          case 'Cu_ppm_DM':
+            if (finalCopperPpm <= 0) continue;
+            value = finalCopperPpm / dmFraction;
+            break;
+          case 'Oxalate_pct_DM':
+            if (finalOxalatePct <= 0) continue;
+            value = finalOxalatePct / dmFraction;
+            break;
+          default:
+            continue;
+        }
+        if ((rule.minValue != null && value < rule.minValue!) ||
+            (rule.maxValue != null && value > rule.maxValue!)) {
+          warnings.add('${rule.warningMessage} (currently ~${value.toStringAsFixed(1)} DM basis)');
+        }
+        continue;
+      }
+
       if (rule.targetType == 'ratio') {
         double? ratio;
         switch (rule.targetName) {
           case 'Ca:AvailP_grower':
           case 'Ca:AvailP_layer':
+          case 'Ca:AvailP_general':
             final stage = profile.productionStage.toLowerCase();
-            final appliesToGrower = rule.targetName == 'Ca:AvailP_grower' &&
-                (stage.contains('grower') || stage.contains('starter') || stage.contains('juvenile'));
-            final appliesToLayer = rule.targetName == 'Ca:AvailP_layer' && stage.contains('layer');
-            if (!appliesToGrower && !appliesToLayer) continue;
+            final isStarterStage = stage.contains('grower') || stage.contains('starter') || stage.contains('juvenile');
+            final isLayerStage = stage.contains('layer');
+            final appliesToGrower = rule.targetName == 'Ca:AvailP_grower' && isStarterStage;
+            final appliesToLayer = rule.targetName == 'Ca:AvailP_layer' && isLayerStage;
+            // General livestock band (1.5:1-2:1-ish) is a fallback for any
+            // stage not already covered by a more specific starter/layer
+            // band above, so ruminant/other mammal stages like maintenance,
+            // lactating, and breeder aren't left with no Ca:P check at all.
+            final appliesToGeneral = rule.targetName == 'Ca:AvailP_general' && !isStarterStage && !isLayerStage;
+            if (!appliesToGrower && !appliesToLayer && !appliesToGeneral) continue;
             if (finalPhosphorusPct <= 0) continue;
             ratio = finalCalciumPct / finalPhosphorusPct;
             break;
@@ -663,6 +733,21 @@ class DietCalculator {
         if ((rule.minRatio != null && ratio < rule.minRatio!) ||
             (rule.maxRatio != null && ratio > rule.maxRatio!)) {
           warnings.add(rule.warningMessage);
+        }
+        continue;
+      }
+
+      if (rule.targetType == 'category_total') {
+        // Sums inclusion % across every item whose real Ingredient.category
+        // matches, rather than a single item's name - used for checks like
+        // "total grain/concentrate share of the ration," where no single
+        // ingredient name would ever match but the combined total matters.
+        final categoryLbs = allItems
+            .where((item) => item.category.toLowerCase() == rule.targetName.toLowerCase())
+            .fold(0.0, (sum, item) => sum + (allLbs[item.id] ?? 0));
+        final inclusionPct = (categoryLbs / finalTotalLbs) * 100.0;
+        if (rule.maxInclusionPerc != null && inclusionPct > rule.maxInclusionPerc!) {
+          warnings.add('${rule.warningMessage} (currently ${inclusionPct.toStringAsFixed(1)}%)');
         }
         continue;
       }

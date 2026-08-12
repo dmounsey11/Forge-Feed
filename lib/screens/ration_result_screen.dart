@@ -6,6 +6,11 @@ import '../services/recipe_file_saver.dart';
 import '../services/tier_service.dart';
 import '../widgets/upgrade_dialog.dart';
 
+const String _kReportFooter =
+    'Estimate only - ForgeFeed is a mathematical estimation tool, not a diagnostic system. '
+    'All dietary changes for unwell, injured, or high-risk animals must be supervised by a '
+    'licensed veterinarian.';
+
 class RationResultScreen extends StatelessWidget {
   final RationResult result;
   final String profileName;
@@ -47,7 +52,7 @@ class RationResultScreen extends StatelessWidget {
     }
 
     buffer.writeln();
-    buffer.writeln('Estimate only - not a substitute for veterinary or professional nutrition guidance.');
+    buffer.writeln(_kReportFooter);
     return buffer.toString();
   }
 
@@ -261,7 +266,7 @@ class RationResultScreen extends StatelessWidget {
           ],
           const SizedBox(height: 20),
           const Text(
-            'Estimate only - not a substitute for veterinary or professional nutrition guidance.',
+            _kReportFooter,
             style: TextStyle(color: Colors.white38, fontSize: 11, fontStyle: FontStyle.italic),
           ),
         ],

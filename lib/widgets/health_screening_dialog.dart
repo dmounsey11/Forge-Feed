@@ -74,6 +74,8 @@ class _HealthScreeningDialogState extends State<HealthScreeningDialog> {
                 'For ${widget.profile.name} - ${widget.profile.ageGroup}',
                 style: const TextStyle(color: Colors.white54, fontSize: 12),
               ),
+              const SizedBox(height: 14),
+              const _NonTriageBanner(),
               const SizedBox(height: 16),
               if (_showsPregnant)
                 _ToggleRow(
@@ -239,6 +241,41 @@ class _InjuryDisclaimerDialog extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Persistent, always-visible banner (not a click-through gate) making clear
+/// this screening feeds into the ration math, not an emergency/triage
+/// assessment - shown every time this dialog opens, regardless of what the
+/// user answers.
+class _NonTriageBanner extends StatelessWidget {
+  const _NonTriageBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF97316).withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFF97316).withValues(alpha: 0.4)),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.warning_amber_rounded, color: Color(0xFFF97316), size: 16),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'This screening adjusts feed math for known conditions - it is not a triage or '
+              'emergency-assessment tool. If this animal is showing signs of acute illness or '
+              'toxicity, contact a veterinarian immediately rather than relying on this screen.',
+              style: TextStyle(color: Colors.white70, fontSize: 11.5, height: 1.4),
+            ),
+          ),
+        ],
       ),
     );
   }

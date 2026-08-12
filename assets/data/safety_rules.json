@@ -66,6 +66,42 @@
     "warningMessage": "Active Layer Ca:AvailP ratio must stay between 7:1 and 11:1 to sustain shell quality without causing kidney failure."
   },
   {
+    "ruleId": "rule_ratio_ca_p_general",
+    "targetType": "ratio",
+    "targetName": "Ca:AvailP_general",
+    "minRatio": 1.5,
+    "maxRatio": 2.0,
+    "severity": "MEDIUM",
+    "warningMessage": "This ration's Calcium:Phosphorus ratio is outside the general safe band (roughly 1.5:1 to 2:1) recommended for most livestock, especially ruminants, to prevent urinary calculi or metabolic bone issues. Add a calcium or phosphorus source to bring it back into range."
+  },
+  {
+    "ruleId": "rule_stepdown_grain_ruminant",
+    "targetType": "category_total",
+    "targetName": "Grains & Cereals",
+    "maxInclusionPerc": 40.0,
+    "severity": "HIGH",
+    "warningMessage": "This ration is over 40% grain/concentrate for a ruminant. High-grain rations must be introduced gradually - step up the grain share over 7-14 days rather than switching all at once, so rumen microbes have time to adapt. Introducing this much grain abruptly risks acidosis.",
+    "appliesToSpecies": ["cattle", "sheep", "goat"]
+  },
+  {
+    "ruleId": "rule_dm_copper_sheep",
+    "targetType": "dm_concentration",
+    "targetName": "Cu_ppm_DM",
+    "maxValue": 10.0,
+    "severity": "CRITICAL",
+    "warningMessage": "This ration's total dietary copper is above the safe dry-matter-basis limit for sheep without excess molybdenum (~10 ppm DM). For a 70 kg sheep eating about 2.1 kg DM/day, that's roughly 21 mg copper/day - above that, risk of fatal copper toxicity rises even if the Cu:Mo ratio looks acceptable. Reduce or remove the copper-heavy ingredient(s) in this batch.",
+    "appliesToSpecies": ["sheep"]
+  },
+  {
+    "ruleId": "rule_dm_oxalate_horse",
+    "targetType": "dm_concentration",
+    "targetName": "Oxalate_pct_DM",
+    "maxValue": 2.0,
+    "severity": "CRITICAL",
+    "warningMessage": "This ration's soluble oxalate content is above the safe dry-matter-basis limit for horses (~2.0% DM). Sustained intake above this level is linked to 'Big Head' disease (nutritional secondary hyperparathyroidism). Cut back on high-oxalate grasses (Setaria, Buffel, Kikuyu, Pangola) or dilute with a low-oxalate hay.",
+    "appliesToSpecies": ["horse"]
+  },
+  {
     "ruleId": "rule_sheep_copper_cattle_feed",
     "targetType": "ingredient_keyword",
     "targetName": "cattle",
@@ -133,7 +169,7 @@
     "targetName": "sorghum-sudangrass",
     "maxInclusionPerc": 0.01,
     "severity": "MEDIUM",
-    "warningMessage": "Sorghum-sudangrass is a nitrate accumulator - risk spikes after drought, frost, heavy nitrogen fertilization, or on lush new regrowth (conditions this app has no way to check). If any of those apply, get it lab-tested for nitrate-N before feeding: under ~700 ppm is generally safe, over ~2,500 ppm is acute-toxicity danger. Don't feed untested to pregnant ruminants.",
+    "warningMessage": "Sorghum-sudangrass is a nitrate accumulator - risk spikes after drought, frost, heavy nitrogen fertilization, or on lush new regrowth (conditions this app has no way to check). If any of those apply, get it lab-tested for nitrate-N before feeding: under ~700 ppm is generally safe, over ~2,500 ppm is acute-toxicity danger. Don't feed untested to pregnant ruminants. Even once tested safe, introduce it gradually over 7-14 days rather than all at once, to give rumen microbes time to adapt.",
     "appliesToSpecies": ["cattle", "sheep", "goat"]
   },
   {
@@ -142,7 +178,7 @@
     "targetName": "johnsongrass",
     "maxInclusionPerc": 0.01,
     "severity": "MEDIUM",
-    "warningMessage": "Johnsongrass is a nitrate accumulator - risk spikes after drought, frost, heavy nitrogen fertilization, or on lush new regrowth (conditions this app has no way to check). If any of those apply, get it lab-tested for nitrate-N before feeding: under ~700 ppm is generally safe, over ~2,500 ppm is acute-toxicity danger. Don't feed untested to pregnant ruminants.",
+    "warningMessage": "Johnsongrass is a nitrate accumulator - risk spikes after drought, frost, heavy nitrogen fertilization, or on lush new regrowth (conditions this app has no way to check). If any of those apply, get it lab-tested for nitrate-N before feeding: under ~700 ppm is generally safe, over ~2,500 ppm is acute-toxicity danger. Don't feed untested to pregnant ruminants. Even once tested safe, introduce it gradually over 7-14 days rather than all at once, to give rumen microbes time to adapt.",
     "appliesToSpecies": ["cattle", "sheep", "goat"]
   },
   {
@@ -151,7 +187,7 @@
     "targetName": "pearl millet",
     "maxInclusionPerc": 0.01,
     "severity": "MEDIUM",
-    "warningMessage": "Pearl millet forage is a nitrate accumulator - risk spikes after drought, frost, heavy nitrogen fertilization, or on lush new regrowth (conditions this app has no way to check). If any of those apply, get it lab-tested for nitrate-N before feeding: under ~700 ppm is generally safe, over ~2,500 ppm is acute-toxicity danger. Don't feed untested to pregnant ruminants.",
+    "warningMessage": "Pearl millet forage is a nitrate accumulator - risk spikes after drought, frost, heavy nitrogen fertilization, or on lush new regrowth (conditions this app has no way to check). If any of those apply, get it lab-tested for nitrate-N before feeding: under ~700 ppm is generally safe, over ~2,500 ppm is acute-toxicity danger. Don't feed untested to pregnant ruminants. Even once tested safe, introduce it gradually over 7-14 days rather than all at once, to give rumen microbes time to adapt.",
     "appliesToSpecies": ["cattle", "sheep", "goat"]
   },
   {
@@ -160,7 +196,7 @@
     "targetName": "corn silage",
     "maxInclusionPerc": 0.01,
     "severity": "MEDIUM",
-    "warningMessage": "Corn silage made from drought-stressed, frosted, or heavily-nitrogen-fertilized plants can accumulate dangerous nitrate levels in the stalk, even though the app has no way to check the growing conditions behind this batch. If any of those applied, get it lab-tested for nitrate-N before feeding: under ~700 ppm is generally safe, over ~2,500 ppm is acute-toxicity danger. Don't feed untested to pregnant ruminants.",
+    "warningMessage": "Corn silage made from drought-stressed, frosted, or heavily-nitrogen-fertilized plants can accumulate dangerous nitrate levels in the stalk, even though the app has no way to check the growing conditions behind this batch. If any of those applied, get it lab-tested for nitrate-N before feeding: under ~700 ppm is generally safe, over ~2,500 ppm is acute-toxicity danger. Don't feed untested to pregnant ruminants. Even once tested safe, introduce it gradually over 7-14 days rather than all at once, to give rumen microbes time to adapt.",
     "appliesToSpecies": ["cattle", "sheep", "goat"]
   }
 ]

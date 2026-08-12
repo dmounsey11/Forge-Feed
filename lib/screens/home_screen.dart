@@ -19,6 +19,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool _showPicker = false;
   AnimalProfile? _selectedProfile;
   PrepAmountResult? _prepResult;
   HealthScreeningResult? _healthResult;
@@ -91,9 +92,24 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: _selectedProfile == null
-              ? _buildProfilePicker(profiles)
-              : _buildSessionSummary(),
+          child: _selectedProfile != null
+              ? _buildSessionSummary()
+              : _showPicker
+                  ? _buildProfilePicker(profiles)
+                  : _buildCreateFeedButton(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCreateFeedButton() {
+    return Center(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => setState(() => _showPicker = true),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 340),
+          child: Image.asset('assets/images/createbutton.png'),
         ),
       ),
     );
@@ -103,6 +119,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        TextButton.icon(
+          onPressed: () => setState(() => _showPicker = false),
+          icon: const Icon(Icons.arrow_back, color: Colors.white60, size: 18),
+          label: const Text('Back', style: TextStyle(color: Colors.white60)),
+        ),
+        const SizedBox(height: 4),
         const Text(
           'Who are you feeding?',
           style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
