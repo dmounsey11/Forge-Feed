@@ -9,6 +9,37 @@ class RationLineItem {
 
 enum NutrientStatus { onTrack, low, high, unknown }
 
+/// Ordered most- to least-severe so callers can sort a warning list simply
+/// by `severity.index`. Mirrors the severities used in safety_rules.json
+/// ('CRITICAL'|'HIGH'|'MEDIUM'|'LOW') plus covers the calculator's own
+/// hand-written advisory notes, which aren't backed by a SafetyRule.
+enum WarningSeverity {
+  critical,
+  high,
+  medium,
+  low;
+
+  static WarningSeverity parse(String raw) {
+    switch (raw.trim().toUpperCase()) {
+      case 'CRITICAL':
+        return WarningSeverity.critical;
+      case 'HIGH':
+        return WarningSeverity.high;
+      case 'MEDIUM':
+        return WarningSeverity.medium;
+      default:
+        return WarningSeverity.low;
+    }
+  }
+}
+
+class RationWarning {
+  final String message;
+  final WarningSeverity severity;
+
+  const RationWarning({required this.message, required this.severity});
+}
+
 class NutrientComparison {
   final String label;
   final String unit;
@@ -42,7 +73,7 @@ class RationResult {
   final List<RationLineItem> baseItems;
   final List<RationLineItem> supplementItems;
   final List<NutrientComparison> nutrientComparisons;
-  final List<String> warnings;
+  final List<RationWarning> warnings;
   final List<String> healthNotes;
   final List<ExcludedItem> excludedItems;
   final List<String> instructionSteps;

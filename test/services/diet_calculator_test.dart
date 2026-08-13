@@ -83,6 +83,7 @@ RationResult _calc({
   required List<Ingredient> pantryItems,
   List<Ingredient> supplementItems = const [],
   List<SafetyRule> safetyRules = const [],
+  bool stageHasDedicatedData = true,
 }) {
   return DietCalculator.calculate(
     profile: profile,
@@ -92,6 +93,7 @@ RationResult _calc({
     pantryItems: pantryItems,
     supplementItems: supplementItems,
     safetyRules: safetyRules,
+    stageHasDedicatedData: stageHasDedicatedData,
   );
 }
 
@@ -151,7 +153,7 @@ void main() {
         pantryItems: [_food('a', proteinPct: 20, copperPpm: 4, dryMatterPct: 50)],
         safetyRules: [copperRule],
       );
-      expect(result.warnings.any((w) => w.contains('Copper level unsafe')), isFalse);
+      expect(result.warnings.any((w) => w.message.contains('Copper level unsafe')), isFalse);
     });
 
     test('as-fed copper over the DM-basis cap warns with the converted value', () {
@@ -162,8 +164,9 @@ void main() {
         pantryItems: [_food('a', proteinPct: 20, copperPpm: 6, dryMatterPct: 50)],
         safetyRules: [copperRule],
       );
-      final warning = result.warnings.firstWhere((w) => w.contains('Copper level unsafe'));
-      expect(warning, contains('12.0'));
+      final warning = result.warnings.firstWhere((w) => w.message.contains('Copper level unsafe'));
+      expect(warning.message, contains('12.0'));
+      expect(warning.severity, WarningSeverity.high);
     });
 
     test('a null dry matter % is treated as fully dry (100%), not a guess', () {
@@ -175,7 +178,7 @@ void main() {
         pantryItems: [_food('a', proteinPct: 20, copperPpm: 6, dryMatterPct: null)],
         safetyRules: [copperRule],
       );
-      expect(result.warnings.any((w) => w.contains('Copper level unsafe')), isFalse);
+      expect(result.warnings.any((w) => w.message.contains('Copper level unsafe')), isFalse);
     });
 
     test('oxalate DM-basis cap fires the same way as copper', () {
@@ -194,7 +197,7 @@ void main() {
         pantryItems: [_food('a', proteinPct: 20, oxalatePct: 0.6, dryMatterPct: 50)],
         safetyRules: [oxalateRule],
       );
-      expect(result.warnings.any((w) => w.contains('Oxalate level unsafe')), isTrue);
+      expect(result.warnings.any((w) => w.message.contains('Oxalate level unsafe')), isTrue);
     });
   });
 
@@ -217,7 +220,8 @@ void main() {
         pantryItems: [_food('a', proteinPct: 20, copperPpm: 20, molybdenumPpm: 2)],
         safetyRules: [cuMoRule],
       );
-      expect(result.warnings.any((w) => w.contains('Cu:Mo ratio unsafe for sheep')), isTrue);
+      expect(result.warnings.any((w) => w.message.contains('Cu:Mo ratio unsafe for sheep')), isTrue);
+      expect(result.warnings.first.severity, WarningSeverity.critical);
     });
 
     test('the same sheep-scoped Cu:Mo rule does not fire for a goat profile', () {
@@ -227,7 +231,7 @@ void main() {
         pantryItems: [_food('a', proteinPct: 20, copperPpm: 20, molybdenumPpm: 2)],
         safetyRules: [cuMoRule],
       );
-      expect(result.warnings.any((w) => w.contains('Cu:Mo ratio unsafe for sheep')), isFalse);
+      expect(result.warnings.any((w) => w.message.contains('Cu:Mo ratio unsafe for sheep')), isFalse);
     });
 
     test('the Cu:Mo Ratio nutrient comparison only appears for sheep', () {
@@ -243,6 +247,43 @@ void main() {
       );
       expect(sheep.nutrientComparisons.any((c) => c.label == 'Cu:Mo Ratio'), isTrue);
       expect(goat.nutrientComparisons.any((c) => c.label == 'Cu:Mo Ratio'), isFalse);
+    });
+  });
+
+  group('warning severity ordering', () {
+    test('warnings come back sorted most- to least-severe across mixed sources', () {
+      final highRule = SafetyRule(
+        ruleId: 'cu_cap',
+        targetType: 'dm_concentration',
+        targetName: 'Cu_ppm_DM',
+        maxValue: 10.0,
+        severity: 'HIGH',
+        warningMessage: 'Copper level unsafe',
+      );
+      final lowRule = SafetyRule(
+        ruleId: 'trace_item',
+        targetType: 'ingredient_keyword',
+        targetName: 'a',
+        maxInclusionPerc: 0,
+        severity: 'LOW',
+        warningMessage: 'Trace item present',
+      );
+      // safetyRules deliberately ordered low-then-high, and
+      // stageHasDedicatedData:false injects a medium-severity advisory note
+      // with no SafetyRule behind it at all - the final list should still
+      // come back high, medium, low regardless of insertion order/source.
+      final result = _calc(
+        profile: _profile(),
+        target: _target(),
+        pantryItems: [_food('a', proteinPct: 20, copperPpm: 6, dryMatterPct: 50)],
+        safetyRules: [lowRule, highRule],
+        stageHasDedicatedData: false,
+      );
+
+      expect(
+        result.warnings.map((w) => w.severity).toList(),
+        [WarningSeverity.high, WarningSeverity.medium, WarningSeverity.low],
+      );
     });
   });
 }

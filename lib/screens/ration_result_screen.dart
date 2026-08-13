@@ -46,14 +46,35 @@ class RationResultScreen extends StatelessWidget {
     if (result.warnings.isNotEmpty) {
       buffer.writeln();
       buffer.writeln('Safety Warnings:');
-      for (final w in result.warnings) {
-        buffer.writeln('- $w');
+      // result.warnings already comes back sorted most- to least-severe;
+      // group under a label per tier rather than a flat bullet list so a
+      // critical warning doesn't read the same as an informational aside.
+      for (final severity in WarningSeverity.values) {
+        final atThisLevel = result.warnings.where((w) => w.severity == severity).toList();
+        if (atThisLevel.isEmpty) continue;
+        buffer.writeln('[${_severityLabel(severity)}]');
+        for (final w in atThisLevel) {
+          buffer.writeln('- ${w.message}');
+        }
       }
     }
 
     buffer.writeln();
     buffer.writeln(_kReportFooter);
     return buffer.toString();
+  }
+
+  static String _severityLabel(WarningSeverity severity) {
+    switch (severity) {
+      case WarningSeverity.critical:
+        return 'CRITICAL';
+      case WarningSeverity.high:
+        return 'HIGH';
+      case WarningSeverity.medium:
+        return 'MEDIUM';
+      case WarningSeverity.low:
+        return 'INFO';
+    }
   }
 
   Future<void> _emailRecipe(BuildContext context) async {
@@ -214,12 +235,7 @@ class RationResultScreen extends StatelessWidget {
               titleColor: Colors.redAccent,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: result.warnings
-                    .map((w) => Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: Text(w, style: const TextStyle(color: Colors.redAccent, fontSize: 13)),
-                        ))
-                    .toList(),
+                children: result.warnings.map((w) => _WarningRow(warning: w)).toList(),
               ),
             ),
           ],
@@ -353,6 +369,56 @@ class _LineItemRow extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// Renders one [RationWarning] with visual weight matched to its severity:
+/// critical/high get a bordered banner with an icon, medium keeps the
+/// original plain red-text styling, and low is muted subtext - so a real
+/// safety-cap breach doesn't read the same as an informational aside.
+class _WarningRow extends StatelessWidget {
+  final RationWarning warning;
+
+  const _WarningRow({required this.warning});
+
+  @override
+  Widget build(BuildContext context) {
+    switch (warning.severity) {
+      case WarningSeverity.critical:
+      case WarningSeverity.high:
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.redAccent.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.redAccent),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  warning.message,
+                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        );
+      case WarningSeverity.medium:
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Text(warning.message, style: const TextStyle(color: Colors.redAccent, fontSize: 13)),
+        );
+      case WarningSeverity.low:
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Text(warning.message, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+        );
+    }
   }
 }
 

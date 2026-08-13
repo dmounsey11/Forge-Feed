@@ -284,34 +284,49 @@ class DietCalculator {
     if (!stageHasDedicatedData) {
       warnings.insert(
         0,
-        'No dedicated nutrition data yet for the "${profile.productionStage}" stage of this species - '
-        'this ration uses general/maintenance-level targets instead. Treat it as a rough starting point, '
-        'not a stage-tuned recipe.',
+        RationWarning(
+          message:
+              'No dedicated nutrition data yet for the "${profile.productionStage}" stage of this species - '
+              'this ration uses general/maintenance-level targets instead. Treat it as a rough starting point, '
+              'not a stage-tuned recipe.',
+          severity: WarningSeverity.medium,
+        ),
       );
     }
     if (profile.feedingSystem == 'Pasture / Forage-First' && prep.mode == PrepMode.days) {
       warnings.insert(
         0,
-        'Assuming grazing covers about ${(_assumedPastureCoverageFraction * 100).round()}% of daily intake - '
-        'a flat default, not a real assessment of your pasture. This batch is sized to cover the rest. If your '
-        'grazing coverage is better or worse than that, enter a direct lbs amount instead of a number of days.',
+        RationWarning(
+          message:
+              'Assuming grazing covers about ${(_assumedPastureCoverageFraction * 100).round()}% of daily intake - '
+              'a flat default, not a real assessment of your pasture. This batch is sized to cover the rest. If your '
+              'grazing coverage is better or worse than that, enter a direct lbs amount instead of a number of days.',
+          severity: WarningSeverity.low,
+        ),
       );
     }
     if (profile.feedingSystem == 'Pasture / Forage-First' && profile.environment == 'Indoor') {
       warnings.add(
-        'This profile is set to "Pasture / Forage-First" but the environment is "Indoor" - '
-        'double check that\'s intentional.',
+        const RationWarning(
+          message: 'This profile is set to "Pasture / Forage-First" but the environment is "Indoor" - '
+              'double check that\'s intentional.',
+          severity: WarningSeverity.low,
+        ),
       );
     }
     final hasPerishableItems = allItems.any((i) => _isFreshOrFrozenProtein(i) || _isFreshProduce(i));
     if (hasPerishableItems && prep.mode == PrepMode.days && prep.value > _maxFrozenStorageDays) {
       warnings.add(
-        'You\'re prepping ${prep.value.round()} days\' worth of portions containing fresh/frozen meat or '
-        'produce. That\'s beyond the roughly $_maxFrozenStorageDays-day (3-month) window recommended for '
-        'frozen raw ingredients before quality and safety start to degrade. Consider freezing this in two '
-        'or more smaller batches instead of one long-dated batch.',
+        RationWarning(
+          message: 'You\'re prepping ${prep.value.round()} days\' worth of portions containing fresh/frozen meat or '
+              'produce. That\'s beyond the roughly $_maxFrozenStorageDays-day (3-month) window recommended for '
+              'frozen raw ingredients before quality and safety start to degrade. Consider freezing this in two '
+              'or more smaller batches instead of one long-dated batch.',
+          severity: WarningSeverity.medium,
+        ),
       );
     }
+    warnings.sort((a, b) => a.severity.index.compareTo(b.severity.index));
 
     final finalBaseItems = selectedFoodItems
         .where((i) => (baseLbs[i.id] ?? 0) > 0)
@@ -772,7 +787,7 @@ class DietCalculator {
     return ' This is well over double the safe limit - look for a substitute ingredient or reduce this item\'s share of the batch.';
   }
 
-  static List<String> _runSafetyChecks({
+  static List<RationWarning> _runSafetyChecks({
     required AnimalProfile profile,
     required List<Ingredient> allItems,
     required Map<String, double> allLbs,
@@ -786,7 +801,7 @@ class DietCalculator {
     required double finalDMPct,
     required List<SafetyRule> safetyRules,
   }) {
-    final warnings = <String>[];
+    final warnings = <RationWarning>[];
     if (finalTotalLbs <= 0) return warnings;
 
     final speciesText = profile.species.toLowerCase();
@@ -822,7 +837,10 @@ class DietCalculator {
         }
         if ((rule.minValue != null && value < rule.minValue!) ||
             (rule.maxValue != null && value > rule.maxValue!)) {
-          warnings.add('${rule.warningMessage} (currently ~${value.toStringAsFixed(1)} DM basis)');
+          warnings.add(RationWarning(
+            message: '${rule.warningMessage} (currently ~${value.toStringAsFixed(1)} DM basis)',
+            severity: WarningSeverity.parse(rule.severity),
+          ));
         }
         continue;
       }
@@ -860,7 +878,7 @@ class DietCalculator {
         }
         if ((rule.minRatio != null && ratio < rule.minRatio!) ||
             (rule.maxRatio != null && ratio > rule.maxRatio!)) {
-          warnings.add(rule.warningMessage);
+          warnings.add(RationWarning(message: rule.warningMessage, severity: WarningSeverity.parse(rule.severity)));
         }
         continue;
       }
@@ -875,10 +893,11 @@ class DietCalculator {
             .fold(0.0, (sum, item) => sum + (allLbs[item.id] ?? 0));
         final inclusionPct = (categoryLbs / finalTotalLbs) * 100.0;
         if (rule.maxInclusionPerc != null && inclusionPct > rule.maxInclusionPerc!) {
-          warnings.add(
-            '${rule.warningMessage} (currently ${inclusionPct.toStringAsFixed(1)}%)'
-            '${_overCapSuffix(inclusionPct, rule.maxInclusionPerc!)}',
-          );
+          warnings.add(RationWarning(
+            message: '${rule.warningMessage} (currently ${inclusionPct.toStringAsFixed(1)}%)'
+                '${_overCapSuffix(inclusionPct, rule.maxInclusionPerc!)}',
+            severity: WarningSeverity.parse(rule.severity),
+          ));
         }
         continue;
       }
@@ -891,10 +910,11 @@ class DietCalculator {
         if (!item.name.toLowerCase().contains(rule.targetName.toLowerCase())) continue;
         final inclusionPct = (lbs / finalTotalLbs) * 100.0;
         if (rule.maxInclusionPerc != null && inclusionPct > rule.maxInclusionPerc!) {
-          warnings.add(
-            '${item.name}: ${rule.warningMessage} (currently ${inclusionPct.toStringAsFixed(1)}%)'
-            '${_overCapSuffix(inclusionPct, rule.maxInclusionPerc!)}',
-          );
+          warnings.add(RationWarning(
+            message: '${item.name}: ${rule.warningMessage} (currently ${inclusionPct.toStringAsFixed(1)}%)'
+                '${_overCapSuffix(inclusionPct, rule.maxInclusionPerc!)}',
+            severity: WarningSeverity.parse(rule.severity),
+          ));
         }
       }
     }
