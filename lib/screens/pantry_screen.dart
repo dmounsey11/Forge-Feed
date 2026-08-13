@@ -77,14 +77,16 @@ class _PantryScreenState extends State<PantryScreen> {
       children: [
         Icon(icon, color: const Color(0xFFF97316), size: 26),
         const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
-            Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+              Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            ],
+          ),
         ),
-        const Spacer(),
+        const SizedBox(width: 12),
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFF97316),
