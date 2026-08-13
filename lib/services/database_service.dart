@@ -84,6 +84,78 @@ class DatabaseService extends ChangeNotifier {
     'ing_05958': 'Natural Supplements', // Vinegar, cider
     'ing_06671': 'Proteins & Meal', // Fish, anchovy, european, raw
     'ing_07608': 'Proteins & Meal', // Fish, mackerel, Atlantic, raw
+    // Phase 6 expansion: a hand-reviewed batch of additional whole-food
+    // USDA SR-Legacy records (identified via tool/find_ingredient_candidates.dart,
+    // which filters the raw dump down to genuine ", raw" whole-ingredient
+    // entries and excludes branded/prepared/dessert items). Deliberately
+    // excludes alliums (garlic, onion, chives, shallots, leeks) and
+    // macadamia nuts - both are real toxicity risks for common target
+    // species (dogs/cats) and this app has no safety_rules.json entries
+    // for them yet.
+    'ing_02868': 'Produce', // Broccoli, raw
+    'ing_02464': 'Produce', // Cabbage, raw
+    'ing_02475': 'Produce', // Cauliflower, raw
+    'ing_02872': 'Produce', // Brussels sprouts, raw
+    'ing_01634': 'Produce', // Beets, raw
+    'ing_02954': 'Produce', // Turnips, raw
+    'ing_02906': 'Produce', // Parsnips, raw
+    'ing_01765': 'Produce', // Radishes, raw
+    'ing_02560': 'Produce', // Yam, raw
+    'ing_00878': 'Produce', // Asparagus, raw
+    'ing_01694': 'Produce', // Artichokes, (globe or french), raw
+    'ing_01740': 'Produce', // Mushrooms, white, raw
+    'ing_01744': 'Produce', // Mushrooms, portabella, raw
+    'ing_02557': 'Produce', // Watercress, raw
+    'ing_01876': 'Produce', // Arugula, raw
+    'ing_02895': 'Produce', // Collards, raw
+    'ing_01745': 'Produce', // Mustard greens, raw
+    'ing_02550': 'Produce', // Turnip greens, raw
+    'ing_02864': 'Produce', // Beet greens, raw
+    'ing_02916': 'Produce', // Peppers, sweet, green, raw
+    'ing_02597': 'Produce', // Peppers, sweet, red, raw
+    'ing_01872': 'Produce', // Peppers, sweet, yellow, raw
+    'ing_04186': 'Fruits', // Apricots, raw
+    'ing_04208': 'Fruits', // Cherries, sweet, raw
+    'ing_02417': 'Fruits', // Peaches, yellow, raw
+    'ing_02438': 'Fruits', // Plums, raw
+    'ing_01581': 'Fruits', // Melons, cantaloupe, raw
+    'ing_02400': 'Fruits', // Melons, honeydew, raw
+    'ing_05522': 'Fruits', // Grapefruit, raw, pink and red and white, all areas
+    'ing_02399': 'Fruits', // Mangos, raw
+    'ing_02415': 'Fruits', // Papayas, raw
+    'ing_05510': 'Fruits', // Figs, raw
+    'ing_00642': 'Fruits', // Kiwifruit, green, raw
+    'ing_01623': 'Fruits', // Pomegranates, raw
+    'ing_02191': 'Grains & Cereals', // Millet, raw
+    'ing_02215': 'Grains & Cereals', // Wild rice, raw
+    'ing_01361': 'Grains & Cereals', // Oat bran, raw
+    'ing_04909': 'Proteins & Meal', // Lentils, raw
+    'ing_06245': 'Proteins & Meal', // Chickpeas (garbanzo beans, bengal gram), mature seeds, raw
+    'ing_06223': 'Proteins & Meal', // Beans, black, mature seeds, raw
+    'ing_07688': 'Proteins & Meal', // Beans, pinto, mature seeds, raw
+    'ing_06234': 'Proteins & Meal', // Beans, navy, mature seeds, raw
+    'ing_07679': 'Proteins & Meal', // Beans, great northern, mature seeds, raw
+    'ing_04919': 'Proteins & Meal', // Peanuts, all types, raw
+    'ing_06759': 'Proteins & Meal', // Soybeans, mature seeds, raw
+    'ing_00885': 'Proteins & Meal', // Lima beans, immature seeds, raw
+    'ing_02908': 'Proteins & Meal', // Peas, green, raw
+    'ing_04965': 'Proteins & Meal', // Tofu, raw, regular, prepared with calcium sulfate
+    'ing_06859': 'Proteins & Meal', // Lamb, ground, raw
+    'ing_05020': 'Proteins & Meal', // Lamb, variety meats and by-products, liver, raw
+    'ing_05016': 'Proteins & Meal', // Lamb, variety meats and by-products, heart, raw
+    'ing_07668': 'Proteins & Meal', // Crustaceans, shrimp, raw
+    'ing_06689': 'Proteins & Meal', // Fish, halibut, Atlantic and Pacific, raw
+    'ing_04444': 'Proteins & Meal', // Fish, cod, Atlantic, raw
+    'ing_07642': 'Proteins & Meal', // Fish, trout, mixed species, raw
+    'ing_07605': 'Proteins & Meal', // Fish, herring, Atlantic, raw
+    'ing_07611': 'Proteins & Meal', // Fish, mackerel, king, raw
+    'ing_07665': 'Proteins & Meal', // Fish, tilapia, raw
+    'ing_04899': 'Proteins & Meal', // Duck, domesticated, meat only, raw
+    'ing_04908': 'Proteins & Meal', // Quail, meat only, raw
+    'ing_06836': 'Proteins & Meal', // Game meat, rabbit, wild, raw
+    'ing_02651': 'Natural Supplements', // Nuts, cashew nuts, raw
+    'ing_02673': 'Natural Supplements', // Nuts, pistachio nuts, raw
+    'ing_02658': 'Natural Supplements', // Nuts, coconut meat, raw
   };
 
   // Retags the pre-existing curated Produce/Fruits USDA records into the
@@ -115,6 +187,41 @@ class DatabaseService extends ChangeNotifier {
     'ing_02408': 'Citrus', // Oranges
     'ing_01607': 'Common & Core Staples', // Pears
     'ing_04211': 'Common & Core Staples', // Cranberries
+    // Phase 6 expansion subcategories - see _curatedUsdaIngredientCategories.
+    'ing_02868': 'Cruciferous Vegetables', // Broccoli
+    'ing_02464': 'Cruciferous Vegetables', // Cabbage
+    'ing_02475': 'Cruciferous Vegetables', // Cauliflower
+    'ing_02872': 'Cruciferous Vegetables', // Brussels sprouts
+    'ing_01634': 'Root Vegetables & Tubers', // Beets
+    'ing_02954': 'Root Vegetables & Tubers', // Turnips
+    'ing_02906': 'Root Vegetables & Tubers', // Parsnips
+    'ing_01765': 'Root Vegetables & Tubers', // Radishes
+    'ing_02560': 'Root Vegetables & Tubers', // Yam
+    'ing_00878': 'Stalk & Bulb', // Asparagus
+    'ing_01694': 'Stalk & Bulb', // Artichokes
+    'ing_01740': 'Fungi', // Mushrooms, white
+    'ing_01744': 'Fungi', // Mushrooms, portabella
+    'ing_02557': 'Leafy Greens & Forage Produce', // Watercress
+    'ing_01876': 'Leafy Greens & Forage Produce', // Arugula
+    'ing_02895': 'Leafy Greens & Forage Produce', // Collards
+    'ing_01745': 'Leafy Greens & Forage Produce', // Mustard greens
+    'ing_02550': 'Leafy Greens & Forage Produce', // Turnip greens
+    'ing_02864': 'Leafy Greens & Forage Produce', // Beet greens
+    'ing_02916': 'Fruiting Vegetables & Nightshades', // Peppers, green
+    'ing_02597': 'Fruiting Vegetables & Nightshades', // Peppers, red
+    'ing_01872': 'Fruiting Vegetables & Nightshades', // Peppers, yellow
+    'ing_04186': 'Common & Core Staples', // Apricots
+    'ing_04208': 'Common & Core Staples', // Cherries
+    'ing_02417': 'Common & Core Staples', // Peaches
+    'ing_02438': 'Common & Core Staples', // Plums
+    'ing_01581': 'Melons & High-Moisture', // Cantaloupe
+    'ing_02400': 'Melons & High-Moisture', // Honeydew
+    'ing_05522': 'Citrus', // Grapefruit
+    'ing_02399': 'Specialty/Wild', // Mangos
+    'ing_02415': 'Specialty/Wild', // Papayas
+    'ing_05510': 'Specialty/Wild', // Figs
+    'ing_00642': 'Specialty/Wild', // Kiwifruit
+    'ing_01623': 'Specialty/Wild', // Pomegranates
   };
 
   // Commercial farm-gate livestock/poultry feeds (Purina, Nutrena,
