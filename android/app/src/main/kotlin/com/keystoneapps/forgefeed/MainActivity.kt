@@ -1,4 +1,4 @@
-package com.example.forge_feed
+package com.keystoneapps.forgefeed
 
 import io.flutter.embedding.android.FlutterActivity
 
