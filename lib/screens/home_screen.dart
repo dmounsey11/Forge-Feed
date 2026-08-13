@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/animal_profile.dart';
 import '../models/health_screening_result.dart';
 import '../models/ingredient.dart';
+import '../models/ration_result.dart';
 import '../services/database_service.dart';
 import '../services/diet_calculator.dart';
 import '../services/nutrition_target_resolver.dart';
@@ -366,9 +367,16 @@ class _HomeScreenState extends State<HomeScreen> {
       stageHasDedicatedData: NutritionTargetResolver.stageHasDedicatedData(profile, db.speciesRequirements),
     );
 
+    if (result is RationCalculationError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.message)),
+      );
+      return;
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => RationResultScreen(result: result, profileName: profile.name),
+        builder: (context) => RationResultScreen(result: result as RationResult, profileName: profile.name),
       ),
     );
   }

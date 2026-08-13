@@ -5,6 +5,7 @@ import '../models/health_screening_result.dart';
 import '../models/safety_rule.dart';
 import '../models/species_requirement.dart';
 import '../widgets/prep_amount_dialog.dart';
+import 'simplex_solver.dart';
 
 const double _kgToLb = 2.20462;
 
@@ -25,12 +26,20 @@ class _TargetAdjustment {
 /// Turns a selected animal, its resolved species targets, health screening
 /// answers, and the user's pantry/supplement stock into a ration: how much
 /// of each pantry item to use, plus how much of each supplement is needed
-/// to close the calcium/phosphorus/sodium gap. See the plan notes in
-/// lib/services (and the project plan file) for what this v1 does and does
+/// to close nutrient gaps the base feed can't cover. See the plan notes in
+/// lib/services (and the project plan file) for what this does and does
 /// not attempt precisely - this is a helpful estimate, not a vet-verified
 /// formulation.
+///
+/// The core blend is produced by a single Linear Program (see
+/// [_solveDietLp]/[SimplexSolver]) that jointly satisfies crude protein,
+/// amino acid minimums, mineral ranges, energy, and every hard safety
+/// ceiling this data can express, rather than a sequential heuristic. If no
+/// combination of the available pantry/supplement items can satisfy every
+/// constraint at once, [calculate] returns a [RationCalculationError]
+/// instead of silently producing an out-of-range blend.
 class DietCalculator {
-  static RationResult calculate({
+  static Object calculate({
     required AnimalProfile profile,
     required SpeciesRequirement target,
     required HealthScreeningResult? health,
@@ -57,9 +66,9 @@ class DietCalculator {
 
     // 1. Split the pantry into real "food" candidates vs. mineral-heavy
     // items (limestone, oyster shell, dicalcium phosphate, etc.) - those
-    // belong in the gap-fill supplement math below, not blended at equal
-    // weight into the base, no matter which list the user happened to put
-    // them in.
+    // belong with the supplements in the LP's candidate pool, not blended
+    // in as if they were food, no matter which list the user happened to
+    // put them in.
     var foodCandidates = pantryItems.where((i) => !_isMineralLike(i)).toList();
     var feedingSystemFilteredIds = <String>{};
     if (profile.feedingSystem == 'Raw / Whole Food + Premix') {
@@ -83,89 +92,46 @@ class DietCalculator {
       ...mineralPantryItems.where((m) => !supplementItems.any((s) => s.id == m.id)),
     ];
 
-    // 2. Pick a small, sensible base blend instead of using everything:
-    // the highest- and lowest-protein selected foods as balancing anchors
-    // (a classic "Pearson square" ration-balancing technique), plus a
-    // couple of extras chosen for their overall nutrient fit (protein,
-    // calcium, phosphorus, fat - not protein alone), capped so a handful
-    // of pantry items aren't drowned out by a dozen others.
-    final targetProteinMidpoint = (adjMinProtein + adjMaxProtein) / 2;
-    final targetCalciumMidpoint = (adjMinCalcium + adjMaxCalcium) / 2;
-    final targetPhosphorusMidpoint = (target.minPhosphorusPerc + target.maxPhosphorusPerc) / 2;
-    final targetFatMidpoint = ((target.minFatPerc ?? 0) + (target.maxFatPerc ?? 0)) / 2;
-    final selectedFoodItems = _selectBaseItems(
-      foodCandidates,
-      targetProteinMidpoint: targetProteinMidpoint,
-      targetCalciumMidpoint: targetCalciumMidpoint,
-      targetPhosphorusMidpoint: targetPhosphorusMidpoint,
-      targetFatMidpoint: targetFatMidpoint,
+    // 2. Solve one Linear Program across every food + supplement candidate
+    // at once - jointly satisfying every nutrient/amino-acid/mineral target
+    // and hard safety ceiling this data can express - rather than hand-
+    // picking a small anchor set and gap-filling afterward. See
+    // _solveDietLp for the constraint matrix.
+    final candidates = [...foodCandidates, ...supplementPool];
+    final lpOutcome = _solveDietLp(
+      candidates: candidates,
+      lowCostIds: foodCandidates.map((i) => i.id).toSet(),
+      totalWeightLbs: totalWeightLbs,
+      target: target,
+      adjMinProtein: adjMinProtein,
+      adjMaxProtein: adjMaxProtein,
+      adjMinCalcium: adjMinCalcium,
+      adjMaxCalcium: adjMaxCalcium,
+      adjMinEnergyKcalLb: adjMinEnergyKcalLb,
+      adjMaxEnergyKcalLb: adjMaxEnergyKcalLb,
+      safetyRules: safetyRules,
+      profile: profile,
     );
-    final baseLbs = _pearsonBlend(selectedFoodItems, totalWeightLbs, targetProteinMidpoint);
-
-    double baseNutrientLbs(double Function(Ingredient) pctOf) {
-      double sum = 0;
-      for (final i in selectedFoodItems) {
-        sum += (baseLbs[i.id] ?? 0) * (pctOf(i) / 100.0);
-      }
-      return sum;
+    if (!lpOutcome.feasible) {
+      return const RationCalculationError(
+        "No combination of your selected pantry and supplement items can satisfy every nutrient and "
+        "safety target at once for this batch. Try adding more pantry variety (especially items higher "
+        "in protein, calcium, or phosphorus) or stocking a broader supplement/mineral base, then "
+        "recalculate.",
+      );
     }
-
-    final baseCalciumLbs = baseNutrientLbs((i) => i.asFedMetrics.calciumPct);
-    final basePhosphorusLbs = baseNutrientLbs((i) => i.asFedMetrics.phosphorusPct);
-    final baseSodiumLbs = baseNutrientLbs((i) => i.asFedMetrics.sodiumPct);
-
-    // 3. Supplement gap-fill for calcium/phosphorus/sodium, aiming for the
-    // midpoint of the adjusted target range.
-    final calciumGoalLbs = ((adjMinCalcium + adjMaxCalcium) / 2 / 100.0) * totalWeightLbs;
-    final phosphorusGoalLbs = ((target.minPhosphorusPerc + target.maxPhosphorusPerc) / 2 / 100.0) * totalWeightLbs;
-    final sodiumGoalLbs = ((target.minSodiumPerc + target.maxSodiumPerc) / 2 / 100.0) * totalWeightLbs;
-
-    final calciumFill = _fillGap(
-      currentLbs: baseCalciumLbs,
-      goalLbs: calciumGoalLbs,
-      supplements: supplementPool,
-      pctOf: (i) => i.asFedMetrics.calciumPct,
-    );
-    final phosphorusFill = _fillGap(
-      currentLbs: basePhosphorusLbs,
-      goalLbs: phosphorusGoalLbs,
-      supplements: supplementPool,
-      pctOf: (i) => i.asFedMetrics.phosphorusPct,
-    );
-    final sodiumFill = _fillGap(
-      currentLbs: baseSodiumLbs,
-      goalLbs: sodiumGoalLbs,
-      supplements: supplementPool,
-      pctOf: (i) => i.asFedMetrics.sodiumPct,
-    );
-
-    final supplementLbs = <String, double>{};
-    for (final pass in [calciumFill, phosphorusFill, sodiumFill]) {
-      for (final entry in pass.entries) {
-        final existing = supplementLbs[entry.key];
-        supplementLbs[entry.key] = (existing == null || entry.value > existing) ? entry.value : existing;
-      }
-    }
-
-    // 4. Final blend across base + supplement items together.
-    final allItems = [...selectedFoodItems, ...supplementPool.where((s) => (supplementLbs[s.id] ?? 0) > 0)];
-    final allLbs = <String, double>{...baseLbs, ...supplementLbs};
+    final allLbs = lpOutcome.lbsByIngredientId;
+    final allItems = candidates.where((i) => allLbs.containsKey(i.id)).toList();
     final finalTotalLbs = allLbs.values.fold(0.0, (sum, v) => sum + v);
 
     final usedIds = allItems.map((i) => i.id).toSet();
-    final unselectedFoodIds =
-        foodCandidates.where((i) => !selectedFoodItems.any((s) => s.id == i.id)).map((i) => i.id).toSet();
     final excludedItems = <ExcludedItem>[];
     final seenExcludedIds = <String>{};
     for (final i in [...pantryItems, ...supplementItems]) {
       if (usedIds.contains(i.id) || !seenExcludedIds.add(i.id)) continue;
       excludedItems.add(ExcludedItem(
         name: i.name,
-        reason: _explainExclusion(
-          item: i,
-          feedingSystemFilteredIds: feedingSystemFilteredIds,
-          unselectedFoodIds: unselectedFoodIds,
-        ),
+        reason: _explainExclusion(item: i, feedingSystemFilteredIds: feedingSystemFilteredIds),
       ));
     }
 
@@ -266,7 +232,11 @@ class DietCalculator {
         _compare('Ca:Oxalate Ratio', ':1', 0.5, null, finalCalciumPct / finalOxalatePct),
     ];
 
-    // 4. Safety rule checks against the final blend.
+    // 3. Safety rule checks against the final blend. The LP above already
+    // treats every rule it can express as a hard constraint, so this is
+    // largely a redundant safety net plus coverage for rule shapes the LP
+    // doesn't linearize (nothing with a maxValue/maxInclusionPerc should
+    // actually fire here in practice).
     final warnings = _runSafetyChecks(
       profile: profile,
       allItems: allItems,
@@ -328,13 +298,13 @@ class DietCalculator {
     }
     warnings.sort((a, b) => a.severity.index.compareTo(b.severity.index));
 
-    final finalBaseItems = selectedFoodItems
-        .where((i) => (baseLbs[i.id] ?? 0) > 0)
-        .map((i) => RationLineItem(ingredient: i, lbs: baseLbs[i.id]!))
+    final finalBaseItems = foodCandidates
+        .where((i) => (allLbs[i.id] ?? 0) > 0)
+        .map((i) => RationLineItem(ingredient: i, lbs: allLbs[i.id]!))
         .toList();
     final finalSupplementItems = supplementPool
-        .where((i) => (supplementLbs[i.id] ?? 0) > 0)
-        .map((i) => RationLineItem(ingredient: i, lbs: supplementLbs[i.id]!))
+        .where((i) => (allLbs[i.id] ?? 0) > 0)
+        .map((i) => RationLineItem(ingredient: i, lbs: allLbs[i.id]!))
         .toList();
 
     final instructions = _buildInstructions(
@@ -357,6 +327,235 @@ class DietCalculator {
       portionCount: instructions.portionCount,
       portionSizeOz: instructions.portionSizeOz,
     );
+  }
+
+  /// Builds and solves the Linear Program that produces the ration blend:
+  /// one variable per candidate ingredient (pounds used), constrained to
+  /// sum to [totalWeightLbs] and to keep every nutrient this app tracks
+  /// within its target range (or above its minimum, for amino acids/
+  /// taurine/niacin), plus every hard safety ceiling [safetyRules] can
+  /// express (see [_hardSafetyConstraints]). The objective prefers whole
+  /// foods ([lowCostIds], cost 0) over supplements/minerals (cost 1), so
+  /// supplements are only used to the extent the foods alone can't meet a
+  /// target - mirroring the old heuristic's intent, just solved jointly
+  /// instead of as a separate gap-fill pass.
+  static ({bool feasible, Map<String, double> lbsByIngredientId}) _solveDietLp({
+    required List<Ingredient> candidates,
+    required Set<String> lowCostIds,
+    required double totalWeightLbs,
+    required SpeciesRequirement target,
+    required double adjMinProtein,
+    required double adjMaxProtein,
+    required double adjMinCalcium,
+    required double adjMaxCalcium,
+    required double adjMinEnergyKcalLb,
+    required double adjMaxEnergyKcalLb,
+    required List<SafetyRule> safetyRules,
+    required AnimalProfile profile,
+  }) {
+    if (candidates.isEmpty || totalWeightLbs <= 0) {
+      return (feasible: false, lbsByIngredientId: <String, double>{});
+    }
+
+    final n = candidates.length;
+    List<double> pctCoeffs(double Function(AsFedMetrics) pctOf) =>
+        candidates.map((i) => pctOf(i.asFedMetrics) / 100.0).toList();
+    List<double> rawCoeffs(double Function(AsFedMetrics) valOf) =>
+        candidates.map((i) => valOf(i.asFedMetrics)).toList();
+
+    final constraints = <LpConstraint>[
+      LpConstraint(List.filled(n, 1.0), ConstraintType.equal, totalWeightLbs),
+    ];
+
+    // A minimum of <= 0 is already guaranteed by x >= 0 and would just add
+    // a needless artificial variable to the solve, so those are skipped;
+    // a maximum is only skipped when genuinely absent (null), since a real
+    // max of 0 is meaningful (forces that nutrient out entirely).
+    void addRange(List<double> coeffs, double? minTotal, double? maxTotal) {
+      if (minTotal != null && minTotal > 0) {
+        constraints.add(LpConstraint(coeffs, ConstraintType.greaterOrEqual, minTotal));
+      }
+      if (maxTotal != null && maxTotal > 0) {
+        constraints.add(LpConstraint(coeffs, ConstraintType.lessOrEqual, maxTotal));
+      }
+    }
+
+    addRange(pctCoeffs((m) => m.crudeProteinPct), adjMinProtein / 100 * totalWeightLbs,
+        adjMaxProtein / 100 * totalWeightLbs);
+    addRange(pctCoeffs((m) => m.calciumPct), adjMinCalcium / 100 * totalWeightLbs,
+        adjMaxCalcium / 100 * totalWeightLbs);
+    addRange(pctCoeffs((m) => m.phosphorusPct), target.minPhosphorusPerc / 100 * totalWeightLbs,
+        target.maxPhosphorusPerc / 100 * totalWeightLbs);
+    addRange(pctCoeffs((m) => m.sodiumPct), target.minSodiumPerc / 100 * totalWeightLbs,
+        target.maxSodiumPerc / 100 * totalWeightLbs);
+    if (target.minFatPerc != null || target.maxFatPerc != null) {
+      addRange(
+        pctCoeffs((m) => m.fatPct),
+        target.minFatPerc == null ? null : target.minFatPerc! / 100 * totalWeightLbs,
+        target.maxFatPerc == null ? null : target.maxFatPerc! / 100 * totalWeightLbs,
+      );
+    }
+    if (target.minFiberPerc != null || target.maxFiberPerc != null) {
+      addRange(
+        pctCoeffs((m) => m.fiberPct),
+        target.minFiberPerc == null ? null : target.minFiberPerc! / 100 * totalWeightLbs,
+        target.maxFiberPerc == null ? null : target.maxFiberPerc! / 100 * totalWeightLbs,
+      );
+    }
+    addRange(pctCoeffs((m) => m.lysinePct), target.minLysinePerc / 100 * totalWeightLbs, null);
+    addRange(pctCoeffs((m) => m.methioninePct), target.minMethioninePerc / 100 * totalWeightLbs, null);
+    addRange(pctCoeffs((m) => m.taurinePct), target.minTaurinePerc / 100 * totalWeightLbs, null);
+    addRange(rawCoeffs((m) => m.niacinMgKg), target.minNiacinMgKg * totalWeightLbs, null);
+    addRange(rawCoeffs((m) => m.energyKcalLb), adjMinEnergyKcalLb * totalWeightLbs,
+        adjMaxEnergyKcalLb * totalWeightLbs);
+
+    constraints.addAll(_hardSafetyConstraints(
+      candidates: candidates,
+      totalWeightLbs: totalWeightLbs,
+      safetyRules: safetyRules,
+      profile: profile,
+    ));
+
+    final costs = candidates.map((i) => lowCostIds.contains(i.id) ? 0.0 : 1.0).toList();
+    final result = SimplexSolver.minimize(costs: costs, constraints: constraints);
+    if (!result.feasible) {
+      return (feasible: false, lbsByIngredientId: <String, double>{});
+    }
+
+    final lbsByIngredientId = <String, double>{};
+    for (var i = 0; i < n; i++) {
+      if (result.solution[i] > 1e-6) {
+        lbsByIngredientId[candidates[i].id] = result.solution[i];
+      }
+    }
+    return (feasible: true, lbsByIngredientId: lbsByIngredientId);
+  }
+
+  /// Turns every species-applicable [SafetyRule] with a hard numeric cap
+  /// into a linear constraint on the LP's candidate variables, so the
+  /// solver can't propose a blend that would trip it in the first place.
+  /// Mirrors the same rule interpretation as [_runSafetyChecks] (dry-matter
+  /// basis conversion, ratio bands, category/keyword inclusion caps) but
+  /// as `coefficients · x {<=,>=} rhs` instead of a post-hoc percentage
+  /// check - see the doc comment on [_solveDietLp] for why both exist.
+  static List<LpConstraint> _hardSafetyConstraints({
+    required List<Ingredient> candidates,
+    required double totalWeightLbs,
+    required List<SafetyRule> safetyRules,
+    required AnimalProfile profile,
+  }) {
+    final constraints = <LpConstraint>[];
+    final speciesText = profile.species.toLowerCase();
+    final n = candidates.length;
+
+    List<double> field(double Function(AsFedMetrics) f) => candidates.map((i) => f(i.asFedMetrics)).toList();
+
+    for (final rule in safetyRules) {
+      if (rule.appliesToSpecies.isNotEmpty &&
+          !rule.appliesToSpecies.any((s) => _speciesTextMatches(speciesText, s))) {
+        continue;
+      }
+
+      if (rule.targetType == 'dm_concentration') {
+        List<double>? valueField;
+        switch (rule.targetName) {
+          case 'Cu_ppm_DM':
+            valueField = field((m) => m.copperPpm);
+            break;
+          case 'Oxalate_pct_DM':
+            valueField = field((m) => m.oxalatePct);
+            break;
+          case 'Sugar_pct_DM':
+            valueField = field((m) => m.sugarPct);
+            break;
+        }
+        if (valueField == null) continue;
+        final dm = field((m) => m.dryMatterPct ?? 100.0);
+        if (rule.maxValue != null) {
+          final coeffs = List<double>.generate(n, (i) => valueField![i] - (rule.maxValue! / 100.0) * dm[i]);
+          constraints.add(LpConstraint(coeffs, ConstraintType.lessOrEqual, 0));
+        }
+        if (rule.minValue != null) {
+          final coeffs = List<double>.generate(n, (i) => valueField![i] - (rule.minValue! / 100.0) * dm[i]);
+          constraints.add(LpConstraint(coeffs, ConstraintType.greaterOrEqual, 0));
+        }
+        continue;
+      }
+
+      if (rule.targetType == 'ratio') {
+        List<double>? numerator;
+        List<double>? denominator;
+        switch (rule.targetName) {
+          case 'Ca:AvailP_grower':
+          case 'Ca:AvailP_layer':
+          case 'Ca:AvailP_general':
+            if (!_caAvailPRuleApplies(rule, profile)) continue;
+            numerator = field((m) => m.calciumPct);
+            denominator = field((m) => m.phosphorusPct);
+            break;
+          case 'Cu:Mo':
+            numerator = field((m) => m.copperPpm);
+            denominator = field((m) => m.molybdenumPpm);
+            break;
+          case 'Ca:Oxalate':
+            numerator = field((m) => m.calciumPct);
+            denominator = field((m) => m.oxalatePct);
+            break;
+        }
+        if (numerator == null || denominator == null) continue;
+        if (rule.minRatio != null) {
+          final coeffs = List<double>.generate(n, (i) => numerator![i] - rule.minRatio! * denominator![i]);
+          constraints.add(LpConstraint(coeffs, ConstraintType.greaterOrEqual, 0));
+        }
+        if (rule.maxRatio != null) {
+          final coeffs = List<double>.generate(n, (i) => numerator![i] - rule.maxRatio! * denominator![i]);
+          constraints.add(LpConstraint(coeffs, ConstraintType.lessOrEqual, 0));
+        }
+        continue;
+      }
+
+      if (rule.targetType == 'category_total' && rule.maxInclusionPerc != null) {
+        final coeffs = List<double>.generate(
+          n,
+          (i) => candidates[i].category.toLowerCase() == rule.targetName.toLowerCase() ? 1.0 : 0.0,
+        );
+        constraints
+            .add(LpConstraint(coeffs, ConstraintType.lessOrEqual, rule.maxInclusionPerc! / 100.0 * totalWeightLbs));
+        continue;
+      }
+
+      if ((rule.targetType == 'ingredient_category' || rule.targetType == 'ingredient_keyword') &&
+          rule.maxInclusionPerc != null) {
+        for (var i = 0; i < n; i++) {
+          if (!candidates[i].name.toLowerCase().contains(rule.targetName.toLowerCase())) continue;
+          final coeffs = List<double>.filled(n, 0.0);
+          coeffs[i] = 1.0;
+          constraints.add(
+              LpConstraint(coeffs, ConstraintType.lessOrEqual, rule.maxInclusionPerc! / 100.0 * totalWeightLbs));
+        }
+      }
+    }
+    return constraints;
+  }
+
+  /// Whether a Ca:AvailP_* ratio rule variant applies to this profile's
+  /// current production stage - mirrors the stage matching in
+  /// [_runSafetyChecks] exactly, since both need to agree on which single
+  /// Ca:P band is "the" applicable one for a given stage.
+  static bool _caAvailPRuleApplies(SafetyRule rule, AnimalProfile profile) {
+    final stage = profile.productionStage.toLowerCase();
+    final isStarterStage = stage.contains('grower') || stage.contains('starter') || stage.contains('juvenile');
+    final isLayerStage = stage.contains('layer');
+    switch (rule.targetName) {
+      case 'Ca:AvailP_grower':
+        return isStarterStage;
+      case 'Ca:AvailP_layer':
+        return isLayerStage;
+      case 'Ca:AvailP_general':
+        return !isStarterStage && !isLayerStage;
+      default:
+        return false;
+    }
   }
 
   static const double _lbToOz = 16.0;
@@ -483,151 +682,28 @@ class DietCalculator {
   /// A large calcium+phosphorus contribution with almost no protein/fat/
   /// fiber is a mineral supplement (limestone, oyster shell, dicalcium
   /// phosphate) rather than a food item, regardless of which list the user
-  /// put it in - blending it at equal weight with corn/meat would just
-  /// dilute everything else.
+  /// put it in - blending it in as if it were food would just dilute
+  /// everything else.
   static bool _isMineralLike(Ingredient i) {
     final m = i.asFedMetrics;
     final combinedMinerals = m.calciumPct + m.phosphorusPct;
     return combinedMinerals > 10.0 && m.crudeProteinPct < 5.0;
   }
 
-  /// Picks a small, sensible set of base food items instead of using
-  /// everything selected: the highest- and lowest-protein items as
-  /// balancing anchors (needed for the Pearson-square protein blend below),
-  /// plus up to 3 more items chosen by overall nutrient fit - see
-  /// [_nutrientFitScore] - so an item that's a poor protein-midpoint match
-  /// but a strong calcium/phosphorus/fat contributor (e.g. whole egg,
-  /// organ meat) can still earn a spot instead of protein % being the only
-  /// axis that matters.
-  static const int _maxExtrasCount = 3;
-
-  static List<Ingredient> _selectBaseItems(
-    List<Ingredient> candidates, {
-    required double targetProteinMidpoint,
-    required double targetCalciumMidpoint,
-    required double targetPhosphorusMidpoint,
-    required double targetFatMidpoint,
-  }) {
-    if (candidates.length <= 2) return candidates;
-
-    final sorted = [...candidates]
-      ..sort((a, b) => a.asFedMetrics.crudeProteinPct.compareTo(b.asFedMetrics.crudeProteinPct));
-    final energyAnchor = sorted.first; // lowest protein
-    final proteinAnchor = sorted.last; // highest protein
-
-    final remaining = candidates.where((i) => i.id != proteinAnchor.id && i.id != energyAnchor.id).toList()
-      ..sort((a, b) => _nutrientFitScore(
-            b,
-            targetProteinMidpoint: targetProteinMidpoint,
-            targetCalciumMidpoint: targetCalciumMidpoint,
-            targetPhosphorusMidpoint: targetPhosphorusMidpoint,
-            targetFatMidpoint: targetFatMidpoint,
-          ).compareTo(_nutrientFitScore(
-            a,
-            targetProteinMidpoint: targetProteinMidpoint,
-            targetCalciumMidpoint: targetCalciumMidpoint,
-            targetPhosphorusMidpoint: targetPhosphorusMidpoint,
-            targetFatMidpoint: targetFatMidpoint,
-          )));
-    final extras = remaining.take(_maxExtrasCount).toList();
-
-    return [proteinAnchor, energyAnchor, ...extras];
-  }
-
-  /// Scores a non-anchor candidate on how well-rounded a pick it would be:
-  /// protein close to the target midpoint (0.4 weight, keeping the extras
-  /// from skewing the anchors' protein balance), plus meaningful calcium
-  /// (0.25), phosphorus (0.15), and fat (0.2) relative to what the target
-  /// range calls for. Each nutrient term saturates at 1.0 once the item
-  /// alone would cover the full target midpoint, so a single ultra-
-  /// concentrated ingredient can't dominate purely on one axis. Weights are
-  /// a judgment call, not a derived optimum - protein still leads since
-  /// it's the axis the anchors are already tuned to.
-  static double _nutrientFitScore(
-    Ingredient item, {
-    required double targetProteinMidpoint,
-    required double targetCalciumMidpoint,
-    required double targetPhosphorusMidpoint,
-    required double targetFatMidpoint,
-  }) {
-    final m = item.asFedMetrics;
-    final proteinScore = targetProteinMidpoint > 0
-        ? 1.0 - ((m.crudeProteinPct - targetProteinMidpoint).abs() / targetProteinMidpoint).clamp(0.0, 1.0)
-        : 0.0;
-    final calciumScore =
-        targetCalciumMidpoint > 0 ? (m.calciumPct / targetCalciumMidpoint).clamp(0.0, 1.0) : 0.0;
-    final phosphorusScore =
-        targetPhosphorusMidpoint > 0 ? (m.phosphorusPct / targetPhosphorusMidpoint).clamp(0.0, 1.0) : 0.0;
-    final fatScore = targetFatMidpoint > 0 ? (m.fatPct / targetFatMidpoint).clamp(0.0, 1.0) : 0.0;
-    return proteinScore * 0.4 + calciumScore * 0.25 + phosphorusScore * 0.15 + fatScore * 0.2;
-  }
-
   /// Plain-language reason a given pantry/supplement item didn't make it
-  /// into this batch, matching the actual selection logic above: the
-  /// feeding-system whole-food filter, the protein-driven base-item pick,
-  /// or the calcium/phosphorus/sodium supplement gap-fill.
+  /// into this batch: either the feeding-system whole-food filter excluded
+  /// it outright, or the LP solve simply didn't need it to satisfy every
+  /// target/safety constraint at once.
   static String _explainExclusion({
     required Ingredient item,
     required Set<String> feedingSystemFilteredIds,
-    required Set<String> unselectedFoodIds,
   }) {
     if (feedingSystemFilteredIds.contains(item.id)) {
       return 'Your feeding system (Raw / Whole Food + Premix) prioritizes fresh/frozen protein and fresh '
           'produce over this kind of item, so it was left out of the base blend.';
     }
-    if (unselectedFoodIds.contains(item.id)) {
-      return "Not chosen as one of this batch's base foods - other items were a closer overall fit on "
-          'protein, calcium, phosphorus, and fat relative to your targets, and the base blend is capped '
-          'at a handful of items to keep portions practical.';
-    }
-    final m = item.asFedMetrics;
-    final contributesMinerals = m.calciumPct > 0 || m.phosphorusPct > 0 || m.sodiumPct > 0;
-    return contributesMinerals
-        ? 'Your calcium, phosphorus, and sodium targets were already met without needing this item this batch.'
-        : "Doesn't supply calcium, phosphorus, or sodium - the only nutrients this batch pulls in "
-            "supplements to close a gap on, so it wasn't needed.";
-  }
-
-  /// Blends the protein and energy anchors using a Pearson-square-style
-  /// ratio to hit the target protein midpoint as closely as those two
-  /// ingredients allow, with any extras included at a small fixed
-  /// inclusion rate for variety.
-  static const double _extrasCapFraction = 0.08;
-
-  static Map<String, double> _pearsonBlend(List<Ingredient> items, double totalLbs, double targetProteinPct) {
-    if (items.isEmpty || totalLbs <= 0) return {};
-    if (items.length == 1) return {items.first.id: totalLbs};
-
-    final proteinAnchor = items[0];
-    final energyAnchor = items[1];
-    final extras = items.length > 2 ? items.sublist(2) : const <Ingredient>[];
-
-    final extrasLbs = <String, double>{};
-    var extrasFraction = 0.0;
-    for (final e in extras) {
-      extrasLbs[e.id] = totalLbs * _extrasCapFraction;
-      extrasFraction += _extrasCapFraction;
-    }
-
-    final anchorsTotalLbs = totalLbs * (1 - extrasFraction);
-    final proteinA = proteinAnchor.asFedMetrics.crudeProteinPct;
-    final proteinB = energyAnchor.asFedMetrics.crudeProteinPct;
-
-    double fractionA;
-    if ((proteinA - proteinB).abs() < 0.001) {
-      fractionA = 0.5;
-    } else {
-      final partsA = targetProteinPct - proteinB;
-      final totalParts = proteinA - proteinB; // == partsA + (proteinA - target)
-      fractionA = (partsA / totalParts).clamp(0.0, 1.0);
-    }
-    final fractionB = 1.0 - fractionA;
-
-    return {
-      proteinAnchor.id: anchorsTotalLbs * fractionA,
-      energyAnchor.id: anchorsTotalLbs * fractionB,
-      ...extrasLbs,
-    };
+    return "Not needed to meet every nutrient and safety target at once for this batch - the optimizer "
+        'found a combination that works without it. That can change with a different batch size or pantry mix.';
   }
 
   /// Rough default share of daily dry matter intake assumed to come from
@@ -728,25 +804,6 @@ class DietCalculator {
       }
     }
     return adjustments;
-  }
-
-  static Map<String, double> _fillGap({
-    required double currentLbs,
-    required double goalLbs,
-    required List<Ingredient> supplements,
-    required double Function(Ingredient) pctOf,
-  }) {
-    final deficit = goalLbs - currentLbs;
-    if (deficit <= 0) return {};
-    final contributors = supplements.where((s) => pctOf(s) > 0).toList();
-    if (contributors.isEmpty) return {};
-    final perItemTarget = deficit / contributors.length;
-    final result = <String, double>{};
-    for (final s in contributors) {
-      final fraction = pctOf(s) / 100.0;
-      result[s.id] = perItemTarget / fraction;
-    }
-    return result;
   }
 
   static NutrientComparison _compare(String label, String unit, double? min, double? max, double actual) {
@@ -851,17 +908,7 @@ class DietCalculator {
           case 'Ca:AvailP_grower':
           case 'Ca:AvailP_layer':
           case 'Ca:AvailP_general':
-            final stage = profile.productionStage.toLowerCase();
-            final isStarterStage = stage.contains('grower') || stage.contains('starter') || stage.contains('juvenile');
-            final isLayerStage = stage.contains('layer');
-            final appliesToGrower = rule.targetName == 'Ca:AvailP_grower' && isStarterStage;
-            final appliesToLayer = rule.targetName == 'Ca:AvailP_layer' && isLayerStage;
-            // General livestock band (1.5:1-2:1-ish) is a fallback for any
-            // stage not already covered by a more specific starter/layer
-            // band above, so ruminant/other mammal stages like maintenance,
-            // lactating, and breeder aren't left with no Ca:P check at all.
-            final appliesToGeneral = rule.targetName == 'Ca:AvailP_general' && !isStarterStage && !isLayerStage;
-            if (!appliesToGrower && !appliesToLayer && !appliesToGeneral) continue;
+            if (!_caAvailPRuleApplies(rule, profile)) continue;
             if (finalPhosphorusPct <= 0) continue;
             ratio = finalCalciumPct / finalPhosphorusPct;
             break;

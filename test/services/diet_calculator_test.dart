@@ -77,7 +77,11 @@ AnimalProfile _profile({String species = 'Livestock: Generic', String production
 
 const _fixedAmount = PrepAmountResult(mode: PrepMode.amount, value: 10.0);
 
-RationResult _calc({
+/// [DietCalculator.calculate] returns either a [RationResult] or a
+/// [RationCalculationError] - callers pick whichever they expect for a
+/// given scenario (`as RationResult`, or an `is RationCalculationError`
+/// check).
+Object _calc({
   required AnimalProfile profile,
   required SpeciesRequirement target,
   required List<Ingredient> pantryItems,
@@ -98,44 +102,43 @@ RationResult _calc({
 }
 
 void main() {
-  group('baseline nutrient requirement matching', () {
-    test('single high-protein ingredient reports status high against a lower max', () {
+  group('LP-enforced nutrient ranges', () {
+    test('a single ingredient that can never satisfy the protein range is reported infeasible', () {
+      // Only one food, fixed at 100% of the batch by the total-weight
+      // equality constraint - its 50% protein has no room to blend down
+      // into a 10-20% range, so there is truly no feasible ration here.
+      // The old heuristic used to silently accept this and just mark the
+      // comparison "high"; the LP correctly refuses to produce it at all.
       final result = _calc(
         profile: _profile(),
         target: _target(minProteinPerc: 10, maxProteinPerc: 20),
         pantryItems: [_food('a', proteinPct: 50)],
       );
-      final protein = result.nutrientComparisons.firstWhere((c) => c.label == 'Protein');
-      expect(protein.status, NutrientStatus.high);
-      expect(protein.actual, closeTo(50, 0.001));
+      expect(result, isA<RationCalculationError>());
     });
 
-    test('single low-protein ingredient reports status low against a higher min', () {
-      final result = _calc(
-        profile: _profile(),
-        target: _target(minProteinPerc: 20, maxProteinPerc: 30),
-        pantryItems: [_food('a', proteinPct: 5)],
-      );
-      final protein = result.nutrientComparisons.firstWhere((c) => c.label == 'Protein');
-      expect(protein.status, NutrientStatus.low);
-    });
-
-    test('two anchor ingredients pearson-blend to the target protein midpoint', () {
-      // Anchors bracket the 15% midpoint (14-16 range); with only two
-      // candidates and no calcium/phosphorus/sodium deficit to fill, the
-      // final blend is exactly the two anchors solved for the midpoint.
+    test('a feasible blend never reports a hard-constrained nutrient as low or high', () {
+      // Two foods whose protein straddles the 14-16% range force a real
+      // blend; because protein min/max are now hard LP constraints, the
+      // solved batch's Protein comparison can only ever be onTrack (or the
+      // solve fails outright) - never low/high as the old heuristic could
+      // silently produce.
       final result = _calc(
         profile: _profile(),
         target: _target(minProteinPerc: 14, maxProteinPerc: 16),
         pantryItems: [_food('high', proteinPct: 30), _food('low', proteinPct: 5)],
-      );
+      ) as RationResult;
       final protein = result.nutrientComparisons.firstWhere((c) => c.label == 'Protein');
       expect(protein.status, NutrientStatus.onTrack);
-      expect(protein.actual, closeTo(15.0, 0.01));
+      expect(protein.actual, inInclusiveRange(14.0, 16.0));
+      // Neither ingredient alone satisfies the range, so a real blend of
+      // both is required - confirms the LP actually mixed them rather than
+      // picking one at 100%.
+      expect(result.baseItems.length, 2);
     });
   });
 
-  group('dry-matter basis conversion + toxicity ceilings', () {
+  group('dry-matter basis conversion + hard toxicity ceilings', () {
     final copperRule = SafetyRule(
       ruleId: 'cu_cap',
       targetType: 'dm_concentration',
@@ -145,43 +148,64 @@ void main() {
       warningMessage: 'Copper level unsafe',
     );
 
-    test('as-fed copper below the DM-basis cap does not warn', () {
+    test('as-fed copper below the DM-basis cap solves fine with no warning', () {
       // 4 ppm as-fed / 50% DM = 8 ppm DM, under the 10 ppm cap.
       final result = _calc(
         profile: _profile(),
         target: _target(),
         pantryItems: [_food('a', proteinPct: 20, copperPpm: 4, dryMatterPct: 50)],
         safetyRules: [copperRule],
-      );
+      ) as RationResult;
       expect(result.warnings.any((w) => w.message.contains('Copper level unsafe')), isFalse);
     });
 
-    test('as-fed copper over the DM-basis cap warns with the converted value', () {
-      // 6 ppm as-fed / 50% DM = 12 ppm DM, over the 10 ppm cap.
+    test('a single ingredient that would breach the DM-basis copper cap is infeasible, not just warned about', () {
+      // 6 ppm as-fed / 50% DM = 12 ppm DM, over the 10 ppm cap - and with
+      // only this one ingredient available, there's no way to dilute it
+      // down. The DM-basis cap is now a hard LP constraint (see
+      // _hardSafetyConstraints), so this correctly fails to solve instead
+      // of quietly producing an over-cap blend with a warning attached.
       final result = _calc(
         profile: _profile(),
         target: _target(),
         pantryItems: [_food('a', proteinPct: 20, copperPpm: 6, dryMatterPct: 50)],
         safetyRules: [copperRule],
       );
-      final warning = result.warnings.firstWhere((w) => w.message.contains('Copper level unsafe'));
-      expect(warning.message, contains('12.0'));
-      expect(warning.severity, WarningSeverity.high);
+      expect(result, isA<RationCalculationError>());
+    });
+
+    test('given an alternative, the LP routes around a copper cap instead of tripping it', () {
+      // A high-copper item alone would breach the cap, but a clean
+      // alternative lets the solver dilute it down (or avoid it) to stay
+      // under 10 ppm DM - demonstrating the ceiling actually shapes the
+      // blend rather than merely being checked after the fact.
+      final result = _calc(
+        profile: _profile(),
+        target: _target(),
+        pantryItems: [
+          _food('risky', proteinPct: 20, copperPpm: 6, dryMatterPct: 50),
+          _food('clean', proteinPct: 20, copperPpm: 0, dryMatterPct: 50),
+        ],
+        safetyRules: [copperRule],
+      ) as RationResult;
+      expect(result.warnings.any((w) => w.message.contains('Copper level unsafe')), isFalse);
     });
 
     test('a null dry matter % is treated as fully dry (100%), not a guess', () {
-      // 6 ppm as-fed / 100% DM = 6 ppm DM, under the 10 ppm cap, even though
-      // the same as-fed value tripped the cap in the 50%-DM case above.
+      // 6 ppm as-fed / 100% DM = 6 ppm DM, under the 10 ppm cap, even
+      // though the same as-fed value was infeasible in the 50%-DM case
+      // above.
       final result = _calc(
         profile: _profile(),
         target: _target(),
         pantryItems: [_food('a', proteinPct: 20, copperPpm: 6, dryMatterPct: null)],
         safetyRules: [copperRule],
       );
-      expect(result.warnings.any((w) => w.message.contains('Copper level unsafe')), isFalse);
+      expect(result, isA<RationResult>());
+      expect((result as RationResult).warnings.any((w) => w.message.contains('Copper level unsafe')), isFalse);
     });
 
-    test('oxalate DM-basis cap fires the same way as copper', () {
+    test('the same DM-basis logic applies to the oxalate cap', () {
       final oxalateRule = SafetyRule(
         ruleId: 'ox_cap',
         targetType: 'dm_concentration',
@@ -190,14 +214,15 @@ void main() {
         severity: 'HIGH',
         warningMessage: 'Oxalate level unsafe',
       );
-      // 0.6% as-fed / 50% DM = 1.2% DM, over the 1.0% cap.
+      // 0.6% as-fed / 50% DM = 1.2% DM, over the 1.0% cap, with no
+      // alternative ingredient to dilute it.
       final result = _calc(
         profile: _profile(),
         target: _target(),
         pantryItems: [_food('a', proteinPct: 20, oxalatePct: 0.6, dryMatterPct: 50)],
         safetyRules: [oxalateRule],
       );
-      expect(result.warnings.any((w) => w.message.contains('Oxalate level unsafe')), isTrue);
+      expect(result, isA<RationCalculationError>());
     });
   });
 
@@ -213,24 +238,26 @@ void main() {
       appliesToSpecies: const ['sheep'],
     );
 
-    test('a sheep-scoped Cu:Mo rule fires for a sheep profile', () {
+    test('a sheep-scoped Cu:Mo rule makes an all-high-ratio pantry infeasible for a sheep profile', () {
+      // Ratio 20:2 = 10:1, over the 8:1 cap - hard-enforced only when the
+      // rule applies to this species, and with only this ingredient
+      // available there's no way to bring the ratio down.
       final result = _calc(
         profile: _profile(species: 'Livestock: Sheep'),
         target: _target(),
         pantryItems: [_food('a', proteinPct: 20, copperPpm: 20, molybdenumPpm: 2)],
         safetyRules: [cuMoRule],
       );
-      expect(result.warnings.any((w) => w.message.contains('Cu:Mo ratio unsafe for sheep')), isTrue);
-      expect(result.warnings.first.severity, WarningSeverity.critical);
+      expect(result, isA<RationCalculationError>());
     });
 
-    test('the same sheep-scoped Cu:Mo rule does not fire for a goat profile', () {
+    test('the same pantry stays feasible for a goat profile since the rule is species-scoped', () {
       final result = _calc(
         profile: _profile(species: 'Livestock: Goat'),
         target: _target(),
         pantryItems: [_food('a', proteinPct: 20, copperPpm: 20, molybdenumPpm: 2)],
         safetyRules: [cuMoRule],
-      );
+      ) as RationResult;
       expect(result.warnings.any((w) => w.message.contains('Cu:Mo ratio unsafe for sheep')), isFalse);
     });
 
@@ -239,12 +266,12 @@ void main() {
         profile: _profile(species: 'Livestock: Sheep'),
         target: _target(),
         pantryItems: [_food('a', proteinPct: 20, copperPpm: 20, molybdenumPpm: 2)],
-      );
+      ) as RationResult;
       final goat = _calc(
         profile: _profile(species: 'Livestock: Goat'),
         target: _target(),
         pantryItems: [_food('a', proteinPct: 20, copperPpm: 20, molybdenumPpm: 2)],
-      );
+      ) as RationResult;
       expect(sheep.nutrientComparisons.any((c) => c.label == 'Cu:Mo Ratio'), isTrue);
       expect(goat.nutrientComparisons.any((c) => c.label == 'Cu:Mo Ratio'), isFalse);
     });
@@ -252,33 +279,42 @@ void main() {
 
   group('warning severity ordering', () {
     test('warnings come back sorted most- to least-severe across mixed sources', () {
+      // targetType 'advisory' is deliberately not one of the five shapes
+      // _hardSafetyConstraints recognizes (dm_concentration/ratio/
+      // category_total/ingredient_category/ingredient_keyword), so these
+      // stay soft/advisory rather than turning this scenario infeasible -
+      // _runSafetyChecks' final fallthrough still name-matches and warns
+      // on them regardless of targetType.
       final highRule = SafetyRule(
-        ruleId: 'cu_cap',
-        targetType: 'dm_concentration',
-        targetName: 'Cu_ppm_DM',
-        maxValue: 10.0,
+        ruleId: 'soft_high',
+        targetType: 'advisory',
+        targetName: 'special',
+        maxInclusionPerc: 5,
         severity: 'HIGH',
-        warningMessage: 'Copper level unsafe',
+        warningMessage: 'Special ingredient should stay minimal',
       );
       final lowRule = SafetyRule(
-        ruleId: 'trace_item',
-        targetType: 'ingredient_keyword',
-        targetName: 'a',
-        maxInclusionPerc: 0,
+        ruleId: 'soft_low',
+        targetType: 'advisory',
+        targetName: 'filler',
+        maxInclusionPerc: 5,
         severity: 'LOW',
-        warningMessage: 'Trace item present',
+        warningMessage: 'Filler ingredient should stay minimal',
       );
-      // safetyRules deliberately ordered low-then-high, and
-      // stageHasDedicatedData:false injects a medium-severity advisory note
-      // with no SafetyRule behind it at all - the final list should still
-      // come back high, medium, low regardless of insertion order/source.
+      // Protein range forces a real blend of both named ingredients (see
+      // the LP-enforced range test above), so both inclusion percentages
+      // land well over the 5% caps regardless of which range boundary the
+      // solver settles on. stageHasDedicatedData:false injects a medium-
+      // severity advisory note with no SafetyRule behind it at all - the
+      // final list should still come back high, medium, low regardless of
+      // insertion order or source.
       final result = _calc(
         profile: _profile(),
-        target: _target(),
-        pantryItems: [_food('a', proteinPct: 20, copperPpm: 6, dryMatterPct: 50)],
+        target: _target(minProteinPerc: 14, maxProteinPerc: 16),
+        pantryItems: [_food('special item', proteinPct: 30), _food('filler item', proteinPct: 5)],
         safetyRules: [lowRule, highRule],
         stageHasDedicatedData: false,
-      );
+      ) as RationResult;
 
       expect(
         result.warnings.map((w) => w.severity).toList(),
