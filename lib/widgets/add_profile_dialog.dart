@@ -167,6 +167,27 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
     return true;
   }
 
+  void _showNoDataDialog(BuildContext context, String species) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF242426),
+        title: const Text('No Nutrition Data Yet', style: TextStyle(color: Colors.white)),
+        content: Text(
+          "$species doesn't have dedicated nutrition data in ForgeFeed yet, so ration calculations aren't "
+          'available for it. Support for more species is being added over time.',
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK', style: TextStyle(color: Color(0xFFF97316))),
+          ),
+        ],
+      ),
+    );
+  }
+
   SpeciesCategory get _currentCategory => _catalog.firstWhere((c) => c.name == _selectedCategory);
 
   SpeciesSubgroup get _currentSubgroup =>
@@ -253,7 +274,9 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final catalog = context.watch<DatabaseService>().speciesCatalog;
+    final db = context.watch<DatabaseService>();
+    final catalog = db.speciesCatalog;
+    final unsupportedSpecies = db.unsupportedSpecies;
     _initFromCatalog(catalog);
 
     final tier = context.watch<TierService>().tier;
@@ -311,12 +334,15 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      isEditing ? 'Edit Profile' : 'Add Animal or Flock Profile',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Text(
+                        isEditing ? 'Edit Profile' : 'Add Animal or Flock Profile',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     IconButton(
@@ -345,6 +371,7 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                 const SizedBox(height: 12),
 
                 _buildDropdown(
+                  key: const Key('categoryDropdown'),
                   label: 'Category',
                   value: _selectedCategory,
                   items: _catalog.map((c) => c.name).toList(),
@@ -361,6 +388,7 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                 if (showSubgroupPicker) ...[
                   const SizedBox(height: 12),
                   _buildDropdown(
+                    key: const Key('subgroupDropdown'),
                     label: 'Type',
                     value: _selectedSubgroup,
                     items: availableSubgroups.map((s) => s.name).toList(),
@@ -376,13 +404,21 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                 ],
                 const SizedBox(height: 12),
                 _buildDropdown(
+                  key: const Key('speciesDropdown'),
                   label: 'Species',
                   value: _selectedSpecies,
                   items: availableSpecies,
                   lockedItems: availableSpecies.where((s) => _isSpeciesLocked(s, tier)).toList(),
+                  noDataItems: availableSpecies
+                      .where((s) => unsupportedSpecies.contains('$_selectedCategory: $s'))
+                      .toList(),
                   onChanged: (val) {
                     if (_isSpeciesLocked(val, tier)) {
                       showDialog(context: context, builder: (context) => const UpgradeDialog());
+                      return;
+                    }
+                    if (unsupportedSpecies.contains('$_selectedCategory: $val')) {
+                      _showNoDataDialog(context, val);
                       return;
                     }
                     setState(() {
@@ -391,6 +427,21 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                     });
                   },
                 ),
+                if (unsupportedSpecies.contains('$_selectedCategory: $_selectedSpecies')) ...[
+                  const SizedBox(height: 8),
+                  const Row(
+                    children: [
+                      Icon(Icons.info_outline, size: 14, color: Colors.white38),
+                      SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'No nutrition data yet for this species - pick a different one to run ration calculations.',
+                          style: TextStyle(color: Colors.white54, fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 if (!isPro) ...[
                   const SizedBox(height: 8),
                   Row(
@@ -602,13 +653,16 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
   }
 
   Widget _buildDropdown({
+    Key? key,
     required String label,
     required String value,
     required List<String> items,
     required ValueChanged<String> onChanged,
     List<String> lockedItems = const [],
+    List<String> noDataItems = const [],
   }) {
     return DropdownButtonFormField<String>(
+      key: key,
       initialValue: value,
       dropdownColor: const Color(0xFF242426),
       style: const TextStyle(color: Colors.white),
@@ -623,25 +677,31 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
           borderSide: BorderSide.none,
         ),
       ),
-      items: items
-          .map((i) => DropdownMenuItem(
-                value: i,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        _feedingSystemLabels[i] ?? i,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (lockedItems.contains(i)) ...[
-                      const SizedBox(width: 6),
-                      const Icon(Icons.lock, size: 14, color: Colors.white38),
-                    ],
-                  ],
+      items: items.map((i) {
+        final isLocked = lockedItems.contains(i);
+        final isNoData = !isLocked && noDataItems.contains(i);
+        return DropdownMenuItem(
+          value: i,
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  _feedingSystemLabels[i] ?? i,
+                  overflow: TextOverflow.ellipsis,
+                  style: isNoData ? const TextStyle(color: Colors.white38) : null,
                 ),
-              ))
-          .toList(),
+              ),
+              if (isLocked) ...[
+                const SizedBox(width: 6),
+                const Icon(Icons.lock, size: 14, color: Colors.white38),
+              ] else if (isNoData) ...[
+                const SizedBox(width: 6),
+                const Icon(Icons.info_outline, size: 14, color: Colors.white38),
+              ],
+            ],
+          ),
+        );
+      }).toList(),
       onChanged: (val) {
         if (val != null) onChanged(val);
       },

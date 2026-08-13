@@ -9,6 +9,7 @@ import '../models/pantry_item.dart';
 import '../models/safety_rule.dart';
 import '../models/species_catalog.dart';
 import '../models/species_requirement.dart';
+import 'nutrition_target_resolver.dart';
 
 class DatabaseService extends ChangeNotifier {
   final Set<String> _pantryIds = {};
@@ -357,8 +358,6 @@ class DatabaseService extends ChangeNotifier {
       _profiles
         ..clear()
         ..addAll(stored.map((s) => AnimalProfile.fromJson(jsonDecode(s) as Map<String, dynamic>)));
-    } else if (_profiles.isEmpty) {
-      _seedInitialProfiles();
     }
   }
 
@@ -518,27 +517,6 @@ class DatabaseService extends ChangeNotifier {
     } catch (e) {
       debugPrint('Failed to load species_catalog.json: $e');
     }
-  }
-
-  void _seedInitialProfiles() {
-    _profiles.addAll([
-      AnimalProfile(
-        id: '1',
-        name: 'Main Backyard Flock',
-        species: 'Livestock: Poultry (Chicken)',
-        headCount: 12,
-        productionStage: 'Active Layer',
-        environment: 'Outdoor',
-      ),
-      AnimalProfile(
-        id: '2',
-        name: 'Coturnix Quail Pens',
-        species: 'Livestock: Poultry (Quail)',
-        headCount: 24,
-        productionStage: 'Breeder / Production',
-        environment: 'Outdoor',
-      ),
-    ]);
   }
 
   void _seedInitialCatalog() {
@@ -2823,9 +2801,6 @@ class DatabaseService extends ChangeNotifier {
       ),
     ]);
 
-    // Pre-populate default items in pantry stock
-    _pantryIds.addAll(['usda_corn', 'usda_soybean_meal']);
-    _supplementIds.add('supp_calcium_limestone');
   }
 
   Set<String> get pantryIds => Set.unmodifiable(_pantryIds);
@@ -2836,6 +2811,29 @@ class DatabaseService extends ChangeNotifier {
   List<AnimalProfile> get profiles => List.unmodifiable(_profiles);
   List<SafetyRule> get safetyRules => List.unmodifiable(_safetyRules);
   List<SpeciesCategory> get speciesCatalog => List.unmodifiable(_speciesCatalog);
+
+  /// Catalog species (in the same '$category: $species' form
+  /// [AnimalProfile.species] uses) that [NutritionTargetResolver] can't
+  /// resolve against the loaded animal_requirements.json - i.e. there's no
+  /// nutrition data for them yet, so the picker can surface that up front
+  /// instead of the user finding out after saving a profile. Computed on
+  /// demand rather than cached since the catalog/requirements only change
+  /// once, at app load.
+  Set<String> get unsupportedSpecies {
+    final unsupported = <String>{};
+    for (final category in _speciesCatalog) {
+      for (final subgroup in category.subgroups) {
+        for (final species in subgroup.species) {
+          final speciesKey = '${category.name}: $species';
+          final probe = AnimalProfile(id: '', name: '', species: speciesKey);
+          if (NutritionTargetResolver.resolve(probe, _speciesRequirements) == null) {
+            unsupported.add(speciesKey);
+          }
+        }
+      }
+    }
+    return unsupported;
+  }
 
   void addProfile(AnimalProfile profile) {
     _profiles.add(profile);
