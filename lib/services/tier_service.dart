@@ -22,6 +22,20 @@ extension UserTierLabel on UserTier {
   bool get isPaid => this != UserTier.free;
 }
 
+extension UserTierLimits on UserTier {
+  /// Max animal profiles allowed on this tier; null means unlimited.
+  int? get maxAnimalProfiles {
+    switch (this) {
+      case UserTier.free:
+        return 3;
+      case UserTier.tier1:
+        return 5;
+      case UserTier.pro:
+        return null;
+    }
+  }
+}
+
 class TierService extends ChangeNotifier {
   static const _prefsKeyTier = 'ff_user_tier';
   static const _prefsKeyFirstLaunch = 'ff_first_launch_date';

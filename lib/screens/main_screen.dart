@@ -184,28 +184,45 @@ class HeaderBar extends StatelessWidget {
               // Actions Group: Feedback Button, Unit Toggle, and Tier Badge
               Row(
                 children: [
-              // Feedback / Request Button
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFFF97316),
-                  side: const BorderSide(color: Color(0xFFF97316), width: 1),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                icon: const Icon(Icons.lightbulb_outline, size: 18),
-                label: const Text(
-                  'Feedback',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                ),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => const FeedbackDialog(),
-                  );
-                },
-              ),
+              // Feedback / Request Button (icon-only on narrow screens to save space)
+              isNarrow
+                  ? IconButton(
+                      icon: const Icon(Icons.lightbulb_outline, size: 18),
+                      color: const Color(0xFFF97316),
+                      style: IconButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFFF97316), width: 1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => const FeedbackDialog(),
+                        );
+                      },
+                    )
+                  : OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFFF97316),
+                        side: const BorderSide(color: Color(0xFFF97316), width: 1),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      icon: const Icon(Icons.lightbulb_outline, size: 18),
+                      label: const Text(
+                        'Feedback',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => const FeedbackDialog(),
+                        );
+                      },
+                    ),
               const SizedBox(width: 12),
 
               // Unit Switcher
@@ -290,22 +307,24 @@ class HeaderBar extends StatelessWidget {
                               fontSize: 12,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF97316),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              tier.isPaid ? 'Tap to Cycle' : 'Upgrade',
-                              style: const TextStyle(
-                                color: Color(0xFF1A1A1C),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10,
+                          if (tier != UserTier.pro) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF97316),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                tier == UserTier.tier1 ? 'Tap to Upgrade' : 'Upgrade',
+                                style: const TextStyle(
+                                  color: Color(0xFF1A1A1C),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ),

@@ -242,5 +242,169 @@
       "molybdenumPpm": 1.0,
       "dryMatterPct": 90.0
     }
+  },
+  {
+    "id": "store_kalmbach_layer_16",
+    "name": "Kalmbach Feeds 16% All Natural Layer Crumbles",
+    "brand": "Kalmbach Feeds",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Poultry",
+    "asFedMetrics": {
+      "crudeProteinPct": 16.0,
+      "calciumPct": 3.9,
+      "phosphorusPct": 0.45,
+      "fatPct": 3.0,
+      "fiberPct": 4.5,
+      "energyKcalLb": 1400,
+      "lysinePct": 0.75,
+      "methioninePct": 0.28,
+      "dryMatterPct": 90.0
+    }
+  },
+  {
+    "id": "store_kalmbach_kalm_n_fit",
+    "name": "Kalmbach Feeds Kalm 'N Fit Horse Feed",
+    "brand": "Kalmbach Feeds",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Horse",
+    "asFedMetrics": {
+      "crudeProteinPct": 14.0,
+      "calciumPct": 0.7,
+      "phosphorusPct": 0.5,
+      "fatPct": 10.0,
+      "fiberPct": 10.0,
+      "energyKcalLb": 1500,
+      "dryMatterPct": 90.0
+    }
+  },
+  {
+    "id": "store_kalmbach_game_plan_16_goat",
+    "name": "Kalmbach Feeds Game Plan 16 Starter/Developer Textured Goat Feed",
+    "brand": "Kalmbach Feeds",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Goat & Cattle",
+    "asFedMetrics": {
+      "crudeProteinPct": 16.0,
+      "calciumPct": 1.0,
+      "phosphorusPct": 0.6,
+      "fatPct": 4.0,
+      "fiberPct": 11.0,
+      "energyKcalLb": 1380,
+      "copperPpm": 45.0,
+      "dryMatterPct": 90.0
+    }
+  },
+  {
+    "id": "store_kalmbach_squeals_of_joy_minipig",
+    "name": "Kalmbach Feeds Squeals of Joy 16% Mini Pig Feed",
+    "brand": "Kalmbach Feeds",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Swine",
+    "asFedMetrics": {
+      "crudeProteinPct": 16.0,
+      "calciumPct": 0.95,
+      "phosphorusPct": 0.7,
+      "fatPct": 3.0,
+      "fiberPct": 12.5,
+      "energyKcalLb": 1350,
+      "lysinePct": 0.8,
+      "dryMatterPct": 90.0
+    }
+  },
+  {
+    "id": "store_kalmbach_duck_goose_18",
+    "name": "Kalmbach Feeds 18% All Natural Duck & Goose Feed",
+    "brand": "Kalmbach Feeds",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Poultry",
+    "asFedMetrics": {
+      "crudeProteinPct": 18.0,
+      "calciumPct": 1.05,
+      "phosphorusPct": 0.65,
+      "fatPct": 3.0,
+      "fiberPct": 5.0,
+      "energyKcalLb": 1420,
+      "lysinePct": 1.0,
+      "methioninePct": 0.45,
+      "niacinMgKg": 99.2,
+      "dryMatterPct": 90.0
+    }
+  },
+  {
+    "id": "store_kalmbach_meatbird_22",
+    "name": "Kalmbach Feeds 22% Start-To-Finish Meatbird Crumbles",
+    "brand": "Kalmbach Feeds",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Poultry",
+    "asFedMetrics": {
+      "crudeProteinPct": 22.0,
+      "calciumPct": 1.0,
+      "phosphorusPct": 0.6,
+      "fatPct": 3.0,
+      "fiberPct": 4.0,
+      "energyKcalLb": 1460,
+      "lysinePct": 1.2,
+      "methioninePct": 0.5,
+      "dryMatterPct": 90.0
+    }
+  },
+  {
+    "id": "store_kent_all_stock_12_pellet",
+    "name": "Kent Field & Farm All Stock 12 Pellet",
+    "brand": "Kent Nutrition",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Multi-Species",
+    "asFedMetrics": {
+      "crudeProteinPct": 12.0,
+      "calciumPct": 0.95,
+      "phosphorusPct": 0.6,
+      "fatPct": 2.5,
+      "fiberPct": 15.0,
+      "energyKcalLb": 1320,
+      "dryMatterPct": 90.0
+    }
+  },
+  {
+    "id": "store_kent_home_fresh_extra_egg_layer",
+    "name": "Kent Home Fresh Extra Egg Layer",
+    "brand": "Kent Nutrition",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Poultry",
+    "asFedMetrics": {
+      "crudeProteinPct": 17.0,
+      "calciumPct": 3.8,
+      "phosphorusPct": 0.55,
+      "fatPct": 3.0,
+      "fiberPct": 4.0,
+      "energyKcalLb": 1420,
+      "lysinePct": 0.86,
+      "methioninePct": 0.39,
+      "dryMatterPct": 90.0
+    }
+  },
+  {
+    "id": "store_hubbard_nutripreme",
+    "name": "Hubbard Life Nutripreme Multi-Species Conditioner",
+    "brand": "Hubbard Feeds",
+    "category": "Store Feed",
+    "catalogSource": "Store",
+    "subCategory": "Multi-Species",
+    "asFedMetrics": {
+      "crudeProteinPct": 25.0,
+      "calciumPct": 0.75,
+      "phosphorusPct": 0.6,
+      "fatPct": 3.0,
+      "fiberPct": 6.0,
+      "energyKcalLb": 1480,
+      "dryMatterPct": 90.0
+    }
   }
 ]

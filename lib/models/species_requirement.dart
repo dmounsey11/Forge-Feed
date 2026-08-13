@@ -6,6 +6,10 @@ class SpeciesRequirement {
   final double targetWeightKg;
   final double minProteinPerc;
   final double maxProteinPerc;
+  final double? minFatPerc;
+  final double? maxFatPerc;
+  final double? minFiberPerc;
+  final double? maxFiberPerc;
   final double minMeKcal;
   final double maxMeKcal;
   final double minCalciumPerc;
@@ -28,6 +32,10 @@ class SpeciesRequirement {
     required this.targetWeightKg,
     required this.minProteinPerc,
     required this.maxProteinPerc,
+    this.minFatPerc,
+    this.maxFatPerc,
+    this.minFiberPerc,
+    this.maxFiberPerc,
     required this.minMeKcal,
     required this.maxMeKcal,
     required this.minCalciumPerc,
@@ -52,6 +60,10 @@ class SpeciesRequirement {
       targetWeightKg: (json['targetWeightKg'] as num?)?.toDouble() ?? 0.0,
       minProteinPerc: (json['minProteinPerc'] as num?)?.toDouble() ?? 0.0,
       maxProteinPerc: (json['maxProteinPerc'] as num?)?.toDouble() ?? 0.0,
+      minFatPerc: (json['minFatPerc'] as num?)?.toDouble(),
+      maxFatPerc: (json['maxFatPerc'] as num?)?.toDouble(),
+      minFiberPerc: (json['minFiberPerc'] as num?)?.toDouble(),
+      maxFiberPerc: (json['maxFiberPerc'] as num?)?.toDouble(),
       minMeKcal: (json['minMeKcal'] as num?)?.toDouble() ?? 0.0,
       maxMeKcal: (json['maxMeKcal'] as num?)?.toDouble() ?? 0.0,
       minCalciumPerc: (json['minCalciumPerc'] as num?)?.toDouble() ?? 0.0,

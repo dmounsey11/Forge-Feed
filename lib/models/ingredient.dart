@@ -13,6 +13,10 @@
   final double copperPpm;
   final double molybdenumPpm;
   final double oxalatePct;
+  /// As-fed sugar %, hand-sourced from nutrition references (the bundled
+  /// USDA dump has no sugar field) - used for the NSC/laminitis caution on
+  /// sugar-heavy produce, mirroring how oxalatePct is stored and checked.
+  final double sugarPct;
   /// % dry matter (100 - moisture %). Null means unknown - callers treat
   /// that as 100% (fully dry) rather than guessing, so an un-populated item
   /// doesn't distort a blend's dry-matter-basis calculations.
@@ -33,6 +37,7 @@
     this.copperPpm = 0.0,
     this.molybdenumPpm = 0.0,
     this.oxalatePct = 0.0,
+    this.sugarPct = 0.0,
     this.dryMatterPct,
   });
 
@@ -56,6 +61,7 @@
         'copperPpm': copperPpm,
         'molybdenumPpm': molybdenumPpm,
         'oxalatePct': oxalatePct,
+        'sugarPct': sugarPct,
         if (dryMatterPct != null) 'dryMatterPct': dryMatterPct,
       };
 
@@ -74,6 +80,7 @@
         copperPpm: (json['copperPpm'] as num?)?.toDouble() ?? 0.0,
         molybdenumPpm: (json['molybdenumPpm'] as num?)?.toDouble() ?? 0.0,
         oxalatePct: (json['oxalatePct'] as num?)?.toDouble() ?? 0.0,
+        sugarPct: (json['sugarPct'] as num?)?.toDouble() ?? 0.0,
         // Some source files (livestock_feeds.json, pet_kibble.json,
         // usda_ingredients.json) publish moisture % instead of dry matter %
         // directly - derive DM from it when dryMatterPct itself isn't given.
@@ -152,7 +159,7 @@ class Ingredient {
   /// Maps a raw record from the USDA SR-Legacy derived `ingredients.json`
   /// (flat schema: crudeProteinPerc, calciumPerc, totalPhosphorusPerc, etc.,
   /// with metabolizableEnergyKcal expressed per kg) onto this app's model.
-  factory Ingredient.fromUsdaJson(Map<String, dynamic> json, {String? categoryOverride}) {
+  factory Ingredient.fromUsdaJson(Map<String, dynamic> json, {String? categoryOverride, String? subCategoryOverride}) {
     double n(String key) => (json[key] as num?)?.toDouble() ?? 0.0;
     const kgToLb = 2.20462;
     final dryMatterPerc = (json['dryMatterPerc'] as num?)?.toDouble();
@@ -161,7 +168,7 @@ class Ingredient {
       name: json['name']?.toString() ?? '',
       category: categoryOverride ?? json['category']?.toString() ?? 'General',
       catalogSource: 'USDA',
-      subCategory: json['storageForm']?.toString() ?? 'General',
+      subCategory: subCategoryOverride ?? json['storageForm']?.toString() ?? 'General',
       asFedMetrics: AsFedMetrics(
         crudeProteinPct: n('crudeProteinPerc'),
         calciumPct: n('calciumPerc'),

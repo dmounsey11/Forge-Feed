@@ -13,7 +13,7 @@ import '../widgets/prep_amount_dialog.dart';
 import '../widgets/upgrade_dialog.dart';
 import 'ration_result_screen.dart';
 
-enum _CreateFeedStage { closed, profilePicker, baseIngredients, supplements }
+enum _CreateFeedStage { closed, profilePicker, baseIngredients }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,7 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
   AnimalProfile? _selectedProfile;
   PrepAmountResult? _prepResult;
   Set<String> _selectedPantryIds = {};
-  Set<String> _selectedSupplementIds = {};
   HealthScreeningResult? _healthResult;
 
   void _resetToStart() {
@@ -35,7 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedProfile = null;
       _prepResult = null;
       _selectedPantryIds = {};
-      _selectedSupplementIds = {};
       _healthResult = null;
       _stage = _CreateFeedStage.profilePicker;
     });
@@ -52,7 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedProfile = profile;
       _prepResult = prepResult;
       _selectedPantryIds = {};
-      _selectedSupplementIds = {};
       _healthResult = null;
       _stage = _CreateFeedStage.baseIngredients;
     });
@@ -94,9 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case _CreateFeedStage.profilePicker:
         body = _buildProfilePicker(db.profiles);
       case _CreateFeedStage.baseIngredients:
-        body = _buildBaseIngredientsStage(db.getPantryIngredients());
-      case _CreateFeedStage.supplements:
-        body = _buildSupplementsStage(db.getSupplementIngredients(), tier);
+        body = _buildBaseIngredientsStage(_pantryItemsForSelectedProfile(db.getPantryIngredients()), tier);
     }
 
     return Scaffold(
@@ -201,7 +196,19 @@ class _HomeScreenState extends State<HomeScreen> {
         : '${prep.value.toStringAsFixed(1)} lbs';
   }
 
-  Widget _buildBaseIngredientsStage(List<Ingredient> pantryItems) {
+  /// "Whole Prey" pantry items (mice, rats, quail, rabbit, etc.) are only
+  /// meaningful for a profile whose feeding system is actually "Whole Prey /
+  /// Feeder Animals" - otherwise they'd show up as selectable base
+  /// ingredients for any animal, including ones that shouldn't be eating
+  /// whole prey at all.
+  List<Ingredient> _pantryItemsForSelectedProfile(List<Ingredient> allPantryItems) {
+    if (_selectedProfile?.feedingSystem == 'Whole Prey / Feeder Animals') {
+      return allPantryItems;
+    }
+    return allPantryItems.where((item) => item.category != 'Whole Prey').toList();
+  }
+
+  Widget _buildBaseIngredientsStage(List<Ingredient> pantryItems, UserTier tier) {
     final profile = _selectedProfile!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,106 +224,38 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
         ),
         Text(
-          'For ${profile.name} - prepping $_prepLabel. Pick which pantry items go in this batch.',
+          'For ${profile.name} - prepping $_prepLabel. Pick which pantry items go in this batch. '
+          "Any supplements you've stocked are applied automatically to close nutrient gaps the base feed can't cover.",
           style: const TextStyle(color: Colors.grey, fontSize: 13),
         ),
         const SizedBox(height: 16),
         Expanded(
           child: pantryItems.isEmpty
               ? _buildEmptyCard('No pantry items in stock yet. Head to the Pantry tab to add some.')
-              : _buildIngredientChecklist(
-                  items: pantryItems,
-                  selectedIds: _selectedPantryIds,
-                  onToggle: (id, selected) => setState(() {
-                    if (selected) {
-                      _selectedPantryIds.add(id);
-                    } else {
-                      _selectedPantryIds.remove(id);
-                    }
-                  }),
+              : ListView(
+                  children: [
+                    _buildIngredientChecklist(
+                      items: pantryItems,
+                      selectedIds: _selectedPantryIds,
+                      onToggle: (id, selected) => setState(() {
+                        if (selected) {
+                          _selectedPantryIds.add(id);
+                        } else {
+                          _selectedPantryIds.remove(id);
+                        }
+                      }),
+                      shrinkWrap: true,
+                    ),
+                    const SizedBox(height: 20),
+                    HealthOptionsSection(
+                      key: ValueKey(profile.id),
+                      profile: profile,
+                      tier: tier,
+                      initialResult: _healthResult,
+                      onResultChanged: (result) => setState(() => _healthResult = result),
+                    ),
+                  ],
                 ),
-        ),
-        const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFF97316),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            onPressed: _confirmBaseIngredients,
-            child: const Text(
-              'Create Base Feed',
-              style: TextStyle(color: Color(0xFF1A1A1C), fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _confirmBaseIngredients() {
-    if (_selectedPantryIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Select at least one pantry item before creating a base feed.')),
-      );
-      return;
-    }
-    setState(() => _stage = _CreateFeedStage.supplements);
-  }
-
-  Widget _buildSupplementsStage(List<Ingredient> supplementItems, UserTier tier) {
-    final profile = _selectedProfile!;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextButton.icon(
-          onPressed: () => setState(() => _stage = _CreateFeedStage.baseIngredients),
-          icon: const Icon(Icons.arrow_back, color: Colors.white60, size: 18),
-          label: const Text('Back', style: TextStyle(color: Colors.white60)),
-        ),
-        const SizedBox(height: 4),
-        const Text(
-          'Add Supplements',
-          style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        const Text(
-          'Optional - pick any supplements to add on top of the base feed.',
-          style: TextStyle(color: Colors.grey, fontSize: 13),
-        ),
-        const SizedBox(height: 16),
-        Expanded(
-          child: ListView(
-            children: [
-              if (supplementItems.isEmpty)
-                const Text(
-                  "You haven't stocked any supplements - that's fine, this step is optional.",
-                  style: TextStyle(color: Colors.grey, fontSize: 13),
-                )
-              else
-                _buildIngredientChecklist(
-                  items: supplementItems,
-                  selectedIds: _selectedSupplementIds,
-                  onToggle: (id, selected) => setState(() {
-                    if (selected) {
-                      _selectedSupplementIds.add(id);
-                    } else {
-                      _selectedSupplementIds.remove(id);
-                    }
-                  }),
-                  shrinkWrap: true,
-                ),
-              const SizedBox(height: 20),
-              HealthOptionsSection(
-                key: ValueKey(profile.id),
-                profile: profile,
-                tier: tier,
-                initialResult: _healthResult,
-                onResultChanged: (result) => setState(() => _healthResult = result),
-              ),
-            ],
-          ),
         ),
         const SizedBox(height: 16),
         SizedBox(
@@ -403,8 +342,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final selectedPantryItems =
         db.getPantryIngredients().where((i) => _selectedPantryIds.contains(i.id)).toList();
-    final selectedSupplementItems =
-        db.getSupplementIngredients().where((i) => _selectedSupplementIds.contains(i.id)).toList();
+    // Supplements aren't manually checked - every stocked supplement is
+    // handed to the calculator, which only actually uses the ones needed to
+    // close the calcium/phosphorus/sodium gap the base feed can't cover.
+    final availableSupplementItems = db.getSupplementIngredients();
 
     if (selectedPantryItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -420,7 +361,7 @@ class _HomeScreenState extends State<HomeScreen> {
       health: _healthResult,
       prep: prep,
       pantryItems: selectedPantryItems,
-      supplementItems: selectedSupplementItems,
+      supplementItems: availableSupplementItems,
       safetyRules: db.safetyRules,
       stageHasDedicatedData: NutritionTargetResolver.stageHasDedicatedData(profile, db.speciesRequirements),
     );

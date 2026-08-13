@@ -241,6 +241,7 @@ class DietCalculator {
     final finalCopper = finalCopperPpm();
     final finalMolybdenum = finalMolybdenumPpm();
     final finalOxalatePct = finalPct((i) => i.asFedMetrics.oxalatePct);
+    final finalSugarPct = finalPct((i) => i.asFedMetrics.sugarPct);
     final finalDMPct = finalDryMatterPct();
 
     final speciesText = profile.species.toLowerCase();
@@ -276,6 +277,7 @@ class DietCalculator {
       finalCopperPpm: finalCopper,
       finalMolybdenumPpm: finalMolybdenum,
       finalOxalatePct: finalOxalatePct,
+      finalSugarPct: finalSugarPct,
       finalDMPct: finalDMPct,
       safetyRules: safetyRules,
     );
@@ -753,6 +755,23 @@ class DietCalculator {
     );
   }
 
+  // A plain substring check (speciesText.contains(keyword)) would wrongly
+  // match e.g. "cattle - angus".contains("cat") - this requires the
+  // keyword to sit on a word boundary, so short species keywords can't be
+  // fooled by a longer species name that happens to start with them.
+  static bool _speciesTextMatches(String speciesText, String keyword) {
+    final pattern = RegExp('(?<![a-z0-9])${RegExp.escape(keyword.toLowerCase())}(?![a-z0-9])');
+    return pattern.hasMatch(speciesText);
+  }
+
+  // When a batch blows well past a safety cap (not just a hair over it),
+  // a bare percentage isn't actionable - nudge toward swapping/reducing the
+  // offending ingredient instead of leaving the user to guess what to do.
+  static String _overCapSuffix(double inclusionPct, double maxPct) {
+    if (maxPct <= 0 || inclusionPct < maxPct * 2) return '';
+    return ' This is well over double the safe limit - look for a substitute ingredient or reduce this item\'s share of the batch.';
+  }
+
   static List<String> _runSafetyChecks({
     required AnimalProfile profile,
     required List<Ingredient> allItems,
@@ -763,6 +782,7 @@ class DietCalculator {
     required double finalCopperPpm,
     required double finalMolybdenumPpm,
     required double finalOxalatePct,
+    required double finalSugarPct,
     required double finalDMPct,
     required List<SafetyRule> safetyRules,
   }) {
@@ -772,7 +792,7 @@ class DietCalculator {
     final speciesText = profile.species.toLowerCase();
     for (final rule in safetyRules) {
       if (rule.appliesToSpecies.isNotEmpty &&
-          !rule.appliesToSpecies.any((s) => speciesText.contains(s.toLowerCase()))) {
+          !rule.appliesToSpecies.any((s) => _speciesTextMatches(speciesText, s))) {
         continue;
       }
       if (rule.targetType == 'dm_concentration') {
@@ -792,6 +812,10 @@ class DietCalculator {
           case 'Oxalate_pct_DM':
             if (finalOxalatePct <= 0) continue;
             value = finalOxalatePct / dmFraction;
+            break;
+          case 'Sugar_pct_DM':
+            if (finalSugarPct <= 0) continue;
+            value = finalSugarPct / dmFraction;
             break;
           default:
             continue;
@@ -851,7 +875,10 @@ class DietCalculator {
             .fold(0.0, (sum, item) => sum + (allLbs[item.id] ?? 0));
         final inclusionPct = (categoryLbs / finalTotalLbs) * 100.0;
         if (rule.maxInclusionPerc != null && inclusionPct > rule.maxInclusionPerc!) {
-          warnings.add('${rule.warningMessage} (currently ${inclusionPct.toStringAsFixed(1)}%)');
+          warnings.add(
+            '${rule.warningMessage} (currently ${inclusionPct.toStringAsFixed(1)}%)'
+            '${_overCapSuffix(inclusionPct, rule.maxInclusionPerc!)}',
+          );
         }
         continue;
       }
@@ -865,7 +892,8 @@ class DietCalculator {
         final inclusionPct = (lbs / finalTotalLbs) * 100.0;
         if (rule.maxInclusionPerc != null && inclusionPct > rule.maxInclusionPerc!) {
           warnings.add(
-            '${item.name}: ${rule.warningMessage} (currently ${inclusionPct.toStringAsFixed(1)}%)',
+            '${item.name}: ${rule.warningMessage} (currently ${inclusionPct.toStringAsFixed(1)}%)'
+            '${_overCapSuffix(inclusionPct, rule.maxInclusionPerc!)}',
           );
         }
       }

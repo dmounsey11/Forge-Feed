@@ -23,6 +23,7 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
     'Proteins & Meal',
     'Forages & Roughage',
     'Produce',
+    'Fruits',
     'Whole Prey',
     'Store Feed',
   ];
@@ -36,7 +37,7 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
   String _searchQuery = '';
   late String _selectedGroup = _allGroupLabel;
 
-  String get _allGroupLabel => widget.isSupplementMode ? 'All Nutrient Groups' : 'All USDA Groups';
+  String get _allGroupLabel => widget.isSupplementMode ? 'All Nutrient Groups' : 'All Categories';
 
   List<String> get _groups => [
         _allGroupLabel,

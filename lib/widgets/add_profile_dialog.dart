@@ -90,14 +90,32 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
     _selectedFeedingSystem = edit?.feedingSystem ?? 'Total Mixed Ration (TMR)';
   }
 
+  /// Default a brand-new profile to Dog: most users adding their first
+  /// animal or flock profile own a dog or cat, so Dog (Companion Mammals)
+  /// saves the common case a few taps instead of landing on an arbitrary
+  /// first catalog entry.
+  void _selectDefaultSpecies() {
+    for (final category in _catalog) {
+      for (final subgroup in category.subgroups) {
+        if (subgroup.species.contains('Dog')) {
+          _selectedCategory = category.name;
+          _selectedSubgroup = subgroup.name;
+          _selectedSpecies = 'Dog';
+          return;
+        }
+      }
+    }
+    _selectedCategory = _catalog.first.name;
+    _selectedSubgroup = _catalog.first.subgroups.first.name;
+    _selectedSpecies = _catalog.first.subgroups.first.species.first;
+  }
+
   void _initFromCatalog(List<SpeciesCategory> catalog) {
     if (_initialized || catalog.isEmpty) return;
     _initialized = true;
     _catalog = catalog;
 
-    _selectedCategory = catalog.first.name;
-    _selectedSubgroup = catalog.first.subgroups.first.name;
-    _selectedSpecies = catalog.first.subgroups.first.species.first;
+    _selectDefaultSpecies();
 
     final edit = widget.profileToEdit;
     if (edit == null || !edit.species.contains(': ')) return;
@@ -153,6 +171,47 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
 
   SpeciesSubgroup get _currentSubgroup =>
       _currentCategory.subgroups.firstWhere((s) => s.name == _selectedSubgroup, orElse: () => _currentCategory.subgroups.first);
+
+  /// Subgroups that are herbivores/grain-and-forage eaters across the board -
+  /// "Whole Prey / Feeder Animals" never makes sense here, unlike Reptile,
+  /// Amphibian, or the Exotic Mammals/Companion Mammals subgroups that mix in
+  /// real predators (ferret, skunk, serval, dog, cat, etc.).
+  static const Set<String> _wholePreyIncompatibleSubgroups = {
+    'Livestock & Ruminants',
+    'Poultry & Waterfowl',
+    'Companion Birds',
+    'Rodents',
+    'Primates & Prosimians',
+    'Marsupials',
+  };
+
+  /// Individual herbivore species that share an otherwise-predator-friendly
+  /// subgroup (e.g. Rabbit sits in Companion Mammals next to Dog/Cat; Alpaca/
+  /// Llama/Sheep/Reindeer are lumped into the catalog's "Exotic Mammals").
+  static const Set<String> _wholePreyIncompatibleSpecies = {
+    'Rabbit',
+    'Alpaca',
+    'Llama',
+    'Sheep',
+    'Reindeer',
+  };
+
+  bool _isFeedingSystemRelevant(String system) {
+    if (system != 'Whole Prey / Feeder Animals') return true;
+    if (_wholePreyIncompatibleSubgroups.contains(_selectedSubgroup)) return false;
+    if (_wholePreyIncompatibleSpecies.contains(_selectedSpecies)) return false;
+    return true;
+  }
+
+  /// Mirrors [_dropProductionStageIfIrrelevant]: resets the selected feeding
+  /// system back to the default if switching category/subgroup/species made
+  /// it biologically irrelevant (e.g. was "Whole Prey", species changed from
+  /// Cat to Sheep).
+  void _dropFeedingSystemIfIrrelevant() {
+    if (!_isFeedingSystemRelevant(_selectedFeedingSystem)) {
+      _selectedFeedingSystem = 'Total Mixed Ration (TMR)';
+    }
+  }
 
   /// Filters out production stages that don't make biological sense for the
   /// selected category/subgroup (e.g. "Active Layer" for a Dog) - stages not
@@ -228,6 +287,11 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
       visibleProductionStages.add(_selectedProductionStage);
     }
 
+    final visibleFeedingSystems = _feedingSystems.where(_isFeedingSystemRelevant).toList();
+    if (!visibleFeedingSystems.contains(_selectedFeedingSystem)) {
+      visibleFeedingSystems.add(_selectedFeedingSystem);
+    }
+
     return Dialog(
       backgroundColor: const Color(0xFF242426),
       shape: RoundedRectangleBorder(
@@ -290,6 +354,7 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                       _selectedSubgroup = _currentCategory.subgroups.first.name;
                       _selectedSpecies = _currentCategory.subgroups.first.species.first;
                       _dropProductionStageIfIrrelevant();
+                      _dropFeedingSystemIfIrrelevant();
                     });
                   },
                 ),
@@ -304,6 +369,7 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                         _selectedSubgroup = val;
                         _selectedSpecies = _currentSubgroup.species.first;
                         _dropProductionStageIfIrrelevant();
+                        _dropFeedingSystemIfIrrelevant();
                       });
                     },
                   ),
@@ -319,7 +385,10 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                       showDialog(context: context, builder: (context) => const UpgradeDialog());
                       return;
                     }
-                    setState(() => _selectedSpecies = val);
+                    setState(() {
+                      _selectedSpecies = val;
+                      _dropFeedingSystemIfIrrelevant();
+                    });
                   },
                 ),
                 if (!isPro) ...[
@@ -473,9 +542,16 @@ class _AddProfileDialogState extends State<AddProfileDialog> {
                 _buildDropdown(
                   label: 'Feeding System',
                   value: _selectedFeedingSystem,
-                  items: _feedingSystems,
+                  items: visibleFeedingSystems,
                   onChanged: (val) => setState(() => _selectedFeedingSystem = val),
                 ),
+                if (!visibleFeedingSystems.contains('Whole Prey / Feeder Animals')) ...[
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Whole Prey / Feeder Animals isn't offered for this species - it doesn't fit as a diet.",
+                    style: TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
+                ],
                 const SizedBox(height: 24),
 
                 SizedBox(

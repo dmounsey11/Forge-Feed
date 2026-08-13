@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../models/animal_profile.dart';
 import '../services/database_service.dart';
 import '../services/nutrition_target_resolver.dart';
+import '../services/tier_service.dart';
 import '../widgets/add_profile_dialog.dart';
+import '../widgets/upgrade_dialog.dart';
 
 class ProfilesScreen extends StatefulWidget {
   const ProfilesScreen({super.key});
@@ -15,6 +17,20 @@ class ProfilesScreen extends StatefulWidget {
 class _ProfilesScreenState extends State<ProfilesScreen> {
   void _openAddProfileDialog() {
     final db = context.read<DatabaseService>();
+    final tier = context.read<TierService>().tier;
+    final limit = tier.maxAnimalProfiles;
+    if (limit != null && db.profiles.length >= limit) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${tier.label} allows up to $limit animal profiles.'),
+          action: SnackBarAction(
+            label: 'Upgrade',
+            onPressed: () => showDialog(context: context, builder: (context) => const UpgradeDialog()),
+          ),
+        ),
+      );
+      return;
+    }
     showDialog(
       context: context,
       builder: (ctx) => AddProfileDialog(

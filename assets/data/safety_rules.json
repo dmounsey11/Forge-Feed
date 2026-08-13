@@ -21,7 +21,8 @@
     "targetName": "fish meal",
     "maxInclusionPerc": 5.0,
     "severity": "MEDIUM",
-    "warningMessage": "Fish meal above 5% risks causing off-flavors ('fishy taint') in eggs and poultry meat, and potential gizzerosine toxicity."
+    "warningMessage": "Fish meal above 5% risks causing off-flavors ('fishy taint') in eggs and poultry meat, and potential gizzerosine toxicity.",
+    "appliesToSpecies": ["chicken", "duck", "goose", "turkey", "quail", "pheasant", "guineafowl", "pigeon", "emu", "ostrich", "rhea"]
   },
   {
     "ruleId": "rule_inc_barley",
@@ -198,5 +199,141 @@
     "severity": "MEDIUM",
     "warningMessage": "Corn silage made from drought-stressed, frosted, or heavily-nitrogen-fertilized plants can accumulate dangerous nitrate levels in the stalk, even though the app has no way to check the growing conditions behind this batch. If any of those applied, get it lab-tested for nitrate-N before feeding: under ~700 ppm is generally safe, over ~2,500 ppm is acute-toxicity danger. Don't feed untested to pregnant ruminants. Even once tested safe, introduce it gradually over 7-14 days rather than all at once, to give rumen microbes time to adapt.",
     "appliesToSpecies": ["cattle", "sheep", "goat"]
+  },
+  {
+    "ruleId": "rule_toxin_grape_canine",
+    "targetType": "ingredient_keyword",
+    "targetName": "grapes,",
+    "maxInclusionPerc": 0.01,
+    "severity": "CRITICAL",
+    "warningMessage": "Grapes are toxic to canids and can cause acute kidney failure at any amount - there is no known safe inclusion level. Remove grapes from this ration entirely.",
+    "appliesToSpecies": ["dog", "fennec fox"]
+  },
+  {
+    "ruleId": "rule_toxin_raisin_canine",
+    "targetType": "ingredient_keyword",
+    "targetName": "raisin",
+    "maxInclusionPerc": 0.01,
+    "severity": "CRITICAL",
+    "warningMessage": "Raisins (dried grapes) are toxic to canids and can cause acute kidney failure at any amount - there is no known safe inclusion level. Remove raisins from this ration entirely.",
+    "appliesToSpecies": ["dog", "fennec fox"]
+  },
+  {
+    "ruleId": "rule_toxin_avocado",
+    "targetType": "ingredient_keyword",
+    "targetName": "avocado",
+    "maxInclusionPerc": 0.01,
+    "severity": "CRITICAL",
+    "warningMessage": "Avocado (all parts - fruit, pit, skin, leaves) contains persin, which is toxic to birds, horses, and goats, potentially causing fatal cardiac/respiratory distress. Remove it from this ration entirely.",
+    "appliesToSpecies": [
+      "parrot", "finch", "canary", "cockatiel", "budgerigar",
+      "chicken", "duck", "goose", "turkey", "quail", "pheasant", "guineafowl", "pigeon", "emu", "ostrich", "rhea",
+      "horse", "goat"
+    ]
+  },
+  {
+    "ruleId": "rule_toxin_allium_onion",
+    "targetType": "ingredient_keyword",
+    "targetName": "onion",
+    "maxInclusionPerc": 0.01,
+    "severity": "CRITICAL",
+    "warningMessage": "Onion (and the rest of the allium family) damages red blood cells and can cause hemolytic anemia across most mammal species, at any amount - there is no known safe inclusion level. Remove it from this ration entirely."
+  },
+  {
+    "ruleId": "rule_toxin_allium_garlic",
+    "targetType": "ingredient_keyword",
+    "targetName": "garlic",
+    "maxInclusionPerc": 0.01,
+    "severity": "CRITICAL",
+    "warningMessage": "Garlic (and the rest of the allium family) damages red blood cells and can cause hemolytic anemia across most mammal species, at any amount - there is no known safe inclusion level. Remove it from this ration entirely."
+  },
+  {
+    "ruleId": "rule_toxin_allium_leek",
+    "targetType": "ingredient_keyword",
+    "targetName": "leek",
+    "maxInclusionPerc": 0.01,
+    "severity": "CRITICAL",
+    "warningMessage": "Leek (and the rest of the allium family) damages red blood cells and can cause hemolytic anemia across most mammal species, at any amount - there is no known safe inclusion level. Remove it from this ration entirely."
+  },
+  {
+    "ruleId": "rule_caution_rhubarb_leaf",
+    "targetType": "ingredient_keyword",
+    "targetName": "rhubarb",
+    "maxInclusionPerc": 0.01,
+    "severity": "HIGH",
+    "warningMessage": "Rhubarb stalk is safe in moderation, but the leaf blade is high enough in oxalates to be genuinely dangerous and should never be fed - make sure only trimmed stalk is used, never the leaf."
+  },
+  {
+    "ruleId": "rule_solanine_potato_raw_green",
+    "targetType": "ingredient_keyword",
+    "targetName": "green/sprouted",
+    "maxInclusionPerc": 0.01,
+    "severity": "HIGH",
+    "warningMessage": "Raw potato skin and any green-tinged or sprouted flesh contain solanine, which is toxic in meaningful amounts. Use only cooked, peeled potato flesh instead."
+  },
+  {
+    "ruleId": "rule_solanine_tomato_unripe",
+    "targetType": "ingredient_keyword",
+    "targetName": "unripe",
+    "maxInclusionPerc": 0.01,
+    "severity": "MEDIUM",
+    "warningMessage": "Unripe/green tomato and tomato vine contain solanine-family compounds, unlike ripe tomato flesh. Use only ripe, red tomato instead."
+  },
+  {
+    "ruleId": "rule_pit_reminder_cherry",
+    "targetType": "ingredient_keyword",
+    "targetName": "cherry",
+    "maxInclusionPerc": 0.01,
+    "severity": "LOW",
+    "warningMessage": "Cherry pits contain cyanogenic compounds (amygdalin) - make sure pits are fully removed before feeding."
+  },
+  {
+    "ruleId": "rule_pit_reminder_peach",
+    "targetType": "ingredient_keyword",
+    "targetName": "peach",
+    "maxInclusionPerc": 0.01,
+    "severity": "LOW",
+    "warningMessage": "Peach pits contain cyanogenic compounds (amygdalin) - make sure pits are fully removed before feeding."
+  },
+  {
+    "ruleId": "rule_pit_reminder_plum",
+    "targetType": "ingredient_keyword",
+    "targetName": "plum (pitted",
+    "maxInclusionPerc": 0.01,
+    "severity": "LOW",
+    "warningMessage": "Plum pits contain cyanogenic compounds (amygdalin) - make sure pits are fully removed before feeding."
+  },
+  {
+    "ruleId": "rule_pit_reminder_apricot",
+    "targetType": "ingredient_keyword",
+    "targetName": "apricot",
+    "maxInclusionPerc": 0.01,
+    "severity": "LOW",
+    "warningMessage": "Apricot pits contain cyanogenic compounds (amygdalin) - make sure pits are fully removed before feeding."
+  },
+  {
+    "ruleId": "rule_pit_reminder_nectarine",
+    "targetType": "ingredient_keyword",
+    "targetName": "nectarine",
+    "maxInclusionPerc": 0.01,
+    "severity": "LOW",
+    "warningMessage": "Nectarine pits contain cyanogenic compounds (amygdalin) - make sure pits are fully removed before feeding."
+  },
+  {
+    "ruleId": "rule_seed_reminder_apple",
+    "targetType": "ingredient_keyword",
+    "targetName": "apple",
+    "maxInclusionPerc": 0.01,
+    "severity": "LOW",
+    "warningMessage": "Apple seeds/core contain cyanogenic compounds (amygdalin) - make sure seeds and core are removed before feeding."
+  },
+  {
+    "ruleId": "rule_sugar_nsc_horse",
+    "targetType": "dm_concentration",
+    "targetName": "Sugar_pct_DM",
+    "maxValue": 12.0,
+    "severity": "HIGH",
+    "warningMessage": "This ration's sugar (NSC) content is above the safe dry-matter-basis threshold commonly used for laminitis-prone or insulin-resistant horses (~10-12% DM). Cut back on high-sugar fruit/produce or dilute with a low-sugar forage.",
+    "appliesToSpecies": ["horse"]
   }
 ]
