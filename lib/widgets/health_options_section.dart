@@ -6,12 +6,14 @@ import 'upgrade_dialog.dart';
 
 /// Inline (non-dialog) health/condition screening, shown at the bottom of
 /// the "Add Supplements" step so it sits right next to the final Calculate
-/// action instead of interrupting the flow as a popup. Tier-gated: Free
-/// tier gets an upgrade prompt instead of the toggle; Hobby gets a toggle
-/// that only exposes pregnant/breeding; Pro gets the full set (adds injured
-/// w/ notes + hibernating/brumating). Reports its result via
-/// [onResultChanged] any time something changes - null means "nothing to
-/// apply" (toggle off, or free tier).
+/// action instead of interrupting the flow as a popup. Tier-gated, except
+/// for the overweight/obese toggle which is available on every tier
+/// (including Free) since it's one of the most common conditions pet
+/// owners deal with: Free tier gets just that toggle plus an upgrade
+/// prompt for the rest; Hobby gets obese + pregnant/breeding; Pro gets the
+/// full set (adds injured w/ notes + hibernating/brumating). Reports its
+/// result via [onResultChanged] any time something changes - null means
+/// "nothing to apply" (toggle off, or nothing enabled on free tier).
 class HealthOptionsSection extends StatefulWidget {
   final AnimalProfile profile;
   final UserTier tier;
@@ -36,6 +38,7 @@ class _HealthOptionsSectionState extends State<HealthOptionsSection> {
   late bool _breeding;
   late bool _injured;
   late bool _hibernatingOrBrumating;
+  late bool _obese;
   late final TextEditingController _injuryController;
 
   bool get _showsPregnant => widget.profile.sex == 'Female' || widget.profile.sex == 'Mixed';
@@ -52,6 +55,7 @@ class _HealthOptionsSectionState extends State<HealthOptionsSection> {
     _breeding = initial?.breeding ?? false;
     _injured = initial?.injured ?? false;
     _hibernatingOrBrumating = initial?.hibernatingOrBrumating ?? false;
+    _obese = initial?.obese ?? false;
     _injuryController = TextEditingController(text: initial?.injuryNotes ?? '');
   }
 
@@ -62,6 +66,10 @@ class _HealthOptionsSectionState extends State<HealthOptionsSection> {
   }
 
   void _emit() {
+    if (widget.tier == UserTier.free) {
+      widget.onResultChanged(_obese ? const HealthScreeningResult(obese: true) : null);
+      return;
+    }
     if (!_enabled) {
       widget.onResultChanged(null);
       return;
@@ -72,13 +80,30 @@ class _HealthOptionsSectionState extends State<HealthOptionsSection> {
       injured: _isPro && _injured,
       injuryNotes: _isPro ? _injuryController.text.trim() : '',
       hibernatingOrBrumating: _isPro && _hibernatingOrBrumating,
+      obese: _obese,
     ));
   }
 
   @override
   Widget build(BuildContext context) {
     if (widget.tier == UserTier.free) {
-      return const _HealthUpgradeCard();
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _NonTriageBanner(),
+          const SizedBox(height: 8),
+          _ToggleRow(
+            label: 'Overweight / needs weight management?',
+            value: _obese,
+            onChanged: (v) {
+              setState(() => _obese = v);
+              _emit();
+            },
+          ),
+          const SizedBox(height: 12),
+          const _HealthUpgradeCard(),
+        ],
+      );
     }
 
     return Column(
@@ -96,6 +121,14 @@ class _HealthOptionsSectionState extends State<HealthOptionsSection> {
           const SizedBox(height: 8),
           const _NonTriageBanner(),
           const SizedBox(height: 8),
+          _ToggleRow(
+            label: 'Overweight / needs weight management?',
+            value: _obese,
+            onChanged: (v) {
+              setState(() => _obese = v);
+              _emit();
+            },
+          ),
           if (_showsPregnant)
             _ToggleRow(
               label: 'Currently pregnant?',
@@ -333,8 +366,8 @@ class _HealthUpgradeCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Upgrade to answer a quick health screening (pregnancy, breeding, and more on Pro) '
-            'so your feed plan can account for it.',
+            'Upgrade to screen for pregnancy and breeding too (Pro also adds injury notes and '
+            'hibernation/brumation) so your feed plan can account for it.',
             style: TextStyle(color: Colors.white70, fontSize: 13),
           ),
           const SizedBox(height: 12),

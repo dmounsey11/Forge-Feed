@@ -14,6 +14,8 @@ import 'package:forge_feed/widgets/prep_amount_dialog.dart';
 SpeciesRequirement _target({
   double minProteinPerc = 0,
   double maxProteinPerc = 100,
+  double? minFatPerc,
+  double? maxFatPerc,
   double minCalciumPerc = 0,
   double maxCalciumPerc = 100,
   double minPhosphorusPerc = 0,
@@ -32,6 +34,8 @@ SpeciesRequirement _target({
     targetWeightKg: targetWeightKg,
     minProteinPerc: minProteinPerc,
     maxProteinPerc: maxProteinPerc,
+    minFatPerc: minFatPerc,
+    maxFatPerc: maxFatPerc,
     minMeKcal: minMeKcal,
     maxMeKcal: maxMeKcal,
     minCalciumPerc: minCalciumPerc,
@@ -48,8 +52,10 @@ SpeciesRequirement _target({
 Ingredient _food(
   String id, {
   double proteinPct = 10,
+  double fatPct = 0,
   double calciumPct = 0,
   double phosphorusPct = 0,
+  double sodiumPct = 0,
   double copperPpm = 0,
   double molybdenumPpm = 0,
   double oxalatePct = 0,
@@ -61,8 +67,10 @@ Ingredient _food(
     category: 'Proteins & Meal',
     asFedMetrics: AsFedMetrics(
       crudeProteinPct: proteinPct,
+      fatPct: fatPct,
       calciumPct: calciumPct,
       phosphorusPct: phosphorusPct,
+      sodiumPct: sodiumPct,
       copperPpm: copperPpm,
       molybdenumPpm: molybdenumPpm,
       oxalatePct: oxalatePct,
@@ -88,6 +96,7 @@ Object _calc({
   List<Ingredient> supplementItems = const [],
   List<SafetyRule> safetyRules = const [],
   bool stageHasDedicatedData = true,
+  List<NutrientRelaxation>? relaxations,
 }) {
   return DietCalculator.calculate(
     profile: profile,
@@ -98,6 +107,7 @@ Object _calc({
     supplementItems: supplementItems,
     safetyRules: safetyRules,
     stageHasDedicatedData: stageHasDedicatedData,
+    relaxations: relaxations,
   );
 }
 
@@ -320,6 +330,134 @@ void main() {
         result.warnings.map((w) => w.severity).toList(),
         [WarningSeverity.high, WarningSeverity.medium, WarningSeverity.low],
       );
+    });
+  });
+
+  group('Diagnostic pass: nutrient infeasibility', () {
+    // 'meat' is the only source of protein and it's also the only source of
+    // fat - a 30% protein floor forces at least ~6.5 lbs of it into a
+    // 10-lb batch, but a 10% fat ceiling caps it at ~4.67 lbs. There is no
+    // blend of these two ingredients that satisfies both at once.
+    List<Ingredient> proteinFatConflictPantry() => [
+          _food('meat', proteinPct: 38, fatPct: 18),
+          _food('lean', proteinPct: 15, fatPct: 3),
+        ];
+
+    SpeciesRequirement proteinFatConflictTarget() => _target(minProteinPerc: 30, maxFatPerc: 10);
+
+    test(
+        'single-culprit: protein floor vs. fat ceiling is pinned to the Protein bound with the '
+        'real achievable max, computed by re-solving the LP', () {
+      final result = _calc(
+        profile: _profile(),
+        target: proteinFatConflictTarget(),
+        pantryItems: proteinFatConflictPantry(),
+      );
+
+      expect(result, isA<RationCalculationError>());
+      final error = result as RationCalculationError;
+      expect(error.reason, DietFailureReason.nutrientInfeasibility);
+      expect(error.bottlenecks, hasLength(1));
+      final bottleneck = error.bottlenecks.single;
+      expect(bottleneck.label, 'Protein');
+      expect(bottleneck.isMinBound, isTrue);
+      expect(bottleneck.blockedBoundValue, 30.0);
+      // Maximizing protein at the 10%-fat ceiling: 0.15x = 0.7 => x = 14/3
+      // lbs of 'meat', giving 2.5733... lbs protein over a 10-lb batch.
+      expect(bottleneck.achievableValue, closeTo(25.73, 0.05));
+    });
+
+    test(
+        'relaxing exactly the identified bottleneck produces a feasible ration with a '
+        '"relaxed" warning attached', () {
+      final diagnostic = _calc(
+        profile: _profile(),
+        target: proteinFatConflictTarget(),
+        pantryItems: proteinFatConflictPantry(),
+      ) as RationCalculationError;
+      final bottleneck = diagnostic.bottlenecks.single;
+
+      final result = _calc(
+        profile: _profile(),
+        target: proteinFatConflictTarget(),
+        pantryItems: proteinFatConflictPantry(),
+        relaxations: [
+          NutrientRelaxation(
+            label: bottleneck.label,
+            unit: bottleneck.unit,
+            isMinBound: bottleneck.isMinBound,
+            relaxedValue: bottleneck.achievableValue,
+          ),
+        ],
+      );
+
+      expect(result, isA<RationResult>());
+      expect((result as RationResult).warnings.any((w) => w.message.contains('relaxed')), isTrue);
+    });
+
+    test(
+        'pairwise-culprit: two independent conflicts (protein/fat and calcium/sodium) - neither '
+        'fixed by a single bound removal - are reported as a 2-entry bottleneck list', () {
+      // 'meat'/'lean' reproduce the protein/fat conflict above; 'mineralMix'
+      // is the only calcium source but also carries sodium, so reaching the
+      // calcium floor necessarily blows the sodium ceiling. The two
+      // conflicts don't share an ingredient, so no single bound removal
+      // resolves both at once - only removing one bound from each pair does.
+      final result = _calc(
+        profile: _profile(),
+        target: _target(minProteinPerc: 30, maxFatPerc: 10, minCalciumPerc: 5, maxSodiumPerc: 1),
+        pantryItems: [
+          _food('meat', proteinPct: 38, fatPct: 18),
+          _food('lean', proteinPct: 15, fatPct: 3),
+          _food('mineralMix', calciumPct: 30, sodiumPct: 20),
+        ],
+      );
+
+      expect(result, isA<RationCalculationError>());
+      final error = result as RationCalculationError;
+      expect(error.reason, DietFailureReason.nutrientInfeasibility);
+      expect(error.bottlenecks, hasLength(2));
+      expect(error.bottlenecks.map((b) => b.label).toSet(), hasLength(2));
+    });
+
+    test(
+        'a safety-rule-driven infeasibility (never a relaxation candidate) is reported as '
+        'unexplained, not misattributed to a nutrient bound', () {
+      final copperRule = SafetyRule(
+        ruleId: 'cu_cap',
+        targetType: 'dm_concentration',
+        targetName: 'Cu_ppm_DM',
+        maxValue: 10.0,
+        severity: 'HIGH',
+        warningMessage: 'Copper level unsafe',
+      );
+      // Wide-open nutrient target - the only possible source of
+      // infeasibility is the hard copper cap, which the diagnostic pass
+      // must never treat as a removable/relaxable nutrient bound.
+      final result = _calc(
+        profile: _profile(),
+        target: _target(),
+        pantryItems: [_food('a', proteinPct: 20, copperPpm: 6, dryMatterPct: 50)],
+        safetyRules: [copperRule],
+      );
+
+      expect(result, isA<RationCalculationError>());
+      final error = result as RationCalculationError;
+      expect(error.reason, DietFailureReason.unexplainedInfeasibility);
+      expect(error.bottlenecks, isEmpty);
+    });
+
+    test('no pantry or supplement items at all is reported as noCandidates, not diagnosed', () {
+      final result = _calc(
+        profile: _profile(),
+        target: _target(),
+        pantryItems: const [],
+      );
+
+      expect(result, isA<RationCalculationError>());
+      final error = result as RationCalculationError;
+      expect(error.reason, DietFailureReason.noCandidates);
+      expect(error.bottlenecks, isEmpty);
     });
   });
 }

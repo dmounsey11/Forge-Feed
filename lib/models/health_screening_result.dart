@@ -4,6 +4,7 @@ class HealthScreeningResult {
   final bool injured;
   final String injuryNotes;
   final bool hibernatingOrBrumating;
+  final bool obese;
 
   const HealthScreeningResult({
     this.pregnant = false,
@@ -11,7 +12,8 @@ class HealthScreeningResult {
     this.injured = false,
     this.injuryNotes = '',
     this.hibernatingOrBrumating = false,
+    this.obese = false,
   });
 
-  bool get hasAnyFlag => pregnant || breeding || injured || hibernatingOrBrumating;
+  bool get hasAnyFlag => pregnant || breeding || injured || hibernatingOrBrumating || obese;
 }

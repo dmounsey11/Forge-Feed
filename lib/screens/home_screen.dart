@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   PrepAmountResult? _prepResult;
   Set<String> _selectedPantryIds = {};
   HealthScreeningResult? _healthResult;
+  RationCalculationError? _lastError;
 
   void _resetToStart() {
     setState(() {
@@ -36,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _prepResult = null;
       _selectedPantryIds = {};
       _healthResult = null;
+      _lastError = null;
       _stage = _CreateFeedStage.profilePicker;
     });
   }
@@ -220,9 +222,22 @@ class _HomeScreenState extends State<HomeScreen> {
           label: const Text('Change Animal', style: TextStyle(color: Colors.white60)),
         ),
         const SizedBox(height: 4),
-        const Text(
-          'Select Base Ingredients',
-          style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Select Base Ingredients',
+              style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            if (pantryItems.isNotEmpty)
+              TextButton(
+                onPressed: () => _toggleSelectAll(pantryItems),
+                child: Text(
+                  _selectedPantryIds.length == pantryItems.length ? 'Deselect All' : 'Select All',
+                  style: const TextStyle(color: Color(0xFFF97316), fontWeight: FontWeight.bold),
+                ),
+              ),
+          ],
         ),
         Text(
           'For ${profile.name} - prepping $_prepLabel. Pick which pantry items go in this batch. '
@@ -259,6 +274,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
         ),
         const SizedBox(height: 16),
+        if (_lastError != null) ...[
+          _buildDiagnosticBanner(_lastError!),
+          const SizedBox(height: 12),
+        ],
         SizedBox(
           width: double.infinity,
           height: 48,
@@ -276,6 +295,16 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ],
     );
+  }
+
+  void _toggleSelectAll(List<Ingredient> pantryItems) {
+    setState(() {
+      if (_selectedPantryIds.length == pantryItems.length) {
+        _selectedPantryIds = {};
+      } else {
+        _selectedPantryIds = pantryItems.map((item) => item.id).toSet();
+      }
+    });
   }
 
   Widget _buildIngredientChecklist({
@@ -328,7 +357,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _calculateDiet() {
+  /// Gathers the profile/pantry/supplement inputs and calls
+  /// [DietCalculator.calculate]. Returns `null` for the two input problems
+  /// (no species data, no pantry selected) that are shown as one-shot
+  /// SnackBars rather than the interactive diagnostic banner - those aren't
+  /// something a "suggest ingredients"/"relax targets" retry can help with.
+  /// Shared by [_calculateDiet] and [_retryWithRelaxation] so a relaxed
+  /// retry doesn't duplicate this setup.
+  Object? _computeResult({List<NutrientRelaxation>? relaxations}) {
     final profile = _selectedProfile!;
     final prep = _prepResult!;
     final db = context.read<DatabaseService>();
@@ -338,11 +374,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No nutrition data available yet for this species.')),
       );
-      return;
+      return null;
     }
 
-    final selectedPantryItems =
-        db.getPantryIngredients().where((i) => _selectedPantryIds.contains(i.id)).toList();
+    final selectedPantryItems = db.getPantryIngredients().where((i) => _selectedPantryIds.contains(i.id)).toList();
     // Supplements aren't manually checked - every stocked supplement is
     // handed to the calculator, which only actually uses the ones needed to
     // close the calcium/phosphorus/sodium gap the base feed can't cover.
@@ -353,10 +388,10 @@ class _HomeScreenState extends State<HomeScreen> {
         const SnackBar(content: Text('Add at least one pantry item before calculating a diet.')),
       );
       setState(() => _stage = _CreateFeedStage.baseIngredients);
-      return;
+      return null;
     }
 
-    final result = DietCalculator.calculate(
+    return DietCalculator.calculate(
       profile: profile,
       target: target,
       health: _healthResult,
@@ -365,18 +400,141 @@ class _HomeScreenState extends State<HomeScreen> {
       supplementItems: availableSupplementItems,
       safetyRules: db.safetyRules,
       stageHasDedicatedData: NutritionTargetResolver.stageHasDedicatedData(profile, db.speciesRequirements),
+      relaxations: relaxations,
     );
+  }
+
+  void _calculateDiet() {
+    final result = _computeResult();
+    if (result == null) return;
 
     if (result is RationCalculationError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.message)),
-      );
+      setState(() => _lastError = result);
       return;
     }
 
+    setState(() => _lastError = null);
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => RationResultScreen(result: result as RationResult, profileName: profile.name),
+        builder: (context) => RationResultScreen(result: result as RationResult, profileName: _selectedProfile!.name),
+      ),
+    );
+  }
+
+  /// "Allow temporary target relaxation": loosens exactly the nutrient
+  /// bound(s) the diagnostic pass already identified in [_lastError] to
+  /// their computed achievable value, then re-solves. The relaxed
+  /// [RationResult] carries its own "target relaxed" warning (added by
+  /// [DietCalculator.calculate]) so the result screen makes clear this
+  /// batch isn't at the animal's normal target.
+  void _retryWithRelaxation() {
+    final bottlenecks = _lastError!.bottlenecks;
+    final relaxations = bottlenecks
+        .map((b) => NutrientRelaxation(
+              label: b.label,
+              unit: b.unit,
+              isMinBound: b.isMinBound,
+              relaxedValue: b.achievableValue,
+            ))
+        .toList();
+
+    final result = _computeResult(relaxations: relaxations);
+    if (result == null) return;
+
+    if (result is RationResult) {
+      setState(() => _lastError = null);
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => RationResultScreen(result: result, profileName: _selectedProfile!.name),
+        ),
+      );
+    } else if (result is RationCalculationError) {
+      // Defensive - relaxing exactly the identified bottleneck should
+      // normally succeed, but surface a fresh diagnostic if it doesn't.
+      setState(() => _lastError = result);
+    }
+  }
+
+  void _showSuggestionsDialog(RationCalculationError error) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF242426),
+        title: const Text('Suggested ingredients', style: TextStyle(color: Colors.white)),
+        content: Text(
+          DietCalculator.suggestMissingIngredients(error.bottlenecks),
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK', style: TextStyle(color: Color(0xFFF97316))),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Interactive replacement for the old one-shot SnackBar: a persistent,
+  /// dismissible card so a failed solve can offer follow-up actions instead
+  /// of just naming the failure once and vanishing. Only shows the two
+  /// action chips when [error.bottlenecks] is non-empty - a generic/
+  /// unexplained infeasibility (e.g. rooted in a hard safety constraint)
+  /// has nothing concrete for "suggest ingredients"/"relax targets" to act
+  /// on.
+  Widget _buildDiagnosticBanner(RationCalculationError error) {
+    final hasBottlenecks = error.bottlenecks.isNotEmpty;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.redAccent.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.redAccent),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  hasBottlenecks ? DietCalculator.describeBottlenecks(error.bottlenecks) : error.message,
+                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                ),
+              ),
+              InkWell(
+                onTap: () => setState(() => _lastError = null),
+                child: const Icon(Icons.close, color: Colors.white54, size: 18),
+              ),
+            ],
+          ),
+          if (hasBottlenecks) ...[
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ActionChip(
+                  backgroundColor: const Color(0xFF242426),
+                  label: const Text('Suggest missing ingredients', style: TextStyle(color: Colors.white)),
+                  onPressed: () => _showSuggestionsDialog(error),
+                ),
+                ActionChip(
+                  backgroundColor: const Color(0xFFF97316),
+                  label: const Text(
+                    'Allow temporary target relaxation',
+                    style: TextStyle(color: Color(0xFF1A1A1C), fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: _retryWithRelaxation,
+                ),
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }

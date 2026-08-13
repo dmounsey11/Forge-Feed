@@ -151,7 +151,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                '${profile.species} â€¢ ${profile.productionStage} â€¢ ${profile.environment}',
+                                '${profile.species} • ${profile.productionStage} • ${profile.environment}',
                                 style: const TextStyle(color: Colors.grey, fontSize: 14),
                               ),
                               const SizedBox(height: 10),

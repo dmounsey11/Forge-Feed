@@ -23,6 +23,56 @@ class _TargetAdjustment {
   });
 }
 
+/// One removable nutrient-target bound inside the diet LP - pairs an
+/// [LpConstraint] with the label/unit/display-conversion the diagnostic
+/// pass ([DietCalculator._diagnoseInfeasibility]) needs to explain and
+/// re-solve around it individually, without duplicating the constraint math
+/// that builds it. Hard safety constraints (from
+/// [DietCalculator._hardSafetyConstraints]) are deliberately never
+/// represented as one of these - they are always fixed and never a removal
+/// candidate for diagnosis or relaxation.
+class _LabeledBound {
+  /// Matches a [NutrientComparison.label] (e.g. 'Protein', 'Fat') and a
+  /// [NutrientRelaxation.label].
+  final String label;
+  final String unit;
+
+  /// True if this is a floor (greaterOrEqual); false if a ceiling
+  /// (lessOrEqual).
+  final bool isMinBound;
+
+  /// This bound's value in display units (e.g. 30.0 for "30%").
+  final double displayBoundValue;
+
+  /// The LP-space right-hand side (e.g. lbs of protein in the batch).
+  final double totalRhs;
+
+  /// The same per-ingredient coefficient vector used to build the
+  /// constraint - reused as-is when maximizing/minimizing this nutrient in
+  /// [DietCalculator._achievableExtreme].
+  final List<double> coefficients;
+
+  /// Converts an LP-space total (e.g. lbs of protein) into display units
+  /// (e.g. %).
+  final double Function(double totalNutrientAmount) toDisplayUnits;
+
+  const _LabeledBound({
+    required this.label,
+    required this.unit,
+    required this.isMinBound,
+    required this.displayBoundValue,
+    required this.totalRhs,
+    required this.coefficients,
+    required this.toDisplayUnits,
+  });
+
+  LpConstraint toConstraint() => LpConstraint(
+        coefficients,
+        isMinBound ? ConstraintType.greaterOrEqual : ConstraintType.lessOrEqual,
+        totalRhs,
+      );
+}
+
 /// Turns a selected animal, its resolved species targets, health screening
 /// answers, and the user's pantry/supplement stock into a ration: how much
 /// of each pantry item to use, plus how much of each supplement is needed
@@ -48,6 +98,7 @@ class DietCalculator {
     required List<Ingredient> supplementItems,
     required List<SafetyRule> safetyRules,
     bool stageHasDedicatedData = true,
+    List<NutrientRelaxation>? relaxations,
   }) {
     final adjustments = _collectAdjustments(profile, health);
     final proteinMult = adjustments.fold(1.0, (m, a) => m * a.proteinMult);
@@ -61,6 +112,86 @@ class DietCalculator {
     final adjMaxCalcium = target.maxCalciumPerc * calciumMult;
     final adjMinEnergyKcalLb = (target.minMeKcal * energyMult) / _kgToLb;
     final adjMaxEnergyKcalLb = (target.maxMeKcal * energyMult) / _kgToLb;
+
+    // "Allow temporary target relaxation" retries pass back exactly the
+    // bound(s) DietCalculator's own diagnostic pass already identified as
+    // the bottleneck - loosening only what the *solver* is allowed to
+    // produce. The final NutrientComparisons built later in this method
+    // still compare against the un-relaxed adj*/target values (see the
+    // `comparisons` list below), so the report honestly shows a relaxed
+    // nutrient as Low/High rather than silently redefining "on track".
+    var effMinProtein = adjMinProtein;
+    var effMaxProtein = adjMaxProtein;
+    var effMinCalcium = adjMinCalcium;
+    var effMaxCalcium = adjMaxCalcium;
+    var effMinPhosphorus = target.minPhosphorusPerc;
+    var effMaxPhosphorus = target.maxPhosphorusPerc;
+    var effMinSodium = target.minSodiumPerc;
+    var effMaxSodium = target.maxSodiumPerc;
+    var effMinFat = target.minFatPerc;
+    var effMaxFat = target.maxFatPerc;
+    var effMinFiber = target.minFiberPerc;
+    var effMaxFiber = target.maxFiberPerc;
+    var effMinLysine = target.minLysinePerc;
+    var effMinMethionine = target.minMethioninePerc;
+    var effMinTaurine = target.minTaurinePerc;
+    var effMinNiacin = target.minNiacinMgKg;
+    var effMinEnergy = adjMinEnergyKcalLb;
+    var effMaxEnergy = adjMaxEnergyKcalLb;
+    for (final r in relaxations ?? const <NutrientRelaxation>[]) {
+      switch (r.label) {
+        case 'Protein':
+          if (r.isMinBound) {
+            effMinProtein = r.relaxedValue;
+          } else {
+            effMaxProtein = r.relaxedValue;
+          }
+        case 'Calcium':
+          if (r.isMinBound) {
+            effMinCalcium = r.relaxedValue;
+          } else {
+            effMaxCalcium = r.relaxedValue;
+          }
+        case 'Phosphorus':
+          if (r.isMinBound) {
+            effMinPhosphorus = r.relaxedValue;
+          } else {
+            effMaxPhosphorus = r.relaxedValue;
+          }
+        case 'Sodium':
+          if (r.isMinBound) {
+            effMinSodium = r.relaxedValue;
+          } else {
+            effMaxSodium = r.relaxedValue;
+          }
+        case 'Fat':
+          if (r.isMinBound) {
+            effMinFat = r.relaxedValue;
+          } else {
+            effMaxFat = r.relaxedValue;
+          }
+        case 'Fiber':
+          if (r.isMinBound) {
+            effMinFiber = r.relaxedValue;
+          } else {
+            effMaxFiber = r.relaxedValue;
+          }
+        case 'Lysine':
+          effMinLysine = r.relaxedValue;
+        case 'Methionine':
+          effMinMethionine = r.relaxedValue;
+        case 'Taurine':
+          effMinTaurine = r.relaxedValue;
+        case 'Niacin':
+          effMinNiacin = r.relaxedValue;
+        case 'Energy':
+          if (r.isMinBound) {
+            effMinEnergy = r.relaxedValue;
+          } else {
+            effMaxEnergy = r.relaxedValue;
+          }
+      }
+    }
 
     final totalWeightLbs = _estimateBatchWeightLbs(prep: prep, profile: profile, target: target);
 
@@ -76,13 +207,10 @@ class DietCalculator {
       // when the pantry has any, since that's the point of this mode; if it
       // doesn't, fall back to the full candidate list rather than returning
       // an empty ration.
-      final wholeFoodItems =
-          foodCandidates.where((i) => _isFreshOrFrozenProtein(i) || _isFreshProduce(i)).toList();
+      final wholeFoodItems = foodCandidates.where((i) => _isFreshOrFrozenProtein(i) || _isFreshProduce(i)).toList();
       if (wholeFoodItems.isNotEmpty) {
-        feedingSystemFilteredIds = foodCandidates
-            .where((i) => !wholeFoodItems.any((w) => w.id == i.id))
-            .map((i) => i.id)
-            .toSet();
+        feedingSystemFilteredIds =
+            foodCandidates.where((i) => !wholeFoodItems.any((w) => w.id == i.id)).map((i) => i.id).toSet();
         foodCandidates = wholeFoodItems;
       }
     }
@@ -98,26 +226,42 @@ class DietCalculator {
     // picking a small anchor set and gap-filling afterward. See
     // _solveDietLp for the constraint matrix.
     final candidates = [...foodCandidates, ...supplementPool];
+    if (candidates.isEmpty || totalWeightLbs <= 0) {
+      return const RationCalculationError(
+        "No pantry or supplement items are available to build this batch, or the batch size is zero.",
+        reason: DietFailureReason.noCandidates,
+      );
+    }
     final lpOutcome = _solveDietLp(
       candidates: candidates,
       lowCostIds: foodCandidates.map((i) => i.id).toSet(),
       totalWeightLbs: totalWeightLbs,
-      target: target,
-      adjMinProtein: adjMinProtein,
-      adjMaxProtein: adjMaxProtein,
-      adjMinCalcium: adjMinCalcium,
-      adjMaxCalcium: adjMaxCalcium,
-      adjMinEnergyKcalLb: adjMinEnergyKcalLb,
-      adjMaxEnergyKcalLb: adjMaxEnergyKcalLb,
+      minProtein: effMinProtein,
+      maxProtein: effMaxProtein,
+      minCalcium: effMinCalcium,
+      maxCalcium: effMaxCalcium,
+      minPhosphorus: effMinPhosphorus,
+      maxPhosphorus: effMaxPhosphorus,
+      minSodium: effMinSodium,
+      maxSodium: effMaxSodium,
+      minFat: effMinFat,
+      maxFat: effMaxFat,
+      minFiber: effMinFiber,
+      maxFiber: effMaxFiber,
+      minLysine: effMinLysine,
+      minMethionine: effMinMethionine,
+      minTaurine: effMinTaurine,
+      minNiacin: effMinNiacin,
+      minEnergyKcalLb: effMinEnergy,
+      maxEnergyKcalLb: effMaxEnergy,
       safetyRules: safetyRules,
       profile: profile,
     );
     if (!lpOutcome.feasible) {
-      return const RationCalculationError(
-        "No combination of your selected pantry and supplement items can satisfy every nutrient and "
-        "safety target at once for this batch. Try adding more pantry variety (especially items higher "
-        "in protein, calcium, or phosphorus) or stocking a broader supplement/mineral base, then "
-        "recalculate.",
+      return _diagnoseInfeasibility(
+        nutrientBounds: lpOutcome.nutrientBounds,
+        baseConstraints: lpOutcome.baseConstraints,
+        n: candidates.length,
       );
     }
     final allLbs = lpOutcome.lbsByIngredientId;
@@ -226,8 +370,7 @@ class DietCalculator {
       _compare('Energy', 'kcal/lb', adjMinEnergyKcalLb, adjMaxEnergyKcalLb, finalEnergy),
       if (target.minTaurinePerc > 0) _compare('Taurine', '%', target.minTaurinePerc, null, finalTaurinePct),
       if (target.minNiacinMgKg > 0) _compare('Niacin', 'mg/kg', target.minNiacinMgKg, null, finalNiacin),
-      if (isSheep && finalMolybdenum > 0)
-        _compare('Cu:Mo Ratio', ':1', 3.0, 10.0, finalCopper / finalMolybdenum),
+      if (isSheep && finalMolybdenum > 0) _compare('Cu:Mo Ratio', ':1', 3.0, 10.0, finalCopper / finalMolybdenum),
       if (isOxalateRiskSpecies && finalOxalatePct > 0)
         _compare('Ca:Oxalate Ratio', ':1', 0.5, null, finalCalciumPct / finalOxalatePct),
     ];
@@ -255,8 +398,7 @@ class DietCalculator {
       warnings.insert(
         0,
         RationWarning(
-          message:
-              'No dedicated nutrition data yet for the "${profile.productionStage}" stage of this species - '
+          message: 'No dedicated nutrition data yet for the "${profile.productionStage}" stage of this species - '
               'this ration uses general/maintenance-level targets instead. Treat it as a rough starting point, '
               'not a stage-tuned recipe.',
           severity: WarningSeverity.medium,
@@ -296,6 +438,17 @@ class DietCalculator {
         ),
       );
     }
+    for (final r in relaxations ?? const <NutrientRelaxation>[]) {
+      warnings.insert(
+        0,
+        RationWarning(
+          message: 'Target relaxed for this batch: the ${r.label} ${r.isMinBound ? "minimum" : "maximum"} was '
+              'loosened to ${r.relaxedValue.toStringAsFixed(1)}${r.unit} instead of the normal target for this '
+              'animal/stage, so a feasible ration could be produced. Treat this batch as temporary.',
+          severity: WarningSeverity.high,
+        ),
+      );
+    }
     warnings.sort((a, b) => a.severity.index.compareTo(b.severity.index));
 
     final finalBaseItems = foodCandidates
@@ -329,97 +482,226 @@ class DietCalculator {
     );
   }
 
-  /// Builds and solves the Linear Program that produces the ration blend:
-  /// one variable per candidate ingredient (pounds used), constrained to
-  /// sum to [totalWeightLbs] and to keep every nutrient this app tracks
-  /// within its target range (or above its minimum, for amino acids/
-  /// taurine/niacin), plus every hard safety ceiling [safetyRules] can
-  /// express (see [_hardSafetyConstraints]). The objective prefers whole
-  /// foods ([lowCostIds], cost 0) over supplements/minerals (cost 1), so
-  /// supplements are only used to the extent the foods alone can't meet a
-  /// target - mirroring the old heuristic's intent, just solved jointly
-  /// instead of as a separate gap-fill pass.
-  static ({bool feasible, Map<String, double> lbsByIngredientId}) _solveDietLp({
+  /// Builds every removable nutrient-target bound (protein, calcium,
+  /// phosphorus, sodium, fat, fiber, lysine, methionine, taurine, niacin,
+  /// energy) as a labeled, individually-removable [_LabeledBound] rather
+  /// than a flat [LpConstraint] list - this is what lets
+  /// [_diagnoseInfeasibility] re-solve with one (or a pair) of these
+  /// removed to find the actual bottleneck, and what lets a "temporary
+  /// target relaxation" retry loosen exactly one of them. Every `min*`/
+  /// `max*` parameter here is already the *effective* value for this solve
+  /// (health-adjusted and/or relaxed) - see the `eff*` locals built in
+  /// [calculate].
+  static List<_LabeledBound> _buildNutrientBounds({
     required List<Ingredient> candidates,
-    required Set<String> lowCostIds,
     required double totalWeightLbs,
-    required SpeciesRequirement target,
-    required double adjMinProtein,
-    required double adjMaxProtein,
-    required double adjMinCalcium,
-    required double adjMaxCalcium,
-    required double adjMinEnergyKcalLb,
-    required double adjMaxEnergyKcalLb,
-    required List<SafetyRule> safetyRules,
-    required AnimalProfile profile,
+    required double minProtein,
+    required double maxProtein,
+    required double minCalcium,
+    required double maxCalcium,
+    required double minPhosphorus,
+    required double maxPhosphorus,
+    required double minSodium,
+    required double maxSodium,
+    required double? minFat,
+    required double? maxFat,
+    required double? minFiber,
+    required double? maxFiber,
+    required double minLysine,
+    required double minMethionine,
+    required double minTaurine,
+    required double minNiacin,
+    required double minEnergyKcalLb,
+    required double maxEnergyKcalLb,
   }) {
-    if (candidates.isEmpty || totalWeightLbs <= 0) {
-      return (feasible: false, lbsByIngredientId: <String, double>{});
-    }
-
-    final n = candidates.length;
     List<double> pctCoeffs(double Function(AsFedMetrics) pctOf) =>
         candidates.map((i) => pctOf(i.asFedMetrics) / 100.0).toList();
     List<double> rawCoeffs(double Function(AsFedMetrics) valOf) =>
         candidates.map((i) => valOf(i.asFedMetrics)).toList();
+    double pctDisplay(double v) => totalWeightLbs <= 0 ? 0 : v / totalWeightLbs * 100.0;
+    double rawDisplay(double v) => totalWeightLbs <= 0 ? 0 : v / totalWeightLbs;
 
-    final constraints = <LpConstraint>[
-      LpConstraint(List.filled(n, 1.0), ConstraintType.equal, totalWeightLbs),
-    ];
-
+    final bounds = <_LabeledBound>[];
     // A minimum of <= 0 is already guaranteed by x >= 0 and would just add
     // a needless artificial variable to the solve, so those are skipped;
     // a maximum is only skipped when genuinely absent (null), since a real
     // max of 0 is meaningful (forces that nutrient out entirely).
-    void addRange(List<double> coeffs, double? minTotal, double? maxTotal) {
+    void addRange(
+      String label,
+      String unit,
+      List<double> coeffs,
+      double? minTotal,
+      double? maxTotal, {
+      required double Function(double) toDisplay,
+    }) {
       if (minTotal != null && minTotal > 0) {
-        constraints.add(LpConstraint(coeffs, ConstraintType.greaterOrEqual, minTotal));
+        bounds.add(_LabeledBound(
+          label: label,
+          unit: unit,
+          isMinBound: true,
+          displayBoundValue: toDisplay(minTotal),
+          totalRhs: minTotal,
+          coefficients: coeffs,
+          toDisplayUnits: toDisplay,
+        ));
       }
       if (maxTotal != null && maxTotal > 0) {
-        constraints.add(LpConstraint(coeffs, ConstraintType.lessOrEqual, maxTotal));
+        bounds.add(_LabeledBound(
+          label: label,
+          unit: unit,
+          isMinBound: false,
+          displayBoundValue: toDisplay(maxTotal),
+          totalRhs: maxTotal,
+          coefficients: coeffs,
+          toDisplayUnits: toDisplay,
+        ));
       }
     }
 
-    addRange(pctCoeffs((m) => m.crudeProteinPct), adjMinProtein / 100 * totalWeightLbs,
-        adjMaxProtein / 100 * totalWeightLbs);
-    addRange(pctCoeffs((m) => m.calciumPct), adjMinCalcium / 100 * totalWeightLbs,
-        adjMaxCalcium / 100 * totalWeightLbs);
-    addRange(pctCoeffs((m) => m.phosphorusPct), target.minPhosphorusPerc / 100 * totalWeightLbs,
-        target.maxPhosphorusPerc / 100 * totalWeightLbs);
-    addRange(pctCoeffs((m) => m.sodiumPct), target.minSodiumPerc / 100 * totalWeightLbs,
-        target.maxSodiumPerc / 100 * totalWeightLbs);
-    if (target.minFatPerc != null || target.maxFatPerc != null) {
+    addRange('Protein', '%', pctCoeffs((m) => m.crudeProteinPct), minProtein / 100 * totalWeightLbs,
+        maxProtein / 100 * totalWeightLbs,
+        toDisplay: pctDisplay);
+    addRange('Calcium', '%', pctCoeffs((m) => m.calciumPct), minCalcium / 100 * totalWeightLbs,
+        maxCalcium / 100 * totalWeightLbs,
+        toDisplay: pctDisplay);
+    addRange('Phosphorus', '%', pctCoeffs((m) => m.phosphorusPct), minPhosphorus / 100 * totalWeightLbs,
+        maxPhosphorus / 100 * totalWeightLbs,
+        toDisplay: pctDisplay);
+    addRange('Sodium', '%', pctCoeffs((m) => m.sodiumPct), minSodium / 100 * totalWeightLbs,
+        maxSodium / 100 * totalWeightLbs,
+        toDisplay: pctDisplay);
+    if (minFat != null || maxFat != null) {
       addRange(
+        'Fat',
+        '%',
         pctCoeffs((m) => m.fatPct),
-        target.minFatPerc == null ? null : target.minFatPerc! / 100 * totalWeightLbs,
-        target.maxFatPerc == null ? null : target.maxFatPerc! / 100 * totalWeightLbs,
+        minFat == null ? null : minFat / 100 * totalWeightLbs,
+        maxFat == null ? null : maxFat / 100 * totalWeightLbs,
+        toDisplay: pctDisplay,
       );
     }
-    if (target.minFiberPerc != null || target.maxFiberPerc != null) {
+    if (minFiber != null || maxFiber != null) {
       addRange(
+        'Fiber',
+        '%',
         pctCoeffs((m) => m.fiberPct),
-        target.minFiberPerc == null ? null : target.minFiberPerc! / 100 * totalWeightLbs,
-        target.maxFiberPerc == null ? null : target.maxFiberPerc! / 100 * totalWeightLbs,
+        minFiber == null ? null : minFiber / 100 * totalWeightLbs,
+        maxFiber == null ? null : maxFiber / 100 * totalWeightLbs,
+        toDisplay: pctDisplay,
       );
     }
-    addRange(pctCoeffs((m) => m.lysinePct), target.minLysinePerc / 100 * totalWeightLbs, null);
-    addRange(pctCoeffs((m) => m.methioninePct), target.minMethioninePerc / 100 * totalWeightLbs, null);
-    addRange(pctCoeffs((m) => m.taurinePct), target.minTaurinePerc / 100 * totalWeightLbs, null);
-    addRange(rawCoeffs((m) => m.niacinMgKg), target.minNiacinMgKg * totalWeightLbs, null);
-    addRange(rawCoeffs((m) => m.energyKcalLb), adjMinEnergyKcalLb * totalWeightLbs,
-        adjMaxEnergyKcalLb * totalWeightLbs);
+    addRange('Lysine', '%', pctCoeffs((m) => m.lysinePct), minLysine / 100 * totalWeightLbs, null,
+        toDisplay: pctDisplay);
+    addRange('Methionine', '%', pctCoeffs((m) => m.methioninePct), minMethionine / 100 * totalWeightLbs, null,
+        toDisplay: pctDisplay);
+    addRange('Taurine', '%', pctCoeffs((m) => m.taurinePct), minTaurine / 100 * totalWeightLbs, null,
+        toDisplay: pctDisplay);
+    addRange('Niacin', 'mg/kg', rawCoeffs((m) => m.niacinMgKg), minNiacin * totalWeightLbs, null,
+        toDisplay: rawDisplay);
+    addRange('Energy', 'kcal/lb', rawCoeffs((m) => m.energyKcalLb), minEnergyKcalLb * totalWeightLbs,
+        maxEnergyKcalLb * totalWeightLbs,
+        toDisplay: rawDisplay);
 
-    constraints.addAll(_hardSafetyConstraints(
+    return bounds;
+  }
+
+  /// Builds and solves the Linear Program that produces the ration blend:
+  /// one variable per candidate ingredient (pounds used), constrained to
+  /// sum to [totalWeightLbs] and to keep every nutrient this app tracks
+  /// within its target range (or above its minimum, for amino acids/
+  /// taurine/niacin) - see [_buildNutrientBounds] - plus every hard safety
+  /// ceiling [safetyRules] can express (see [_hardSafetyConstraints]). The
+  /// objective prefers whole foods ([lowCostIds], cost 0) over supplements/
+  /// minerals (cost 1), so supplements are only used to the extent the
+  /// foods alone can't meet a target - mirroring the old heuristic's
+  /// intent, just solved jointly instead of as a separate gap-fill pass.
+  ///
+  /// Also returns [nutrientBounds] and [baseConstraints] (the batch-weight
+  /// equality plus every hard safety constraint) so that, on infeasibility,
+  /// [_diagnoseInfeasibility] can re-solve against subsets of the same LP
+  /// without rebuilding it from scratch.
+  static ({
+    bool feasible,
+    Map<String, double> lbsByIngredientId,
+    List<_LabeledBound> nutrientBounds,
+    List<LpConstraint> baseConstraints,
+  }) _solveDietLp({
+    required List<Ingredient> candidates,
+    required Set<String> lowCostIds,
+    required double totalWeightLbs,
+    required double minProtein,
+    required double maxProtein,
+    required double minCalcium,
+    required double maxCalcium,
+    required double minPhosphorus,
+    required double maxPhosphorus,
+    required double minSodium,
+    required double maxSodium,
+    required double? minFat,
+    required double? maxFat,
+    required double? minFiber,
+    required double? maxFiber,
+    required double minLysine,
+    required double minMethionine,
+    required double minTaurine,
+    required double minNiacin,
+    required double minEnergyKcalLb,
+    required double maxEnergyKcalLb,
+    required List<SafetyRule> safetyRules,
+    required AnimalProfile profile,
+  }) {
+    if (candidates.isEmpty || totalWeightLbs <= 0) {
+      return (
+        feasible: false,
+        lbsByIngredientId: <String, double>{},
+        nutrientBounds: <_LabeledBound>[],
+        baseConstraints: <LpConstraint>[],
+      );
+    }
+
+    final n = candidates.length;
+    final baseConstraints = <LpConstraint>[
+      LpConstraint(List.filled(n, 1.0), ConstraintType.equal, totalWeightLbs),
+      ..._hardSafetyConstraints(
+        candidates: candidates,
+        totalWeightLbs: totalWeightLbs,
+        safetyRules: safetyRules,
+        profile: profile,
+      ),
+    ];
+    final nutrientBounds = _buildNutrientBounds(
       candidates: candidates,
       totalWeightLbs: totalWeightLbs,
-      safetyRules: safetyRules,
-      profile: profile,
-    ));
+      minProtein: minProtein,
+      maxProtein: maxProtein,
+      minCalcium: minCalcium,
+      maxCalcium: maxCalcium,
+      minPhosphorus: minPhosphorus,
+      maxPhosphorus: maxPhosphorus,
+      minSodium: minSodium,
+      maxSodium: maxSodium,
+      minFat: minFat,
+      maxFat: maxFat,
+      minFiber: minFiber,
+      maxFiber: maxFiber,
+      minLysine: minLysine,
+      minMethionine: minMethionine,
+      minTaurine: minTaurine,
+      minNiacin: minNiacin,
+      minEnergyKcalLb: minEnergyKcalLb,
+      maxEnergyKcalLb: maxEnergyKcalLb,
+    );
 
+    final constraints = [...baseConstraints, ...nutrientBounds.map((b) => b.toConstraint())];
     final costs = candidates.map((i) => lowCostIds.contains(i.id) ? 0.0 : 1.0).toList();
     final result = SimplexSolver.minimize(costs: costs, constraints: constraints);
     if (!result.feasible) {
-      return (feasible: false, lbsByIngredientId: <String, double>{});
+      return (
+        feasible: false,
+        lbsByIngredientId: <String, double>{},
+        nutrientBounds: nutrientBounds,
+        baseConstraints: baseConstraints,
+      );
     }
 
     final lbsByIngredientId = <String, double>{};
@@ -428,7 +710,192 @@ class DietCalculator {
         lbsByIngredientId[candidates[i].id] = result.solution[i];
       }
     }
-    return (feasible: true, lbsByIngredientId: lbsByIngredientId);
+    return (
+      feasible: true,
+      lbsByIngredientId: lbsByIngredientId,
+      nutrientBounds: nutrientBounds,
+      baseConstraints: baseConstraints,
+    );
+  }
+
+  static const _kGenericInfeasibleMessage =
+      "No combination of your selected pantry and supplement items can satisfy every nutrient and "
+      "safety target at once for this batch. Try adding more pantry variety (especially items higher "
+      "in protein, calcium, or phosphorus) or stocking a broader supplement/mineral base, then "
+      "recalculate.";
+
+  /// Runs only once the primary solve in [_solveDietLp] has already failed.
+  /// Tries to pin the infeasibility to a single nutrient-target bound, then
+  /// (failing that) a pair of them, by re-solving the *real* LP -
+  /// [baseConstraints] (batch-weight equality + every hard safety
+  /// constraint, always both kept) plus every [nutrientBounds] entry except
+  /// the one(s) under test - with [SimplexSolver], never by guessing or
+  /// interpolating. Hard safety constraints are never a removal candidate,
+  /// so a conflict rooted in one (rather than in a nutrient-target range)
+  /// falls through to the generic, unexplained message.
+  static RationCalculationError _diagnoseInfeasibility({
+    required List<_LabeledBound> nutrientBounds,
+    required List<LpConstraint> baseConstraints,
+    required int n,
+  }) {
+    bool feasibleWith(List<_LabeledBound> active) {
+      final constraints = [...baseConstraints, ...active.map((b) => b.toConstraint())];
+      return SimplexSolver.minimize(costs: List.filled(n, 0.0), constraints: constraints).feasible;
+    }
+
+    // Phase 1: remove exactly one bound at a time.
+    for (var i = 0; i < nutrientBounds.length; i++) {
+      final without = [...nutrientBounds]..removeAt(i);
+      if (!feasibleWith(without)) continue;
+      final achievable = _achievableExtreme(
+        bound: nutrientBounds[i],
+        otherBounds: without,
+        baseConstraints: baseConstraints,
+        n: n,
+      );
+      if (achievable == null) continue;
+      return RationCalculationError(
+        _kGenericInfeasibleMessage,
+        reason: DietFailureReason.nutrientInfeasibility,
+        bottlenecks: [
+          NutrientBottleneck(
+            label: nutrientBounds[i].label,
+            unit: nutrientBounds[i].unit,
+            blockedBoundValue: nutrientBounds[i].displayBoundValue,
+            isMinBound: nutrientBounds[i].isMinBound,
+            achievableValue: achievable,
+          ),
+        ],
+      );
+    }
+
+    // Phase 2: remove a (min-bound A, max-bound B) pair, different labels
+    // only - a same-label min+max pair (e.g. Protein's own floor and
+    // ceiling) can never itself be the conflict, since both already
+    // survived being paired with every other bound individually in phase 1.
+    for (var i = 0; i < nutrientBounds.length; i++) {
+      if (!nutrientBounds[i].isMinBound) continue;
+      for (var j = 0; j < nutrientBounds.length; j++) {
+        if (nutrientBounds[j].isMinBound) continue;
+        if (nutrientBounds[j].label == nutrientBounds[i].label) continue;
+        final without = [...nutrientBounds]..removeAt(i);
+        without.removeWhere((b) => identical(b, nutrientBounds[j]));
+        if (!feasibleWith(without)) continue;
+        final maxA = _achievableExtreme(
+          bound: nutrientBounds[i],
+          otherBounds: without,
+          baseConstraints: baseConstraints,
+          n: n,
+        );
+        final minB = _achievableExtreme(
+          bound: nutrientBounds[j],
+          otherBounds: without,
+          baseConstraints: baseConstraints,
+          n: n,
+        );
+        if (maxA == null || minB == null) continue;
+        return RationCalculationError(
+          _kGenericInfeasibleMessage,
+          reason: DietFailureReason.nutrientInfeasibility,
+          bottlenecks: [
+            NutrientBottleneck(
+              label: nutrientBounds[i].label,
+              unit: nutrientBounds[i].unit,
+              blockedBoundValue: nutrientBounds[i].displayBoundValue,
+              isMinBound: true,
+              achievableValue: maxA,
+            ),
+            NutrientBottleneck(
+              label: nutrientBounds[j].label,
+              unit: nutrientBounds[j].unit,
+              blockedBoundValue: nutrientBounds[j].displayBoundValue,
+              isMinBound: false,
+              achievableValue: minB,
+            ),
+          ],
+        );
+      }
+    }
+
+    return const RationCalculationError(_kGenericInfeasibleMessage, reason: DietFailureReason.unexplainedInfeasibility);
+  }
+
+  /// Re-solves for the true achievable extreme of [bound]'s nutrient total -
+  /// maximizing it (via [SimplexSolver.minimize] on the negated
+  /// coefficients) if [bound] is a floor, minimizing it directly if
+  /// [bound] is a ceiling - subject to [otherBounds] + [baseConstraints],
+  /// with [bound]'s own bound removed. Returns null only if this solve is
+  /// itself infeasible, which shouldn't happen given the caller just
+  /// confirmed [otherBounds] + [baseConstraints] together are feasible (the
+  /// batch-weight equality bounds every variable, so true unboundedness
+  /// isn't possible here either) - checked defensively rather than assumed.
+  static double? _achievableExtreme({
+    required _LabeledBound bound,
+    required List<_LabeledBound> otherBounds,
+    required List<LpConstraint> baseConstraints,
+    required int n,
+  }) {
+    final constraints = [...baseConstraints, ...otherBounds.map((b) => b.toConstraint())];
+    final sign = bound.isMinBound ? -1.0 : 1.0;
+    final costs = bound.coefficients.map((c) => c * sign).toList();
+    final result = SimplexSolver.minimize(costs: costs, constraints: constraints);
+    if (!result.feasible) return null;
+    return bound.toDisplayUnits(sign * result.objectiveValue);
+  }
+
+  /// Plain-language "what kind of ingredient would help" text per nutrient
+  /// [_LabeledBound.label], used to build the "Suggest missing ingredients"
+  /// action's content in [suggestMissingIngredients].
+  static const Map<String, String> _ingredientSuggestionsByLabel = {
+    'Protein': 'a lean, high-protein ingredient (more meat/organ, egg, or a protein supplement)',
+    'Fat': 'a leaner ingredient, or less of a high-fat item already in this batch',
+    'Fiber': 'a fiber-rich ingredient (forage, bran, vegetable matter)',
+    'Calcium': 'a calcium source (bone-in meat, eggshell, or a calcium supplement)',
+    'Phosphorus': 'a phosphorus source (meat/organ, bone, or a phosphorus supplement)',
+    'Sodium': 'a small salt/mineral source',
+    'Lysine': 'a lysine-rich protein source or amino acid supplement',
+    'Methionine': 'a methionine-rich protein source or amino acid supplement',
+    'Taurine': 'a taurine supplement or more heart/dark meat',
+    'Niacin': 'a niacin supplement or more organ meat',
+    'Energy': 'a higher- or lower-energy-density ingredient, depending on which direction is blocked',
+  };
+
+  /// Headline text for the diagnostic banner, e.g. "Cannot reach 30%
+  /// Protein while staying under 10% Fat with current ingredients (max
+  /// achievable protein is ~25.7%)." for a single min/max pair, or a
+  /// single-bound phrasing when only one nutrient is implicated. Rounds to
+  /// 1 decimal place throughout so the achievable value never cosmetically
+  /// rounds up to equal the blocked bound.
+  static String describeBottlenecks(List<NutrientBottleneck> bottlenecks) {
+    if (bottlenecks.isEmpty) return _kGenericInfeasibleMessage;
+    if (bottlenecks.length == 1) {
+      final b = bottlenecks.first;
+      final boundWord = b.isMinBound ? 'reach' : 'stay under';
+      return 'Cannot $boundWord ${b.blockedBoundValue.toStringAsFixed(1)}${b.unit} ${b.label} with your current '
+          'ingredients (${b.isMinBound ? "max achievable is" : "minimum achievable is"} '
+          '~${b.achievableValue.toStringAsFixed(1)}${b.unit}).';
+    }
+    final min = bottlenecks.firstWhere((b) => b.isMinBound);
+    final max = bottlenecks.firstWhere((b) => !b.isMinBound);
+    return 'Cannot reach ${min.blockedBoundValue.toStringAsFixed(1)}${min.unit} ${min.label} while staying under '
+        '${max.blockedBoundValue.toStringAsFixed(1)}${max.unit} ${max.label} with your current ingredients '
+        '(max achievable ${min.label.toLowerCase()} if you also drop the ${max.label} ceiling entirely is '
+        '~${min.achievableValue.toStringAsFixed(1)}${min.unit}).';
+  }
+
+  /// Content for the "Suggest missing ingredients" action - plain-language
+  /// suggestions for every distinct blocked nutrient label in
+  /// [bottlenecks].
+  static String suggestMissingIngredients(List<NutrientBottleneck> bottlenecks) {
+    if (bottlenecks.isEmpty) {
+      return 'Try adding more pantry variety (especially items higher in protein, calcium, or phosphorus) or '
+          'stocking a broader supplement/mineral base, then recalculate.';
+    }
+    final lines = bottlenecks.map((b) {
+      final suggestion = _ingredientSuggestionsByLabel[b.label] ?? 'a different ingredient mix';
+      return '${b.label}: try adding $suggestion.';
+    });
+    return lines.join('\n');
   }
 
   /// Turns every species-applicable [SafetyRule] with a hard numeric cap
@@ -451,8 +918,7 @@ class DietCalculator {
     List<double> field(double Function(AsFedMetrics) f) => candidates.map((i) => f(i.asFedMetrics)).toList();
 
     for (final rule in safetyRules) {
-      if (rule.appliesToSpecies.isNotEmpty &&
-          !rule.appliesToSpecies.any((s) => _speciesTextMatches(speciesText, s))) {
+      if (rule.appliesToSpecies.isNotEmpty && !rule.appliesToSpecies.any((s) => _speciesTextMatches(speciesText, s))) {
         continue;
       }
 
@@ -530,8 +996,8 @@ class DietCalculator {
           if (!candidates[i].name.toLowerCase().contains(rule.targetName.toLowerCase())) continue;
           final coeffs = List<double>.filled(n, 0.0);
           coeffs[i] = 1.0;
-          constraints.add(
-              LpConstraint(coeffs, ConstraintType.lessOrEqual, rule.maxInclusionPerc! / 100.0 * totalWeightLbs));
+          constraints
+              .add(LpConstraint(coeffs, ConstraintType.lessOrEqual, rule.maxInclusionPerc! / 100.0 * totalWeightLbs));
         }
       }
     }
@@ -802,6 +1268,14 @@ class DietCalculator {
           note: 'Hibernating/brumating: significantly reduced energy needs',
         ));
       }
+      if (health.obese) {
+        adjustments.add(const _TargetAdjustment(
+          proteinMult: 1.15,
+          energyMult: 0.8,
+          note: 'Overweight/obese: reduced energy target with increased protein density '
+              'to support weight loss while preserving lean muscle mass',
+        ));
+      }
     }
     return adjustments;
   }
@@ -863,8 +1337,7 @@ class DietCalculator {
 
     final speciesText = profile.species.toLowerCase();
     for (final rule in safetyRules) {
-      if (rule.appliesToSpecies.isNotEmpty &&
-          !rule.appliesToSpecies.any((s) => _speciesTextMatches(speciesText, s))) {
+      if (rule.appliesToSpecies.isNotEmpty && !rule.appliesToSpecies.any((s) => _speciesTextMatches(speciesText, s))) {
         continue;
       }
       if (rule.targetType == 'dm_concentration') {
@@ -892,8 +1365,7 @@ class DietCalculator {
           default:
             continue;
         }
-        if ((rule.minValue != null && value < rule.minValue!) ||
-            (rule.maxValue != null && value > rule.maxValue!)) {
+        if ((rule.minValue != null && value < rule.minValue!) || (rule.maxValue != null && value > rule.maxValue!)) {
           warnings.add(RationWarning(
             message: '${rule.warningMessage} (currently ~${value.toStringAsFixed(1)} DM basis)',
             severity: WarningSeverity.parse(rule.severity),
@@ -923,8 +1395,7 @@ class DietCalculator {
           default:
             continue;
         }
-        if ((rule.minRatio != null && ratio < rule.minRatio!) ||
-            (rule.maxRatio != null && ratio > rule.maxRatio!)) {
+        if ((rule.minRatio != null && ratio < rule.minRatio!) || (rule.maxRatio != null && ratio > rule.maxRatio!)) {
           warnings.add(RationWarning(message: rule.warningMessage, severity: WarningSeverity.parse(rule.severity)));
         }
         continue;
