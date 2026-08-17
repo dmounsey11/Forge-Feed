@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'privacy_policy_screen.dart';
 
 class InfoScreen extends StatelessWidget {
   const InfoScreen({super.key});
@@ -52,6 +53,19 @@ class InfoScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+              InkWell(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
+                ),
+                child: const Text(
+                  'Privacy Policy',
+                  style: TextStyle(
+                    color: Color(0xFFF97316),
+                    fontSize: 12,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
             ],
           ),
         ],
