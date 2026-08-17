@@ -16,6 +16,7 @@ dependencies:
   url_launcher: ^6.3.1
   in_app_purchase: ^3.2.3
   google_mobile_ads: ^9.0.0
+  upgrader: ^13.6.0
 
 dev_dependencies:
   flutter_test:

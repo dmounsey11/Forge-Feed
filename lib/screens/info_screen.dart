@@ -1,7 +1,63 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class InfoScreen extends StatelessWidget {
   const InfoScreen({super.key});
+
+  static const List<(String, String)> _referenceSources = [
+    ('USDA FoodData Central', 'https://fdc.nal.usda.gov'),
+    ('National Academies (NRC Nutrient Requirements)', 'https://www.nap.edu'),
+    ('AAFCO', 'https://www.aafco.org'),
+    ('Feedipedia', 'https://www.feedipedia.org'),
+    ('Merck Veterinary Manual', 'https://www.merckvetmanual.com'),
+  ];
+
+  Future<void> _openReference(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Couldn't open $url")),
+      );
+    }
+  }
+
+  Widget _buildReferenceFooter(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: Colors.white12)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'DATA SOURCES & REFERENCES',
+            style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+          ),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 12,
+            runSpacing: 4,
+            children: [
+              for (final (name, url) in _referenceSources)
+                InkWell(
+                  onTap: () => _openReference(context, url),
+                  child: Text(
+                    name,
+                    style: const TextStyle(
+                      color: Color(0xFFF97316),
+                      fontSize: 12,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +73,7 @@ class InfoScreen extends StatelessWidget {
             tabs: [
               Tab(icon: Icon(Icons.battery_charging_full), text: 'Body Battery'),
               Tab(icon: Icon(Icons.science), text: 'Vitamins & Minerals'),
-              Tab(icon: Icon(Icons.menu_book), text: 'Ingredients'),
+              Tab(icon: Icon(Icons.menu_book), text: 'How We Blend'),
               Tab(icon: Icon(Icons.kitchen), text: 'Kitchen Tools'),
             ],
           ),
@@ -31,6 +87,7 @@ class InfoScreen extends StatelessWidget {
               ],
             ),
           ),
+          _buildReferenceFooter(context),
         ],
       ),
     );
@@ -278,12 +335,136 @@ class InfoScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
-        _buildIngredientInfo('Yellow Corn', 'Energy Feed', '8.5% Protein', 'High energy carbohydrate source. Low in Lysine and Methionine.'),
-        _buildIngredientInfo('Soybean Meal (48%)', 'Protein Feed', '48.0% Protein', 'Standard plant protein. High Lysine, ideal base balance.'),
-        _buildIngredientInfo('Black Soldier Fly Larvae', 'Protein & Fat Feed', '40.0% Protein', 'Rich in natural fats, protein, and high bioavailable calcium.'),
-        _buildIngredientInfo('Limestone / Oyster Shell', 'Mineral Supplement', '0% Protein (38% Ca)', 'Primary source of coarse-particle calcium for persistent eggshell synthesis.'),
-        _buildIngredientInfo('Alfalfa Meal', 'Forage / Fiber', '17.0% Protein', 'Provides natural carotenoids for yolk color and digestive fiber.'),
+        Card(
+          color: Colors.black45,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: Colors.redAccent, width: 1),
+          ),
+          child: const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+                    SizedBox(width: 8),
+                    Text(
+                      'Never Feed Cooked Bone',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.redAccent),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Raw bone is pliable - it bends and gives under bite pressure, and stomach acid in a raw-fed '
+                  'carnivore or omnivore is strong enough to soften and digest it. Cooking (boiling, baking, '
+                  "roasting, grilling) drives the moisture out and changes the bone's structure, leaving it dry "
+                  'and brittle. A brittle bone doesn\'t bend under bite pressure - it shatters into sharp shards. '
+                  'Those shards can splinter in the mouth, get lodged in the throat, or work their way through '
+                  'the digestive tract and cause a perforation or blockage - both of which are medical '
+                  'emergencies.',
+                  style: TextStyle(color: Colors.white70),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'This applies to any cooked bone from any source - table scraps, roasted carcasses, cooked '
+                  'stock bones. It does not apply to processed, rendered products like bone meal, which is '
+                  "broken down before it's added to a batch and is handled by ForgeFeed's own inclusion-rate "
+                  'safety checks.',
+                  style: TextStyle(color: Colors.white70),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Card(
+          color: Colors.black45,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: Color(0xFFF97316), width: 1),
+          ),
+          child: const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'How ForgeFeed Builds Your Blend',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFFF97316)),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  "This isn't a recipe picked from a list - it's the output of a solve. ForgeFeed takes every "
+                  "item in your Pantry and Supplements, looks up its published nutrient values, and searches for "
+                  "the exact combination of pounds of each one that lands closest to every nutrient target your "
+                  "animal needs, all at the same time. Here's what's actually happening under the hood.",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ),
+        _buildBlendStepCard(
+          Icons.storage,
+          'Step 1 - Real Nutrient Data, Not Guesswork',
+          "Every ingredient in ForgeFeed's library carries published nutrient values - protein, fat, fiber, "
+          "amino acids, calcium, phosphorus, energy, and more - sourced from the USDA nutrient database and "
+          "standard feed-composition references, not estimated on the fly. If an ingredient is in your batch, "
+          "ForgeFeed already knows what it actually contributes.",
+        ),
+        _buildBlendStepCard(
+          Icons.flag,
+          'Step 2 - A Target Built for This Animal',
+          "Your animal's species, age, production stage, and any health flags (pregnant, breeding, injured, "
+          "overweight) set the target: minimums and safe ranges for protein, fat, fiber, calcium, phosphorus, "
+          "energy, key amino acids, and trace minerals - the same figures shown in the Vitamins & Minerals tab. "
+          "These come from published species nutrition data, adjusted up or down for growth, reproduction, or "
+          "recovery needs.",
+        ),
+        _buildBlendStepCard(
+          Icons.calculate,
+          'Step 3 - One Solve, Not a Sequence of Guesses',
+          "Rather than picking a protein source, then a calcium source, then eyeballing the rest, ForgeFeed runs "
+          "a linear program across your entire Pantry and Supplements list at once. It searches for the blend of "
+          "quantities that satisfies every target simultaneously - protein and amino acid floors, calcium and "
+          "phosphorus ranges, energy, fiber, and every hard safety ceiling (toxic mineral ratios, inclusion caps) "
+          "this data can express - and finds the most balanced feed that's actually achievable from what you have "
+          "on hand.",
+        ),
+        _buildBlendStepCard(
+          Icons.eco,
+          'Step 4 - Whole Foods First',
+          "When more than one combination could work, the solve is built to prefer your real Pantry foods over "
+          "Supplements - a vitamin/mineral premix or amino acid isolate is only pulled in to close a gap your "
+          "foods genuinely can't cover on their own, not used as a shortcut.",
+        ),
+        _buildBlendStepCard(
+          Icons.rule,
+          'Step 5 - Honest About Limits',
+          "If your current Pantry can't hit every target at once, ForgeFeed doesn't quietly serve up an "
+          "imbalanced batch or refuse to help - it tells you exactly which target it had to loosen, how close it "
+          "still got, and what kind of ingredient would close the gap. The one thing it never loosens is a hard "
+          "safety limit: a toxic mineral ratio or inclusion cap will always block the batch rather than bend for "
+          "the sake of producing a recipe.",
+        ),
       ],
+    );
+  }
+
+  Widget _buildBlendStepCard(IconData icon, String title, String desc) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      child: ListTile(
+        leading: Icon(icon, color: const Color(0xFFF97316), size: 32),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Text(desc, style: const TextStyle(color: Colors.white70)),
+        ),
+      ),
     );
   }
 
@@ -348,33 +529,6 @@ class InfoScreen extends StatelessWidget {
             Text('Used for: $purpose', style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white)),
             const SizedBox(height: 2),
             Text(notes, style: const TextStyle(color: Colors.grey)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIngredientInfo(String name, String type, String protein, String desc) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      child: ListTile(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-            Chip(
-              label: Text(protein, style: const TextStyle(fontSize: 10, color: Colors.white)),
-              backgroundColor: const Color(0xFFC2410C),
-              padding: EdgeInsets.zero,
-            ),
-          ],
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Category: $type', style: const TextStyle(color: Color(0xFFF97316), fontSize: 12)),
-            const SizedBox(height: 4),
-            Text(desc, style: const TextStyle(color: Colors.white70)),
           ],
         ),
       ),

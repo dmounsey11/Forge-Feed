@@ -60,6 +60,13 @@ class OnboardingDisclaimerScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   const Text(
+                    'ForgeFeed is currently a prototype in active development. You may '
+                    'encounter bugs, inaccurate results, or unexpected behavior - always '
+                    'use your own judgment and verify important calculations.',
+                    style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.5),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
                     'By continuing, you confirm you understand and accept this.',
                     style: TextStyle(color: Colors.white54, fontSize: 13, height: 1.5, fontStyle: FontStyle.italic),
                   ),

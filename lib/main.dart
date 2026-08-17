@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:upgrader/upgrader.dart';
 import 'services/ad_service.dart';
 import 'services/database_service.dart';
 import 'services/purchase_service.dart';
@@ -89,7 +90,10 @@ class _AppStartupState extends State<AppStartup> {
             onAccepted: () => setState(() => _disclaimerAccepted = true),
           );
         }
-        return const MainScreen();
+        return UpgradeAlert(
+          upgrader: Upgrader(debugLogging: false),
+          child: const MainScreen(),
+        );
       },
     );
   }
