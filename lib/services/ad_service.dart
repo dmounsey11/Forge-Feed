@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -29,8 +31,40 @@ const _testDeviceIds = <String>[];
 
 Future<void> initializeAds() async {
   if (!adsSupported) return;
+  await _requestConsent();
   await MobileAds.instance.updateRequestConfiguration(
     RequestConfiguration(testDeviceIds: _testDeviceIds),
   );
   await MobileAds.instance.initialize();
+}
+
+/// Runs Google's User Messaging Platform consent flow, which the Play Store
+/// requires before any app serves Google ads. Shows an EEA/UK consent form
+/// only when the user's location requires one under GDPR/UK law; resolves
+/// immediately for everyone else. Ads are only requested after this
+/// completes, so consent status is always settled first.
+Future<void> _requestConsent() async {
+  final completer = Completer<void>();
+  ConsentInformation.instance.requestConsentInfoUpdate(
+    ConsentRequestParameters(),
+    () => _loadConsentFormIfRequired(completer),
+    (_) => completer.complete(),
+  );
+  return completer.future;
+}
+
+void _loadConsentFormIfRequired(Completer<void> completer) {
+  ConsentForm.loadConsentForm(
+    (ConsentForm form) async {
+      final status = await ConsentInformation.instance.getConsentStatus();
+      if (status == ConsentStatus.required) {
+        form.show((_) => _loadConsentFormIfRequired(completer));
+      } else if (!completer.isCompleted) {
+        completer.complete();
+      }
+    },
+    (_) {
+      if (!completer.isCompleted) completer.complete();
+    },
+  );
 }
