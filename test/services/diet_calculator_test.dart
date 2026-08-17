@@ -399,6 +399,18 @@ void main() {
       final warning = result.warnings.firstWhere((w) => w.message.contains('Fat'));
       expect(warning.severity, WarningSeverity.medium);
       expect(warning.message, contains('running/cumulative'));
+
+      // The served blend itself should land near that same achievable
+      // 12.78% - not just the shortfall message quoting a number nobody
+      // actually gets. Before auto-relax pinned the final solve near the
+      // achievable extreme, the flat whole-food-cost objective had no pull
+      // toward the dropped Fat bound and could land anywhere on the
+      // feasible line between ~6.52 lbs and 10 lbs of 'meat' (12.78% up to
+      // 18% fat) - e.g. all-'meat' is just as cost-optimal as the boundary
+      // point, but leaves fat nearly 50% further from its ceiling than
+      // necessary.
+      final fat = result.nutrientComparisons.firstWhere((c) => c.label == 'Fat');
+      expect(fat.actual, closeTo(12.78, 0.05));
     });
 
     test(
@@ -485,6 +497,63 @@ void main() {
       expect(result, isA<RationCalculationError>());
       final error = result as RationCalculationError;
       expect(error.reason, DietFailureReason.noCandidates);
+    });
+  });
+
+  group('excluded-item reasons are differentiated per item, not one boilerplate sentence', () {
+    test('an unneeded supplement names the nutrient it would have added and confirms the batch '
+        'already covers it', () {
+      // Protein alone is enough to make 'chicken' the only thing the LP
+      // needs; 'calciumSupp' carries real calcium (which the target range
+      // already comfortably allows without it) but nothing else, and
+      // supplements cost 1 vs. a food's 0 in the objective, so it's never
+      // picked - a deterministic exclusion to check the reason text against.
+      final result = _calc(
+        profile: _profile(),
+        target: _target(minProteinPerc: 20, minCalciumPerc: 0.05, maxCalciumPerc: 5),
+        pantryItems: [_food('chicken', proteinPct: 30, calciumPct: 1)],
+        supplementItems: [_food('calciumSupp', proteinPct: 0, calciumPct: 30)],
+      ) as RationResult;
+
+      expect(result.baseItems.map((i) => i.ingredient.id), ['chicken']);
+      expect(result.excludedItems, hasLength(1));
+      final excluded = result.excludedItems.single;
+      expect(excluded.name, 'calciumSupp');
+      expect(excluded.reason, contains('Calcium'));
+      expect(excluded.reason, contains('comfortably within target'));
+      // Not the old one-sentence-fits-all boilerplate.
+      expect(excluded.reason, isNot(contains('Not needed to meet every nutrient')));
+    });
+
+    test('two excluded items with different dominant nutrients get different reasons', () {
+      final result = _calc(
+        profile: _profile(),
+        target: _target(minProteinPerc: 20, minCalciumPerc: 0.05, maxCalciumPerc: 5),
+        pantryItems: [_food('chicken', proteinPct: 30, calciumPct: 1)],
+        supplementItems: [
+          _food('calciumSupp', proteinPct: 0, calciumPct: 30),
+          _food('phosphorusSupp', proteinPct: 0, phosphorusPct: 30),
+        ],
+      ) as RationResult;
+
+      expect(result.excludedItems, hasLength(2));
+      final calciumReason = result.excludedItems.firstWhere((e) => e.name == 'calciumSupp').reason;
+      final phosphorusReason = result.excludedItems.firstWhere((e) => e.name == 'phosphorusSupp').reason;
+      expect(calciumReason, contains('Calcium'));
+      expect(phosphorusReason, contains('Phosphorus'));
+      expect(calciumReason, isNot(equals(phosphorusReason)));
+    });
+
+    test('an item with no notable tracked nutrients falls back to the honest generic reason', () {
+      final result = _calc(
+        profile: _profile(),
+        target: _target(minProteinPerc: 20),
+        pantryItems: [_food('chicken', proteinPct: 30)],
+        supplementItems: [_food('traceItem', proteinPct: 0.1, calciumPct: 0.05)],
+      ) as RationResult;
+
+      final excluded = result.excludedItems.firstWhere((e) => e.name == 'traceItem');
+      expect(excluded.reason, contains("Doesn't stand out"));
     });
   });
 }

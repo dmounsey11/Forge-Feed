@@ -207,17 +207,6 @@ class DietCalculator {
     final allItems = candidates.where((i) => allLbs.containsKey(i.id)).toList();
     final finalTotalLbs = allLbs.values.fold(0.0, (sum, v) => sum + v);
 
-    final usedIds = allItems.map((i) => i.id).toSet();
-    final excludedItems = <ExcludedItem>[];
-    final seenExcludedIds = <String>{};
-    for (final i in [...pantryItems, ...supplementItems]) {
-      if (usedIds.contains(i.id) || !seenExcludedIds.add(i.id)) continue;
-      excludedItems.add(ExcludedItem(
-        name: i.name,
-        reason: _explainExclusion(item: i, feedingSystemFilteredIds: feedingSystemFilteredIds),
-      ));
-    }
-
     double finalPct(double Function(Ingredient) pctOf) {
       if (finalTotalLbs <= 0) return 0;
       double sum = 0;
@@ -313,6 +302,21 @@ class DietCalculator {
       if (isOxalateRiskSpecies && finalOxalatePct > 0)
         _compare('Ca:Oxalate Ratio', ':1', 0.5, null, finalCalciumPct / finalOxalatePct),
     ];
+
+    final usedIds = allItems.map((i) => i.id).toSet();
+    final excludedItems = <ExcludedItem>[];
+    final seenExcludedIds = <String>{};
+    for (final i in [...pantryItems, ...supplementItems]) {
+      if (usedIds.contains(i.id) || !seenExcludedIds.add(i.id)) continue;
+      excludedItems.add(ExcludedItem(
+        name: i.name,
+        reason: _explainExclusion(
+          item: i,
+          feedingSystemFilteredIds: feedingSystemFilteredIds,
+          comparisons: comparisons,
+        ),
+      ));
+    }
 
     // 3. Safety rule checks against the final blend. The LP above already
     // treats every rule it can express as a hard constraint, so this is
@@ -708,7 +712,43 @@ class DietCalculator {
       }
     }
 
-    final finalConstraints = [...baseConstraints, ...kept.map((b) => b.toConstraint())];
+    final keptConstraints = [...baseConstraints, ...kept.map((b) => b.toConstraint())];
+
+    // A dropped bound isn't abandoned outright: for each one, find the true
+    // achievable extreme against the kept bounds, then try pinning the
+    // final blend within a hair of it - added one at a time, keeping only
+    // the ones that stay jointly feasible with whatever's already pinned.
+    // Without this, the final cost-min solve below has zero pull toward a
+    // dropped nutrient once its own bound is gone, so e.g. a relaxed Energy
+    // floor could land far below what the pantry can actually reach even
+    // though the shortfall message claims that higher number is possible.
+    bool feasibleWithExtra(List<LpConstraint> extra) {
+      return SimplexSolver.minimize(
+        costs: List.filled(n, 0.0),
+        constraints: [...keptConstraints, ...extra],
+      ).feasible;
+    }
+
+    final pushed = <LpConstraint>[];
+    final achievableDisplayByLabel = <String, double>{};
+    for (final bound in dropped) {
+      final extreme = _achievableExtreme(bound: bound, otherBounds: kept, baseConstraints: baseConstraints, n: n);
+      if (extreme == null) continue;
+      achievableDisplayByLabel[bound.label] = extreme.display;
+
+      final slack = extreme.raw.abs() * 1e-6 + 1e-6;
+      final pushConstraint = LpConstraint(
+        bound.coefficients,
+        bound.isMinBound ? ConstraintType.greaterOrEqual : ConstraintType.lessOrEqual,
+        bound.isMinBound ? extreme.raw - slack : extreme.raw + slack,
+      );
+      final trial = [...pushed, pushConstraint];
+      if (feasibleWithExtra(trial)) {
+        pushed.add(pushConstraint);
+      }
+    }
+
+    final finalConstraints = [...keptConstraints, ...pushed];
     final costs = candidates.map((i) => lowCostIds.contains(i.id) ? 0.0 : 1.0).toList();
     final result = SimplexSolver.minimize(costs: costs, constraints: finalConstraints);
     if (!result.feasible) return null;
@@ -721,18 +761,12 @@ class DietCalculator {
     }
 
     final shortfalls = dropped.map((bound) {
-      final achievable = _achievableExtreme(
-        bound: bound,
-        otherBounds: kept,
-        baseConstraints: baseConstraints,
-        n: n,
-      );
       return NutrientShortfall(
         label: bound.label,
         unit: bound.unit,
         isMinBound: bound.isMinBound,
         targetValue: bound.displayBoundValue,
-        achievableValue: achievable ?? bound.displayBoundValue,
+        achievableValue: achievableDisplayByLabel[bound.label] ?? bound.displayBoundValue,
         suggestion: _ingredientSuggestionsByLabel[bound.label] ?? 'a different ingredient mix',
       );
     }).toList();
@@ -744,12 +778,15 @@ class DietCalculator {
   /// maximizing it (via [SimplexSolver.minimize] on the negated
   /// coefficients) if [bound] is a floor, minimizing it directly if
   /// [bound] is a ceiling - subject to [otherBounds] + [baseConstraints],
-  /// with [bound]'s own bound removed. Returns null only if this solve is
-  /// itself infeasible, which shouldn't happen given the caller just
-  /// confirmed [otherBounds] + [baseConstraints] together are feasible (the
-  /// batch-weight equality bounds every variable, so true unboundedness
-  /// isn't possible here either) - checked defensively rather than assumed.
-  static double? _achievableExtreme({
+  /// with [bound]'s own bound removed. Returns both the raw LP-space total
+  /// (so [_autoRelax] can pin the final blend near it with a real
+  /// constraint) and the display-unit value (for the [NutrientShortfall]
+  /// message). Returns null only if this solve is itself infeasible, which
+  /// shouldn't happen given the caller just confirmed [otherBounds] +
+  /// [baseConstraints] together are feasible (the batch-weight equality
+  /// bounds every variable, so true unboundedness isn't possible here
+  /// either) - checked defensively rather than assumed.
+  static ({double raw, double display})? _achievableExtreme({
     required _LabeledBound bound,
     required List<_LabeledBound> otherBounds,
     required List<LpConstraint> baseConstraints,
@@ -760,7 +797,8 @@ class DietCalculator {
     final costs = bound.coefficients.map((c) => c * sign).toList();
     final result = SimplexSolver.minimize(costs: costs, constraints: constraints);
     if (!result.feasible) return null;
-    return bound.toDisplayUnits(sign * result.objectiveValue);
+    final raw = sign * result.objectiveValue;
+    return (raw: raw, display: bound.toDisplayUnits(raw));
   }
 
   /// Plain-language "what kind of ingredient would help" text per nutrient
@@ -1038,20 +1076,86 @@ class DietCalculator {
     return combinedMinerals > 10.0 && m.crudeProteinPct < 5.0;
   }
 
+  /// Nutrients checked when picking which one an excluded item is "richest"
+  /// in, for [_explainExclusion] - matches the labels [_compare] already
+  /// produces in [calculate]'s `comparisons` list, so the reason can quote
+  /// the same numbers already shown in the Nutrient Check card.
+  static Map<String, double> _trackedNutrientPcts(Ingredient item) {
+    final m = item.asFedMetrics;
+    return {
+      'Protein': m.crudeProteinPct,
+      'Fat': m.fatPct,
+      'Fiber': m.fiberPct,
+      'Calcium': m.calciumPct,
+      'Phosphorus': m.phosphorusPct,
+      'Energy': m.energyKcalLb,
+    };
+  }
+
   /// Plain-language reason a given pantry/supplement item didn't make it
-  /// into this batch: either the feeding-system whole-food filter excluded
-  /// it outright, or the LP solve simply didn't need it to satisfy every
-  /// target/safety constraint at once.
+  /// into this batch. Feeding-system exclusions get their own reason since
+  /// that filter runs before the LP ever sees the item; everything else is
+  /// differentiated by which tracked nutrient the item is richest in
+  /// (relative to that nutrient's own target scale) and how the final blend
+  /// actually stands on that nutrient - already comfortably covered,
+  /// already at its safety ceiling, or (after auto-relax) still genuinely
+  /// short, in which case this item is named as a real fix rather than
+  /// dismissed with the same boilerplate as everything else.
   static String _explainExclusion({
     required Ingredient item,
     required Set<String> feedingSystemFilteredIds,
+    required List<NutrientComparison> comparisons,
   }) {
     if (feedingSystemFilteredIds.contains(item.id)) {
       return 'Your feeding system (Raw / Whole Food + Premix) prioritizes fresh/frozen protein and fresh '
           'produce over this kind of item, so it was left out of the base blend.';
     }
-    return "Not needed to meet every nutrient and safety target at once for this batch - the optimizer "
-        'found a combination that works without it. That can change with a different batch size or pantry mix.';
+
+    NutrientComparison? richest;
+    var bestScore = 0.0;
+    for (final entry in _trackedNutrientPcts(item).entries) {
+      if (entry.value <= 0) continue;
+      NutrientComparison? cmp;
+      for (final c in comparisons) {
+        if (c.label == entry.key) {
+          cmp = c;
+          break;
+        }
+      }
+      final scale = cmp?.targetMax ?? cmp?.targetMin;
+      if (cmp == null || scale == null || scale <= 0) continue;
+      final score = entry.value / scale;
+      if (score > bestScore) {
+        bestScore = score;
+        richest = cmp;
+      }
+    }
+
+    // Below this, the item isn't a notable source of anything this app
+    // tracks relative to the target scale - the generic reason is honest
+    // here rather than manufacturing a specific-sounding but meaningless
+    // one for, say, a low-everything item like plain lettuce.
+    if (richest == null || bestScore < 0.15) {
+      return "Doesn't stand out on any nutrient this batch still needed more of, so the optimizer found a "
+          'combination that works without it. That can change with a different batch size or pantry mix.';
+    }
+
+    final label = richest.label;
+    final unit = richest.unit;
+    final actualStr = richest.actual.toStringAsFixed(1);
+    switch (richest.status) {
+      case NutrientStatus.high:
+        return 'This is a strong source of $label, and this batch is already at its upper safety limit for '
+            '$label ($actualStr$unit) - adding more would push it over.';
+      case NutrientStatus.low:
+        return 'This is a strong source of $label, which this batch is currently short on even after relaxing '
+            'the target ($actualStr$unit so far). Swapping it in for a lower-$label item already used, or using a '
+            'smaller batch, could help close that gap.';
+      case NutrientStatus.onTrack:
+      case NutrientStatus.unknown:
+        return '$label is this item\'s main strength, and the batch already reaches $actualStr$unit from the '
+            "items selected - comfortably within target - so this wasn't needed to get there.";
+    }
   }
 
   /// Rough default share of daily dry matter intake assumed to come from
@@ -1163,12 +1267,18 @@ class DietCalculator {
   }
 
   static NutrientComparison _compare(String label, String unit, double? min, double? max, double actual) {
+    // The LP solver's own feasibility tolerance (SimplexSolver._epsilon)
+    // means a constraint it treats as satisfied can round-trip back a hair
+    // below/above its exact bound - without slack here, a value that
+    // displays as exactly on-target (e.g. "18.00%" against an 18.0% floor)
+    // could still get flagged Low/High by a difference too small to show.
+    double tol(double bound) => bound.abs() * 1e-6 + 1e-6;
     NutrientStatus status;
     if (min == null && max == null) {
       status = NutrientStatus.unknown;
-    } else if (min != null && actual < min) {
+    } else if (min != null && actual < min - tol(min)) {
       status = NutrientStatus.low;
-    } else if (max != null && actual > max) {
+    } else if (max != null && actual > max + tol(max)) {
       status = NutrientStatus.high;
     } else {
       status = NutrientStatus.onTrack;
