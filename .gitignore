@@ -26,3 +26,12 @@ VSCodeUserSetup*.exe
 
 # Large raw data dumps - superseded by curated assets/data/*.json
 FoodData_Central_sr_legacy_food_csv_2018-04/
+
+# Release signing secrets - never commit these. Losing the keystore means
+# you can never publish an update to an already-shipped app under the same
+# listing, so back it up somewhere safe outside git (password manager,
+# encrypted cloud storage) as soon as it's created.
+android/key.properties
+android/*.jks
+android/*.keystore
+android/app/upload-keystore.jks

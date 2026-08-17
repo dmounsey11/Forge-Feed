@@ -1,0 +1,8 @@
+# Copy this file to android/key.properties (which is gitignored - never
+# commit the real one) and fill in the values from the keystore you generate
+# yourself. See the "Release signing" section of the rollout notes for how
+# to create that keystore.
+storePassword=REPLACE_ME
+keyPassword=REPLACE_ME
+keyAlias=upload
+storeFile=upload-keystore.jks
