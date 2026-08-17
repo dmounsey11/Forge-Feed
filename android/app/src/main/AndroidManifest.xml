@@ -30,13 +30,10 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <!-- Google's official AdMob test App ID. Required for the ad SDK to
-             load ads at all - safe to ship since it only ever serves test
-             ads. Replace with the real AdMob App ID from your own AdMob
-             account before this app goes live in the Play Store. -->
+        <!-- Real AdMob App ID for the Keystone Apps / ForgeFeed AdMob account. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-3930015548486501~8237787470" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
