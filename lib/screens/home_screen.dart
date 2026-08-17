@@ -360,11 +360,9 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Gathers the profile/pantry/supplement inputs and calls
   /// [DietCalculator.calculate]. Returns `null` for the two input problems
   /// (no species data, no pantry selected) that are shown as one-shot
-  /// SnackBars rather than the interactive diagnostic banner - those aren't
-  /// something a "suggest ingredients"/"relax targets" retry can help with.
-  /// Shared by [_calculateDiet] and [_retryWithRelaxation] so a relaxed
-  /// retry doesn't duplicate this setup.
-  Object? _computeResult({List<NutrientRelaxation>? relaxations}) {
+  /// SnackBars rather than the diagnostic banner - those aren't something
+  /// the calculator itself can work around.
+  Object? _computeResult() {
     final profile = _selectedProfile!;
     final prep = _prepResult!;
     final db = context.read<DatabaseService>();
@@ -400,7 +398,6 @@ class _HomeScreenState extends State<HomeScreen> {
       supplementItems: availableSupplementItems,
       safetyRules: db.safetyRules,
       stageHasDedicatedData: NutritionTargetResolver.stageHasDedicatedData(profile, db.speciesRequirements),
-      relaxations: relaxations,
     );
   }
 
@@ -414,76 +411,91 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     setState(() => _lastError = null);
+    final ration = result as RationResult;
+    if (ration.nutrientShortfalls.isNotEmpty) {
+      _showShortfallDialog(ration);
+    } else {
+      _openResultScreen(ration);
+    }
+  }
+
+  void _openResultScreen(RationResult result) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => RationResultScreen(result: result as RationResult, profileName: _selectedProfile!.name),
+        builder: (context) => RationResultScreen(result: result, profileName: _selectedProfile!.name),
       ),
     );
   }
 
-  /// "Allow temporary target relaxation": loosens exactly the nutrient
-  /// bound(s) the diagnostic pass already identified in [_lastError] to
-  /// their computed achievable value, then re-solves. The relaxed
-  /// [RationResult] carries its own "target relaxed" warning (added by
-  /// [DietCalculator.calculate]) so the result screen makes clear this
-  /// batch isn't at the animal's normal target.
-  void _retryWithRelaxation() {
-    final bottlenecks = _lastError!.bottlenecks;
-    final relaxations = bottlenecks
-        .map((b) => NutrientRelaxation(
-              label: b.label,
-              unit: b.unit,
-              isMinBound: b.isMinBound,
-              relaxedValue: b.achievableValue,
-            ))
-        .toList();
-
-    final result = _computeResult(relaxations: relaxations);
-    if (result == null) return;
-
-    if (result is RationResult) {
-      setState(() => _lastError = null);
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => RationResultScreen(result: result, profileName: _selectedProfile!.name),
-        ),
-      );
-    } else if (result is RationCalculationError) {
-      // Defensive - relaxing exactly the identified bottleneck should
-      // normally succeed, but surface a fresh diagnostic if it doesn't.
-      setState(() => _lastError = result);
-    }
-  }
-
-  void _showSuggestionsDialog(RationCalculationError error) {
+  /// Shown instead of jumping straight to the results screen whenever
+  /// [DietCalculator.calculate] had to auto-relax one or more nutrient
+  /// targets to produce this batch (see [DietCalculator._autoRelax]). These
+  /// are cumulative/running targets, not a single-meal danger - the same
+  /// [RationResult] is one tap away either way, this just makes sure the
+  /// user actually sees what's short and what natural food/supplement would
+  /// close the gap before moving on.
+  void _showShortfallDialog(RationResult result) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF242426),
-        title: const Text('Suggested ingredients', style: TextStyle(color: Colors.white)),
-        content: Text(
-          DietCalculator.suggestMissingIngredients(error.bottlenecks),
-          style: const TextStyle(color: Colors.white70),
+        title: const Text('This batch is a little short', style: TextStyle(color: Colors.white)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'These are running/cumulative targets, not a single-meal danger, so it\'s fine to feed this '
+                'batch while you work on the gap:',
+                style: TextStyle(color: Colors.white70),
+              ),
+              const SizedBox(height: 12),
+              for (final s in result.nutrientShortfalls)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${s.label} ${s.isMinBound ? "(short)" : "(over)"}: target '
+                        '${s.isMinBound ? "≥" : "≤"} ${s.targetValue.toStringAsFixed(1)}${s.unit}, this batch '
+                        'reaches ~${s.achievableValue.toStringAsFixed(1)}${s.unit}.',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      Text(
+                        'Try stocking ${s.suggestion}.',
+                        style: const TextStyle(color: Colors.white70, fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK', style: TextStyle(color: Color(0xFFF97316))),
+            child: const Text('Go back to pantry', style: TextStyle(color: Colors.white70)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _openResultScreen(result);
+            },
+            child: const Text('Continue anyway', style: TextStyle(color: Color(0xFFF97316))),
           ),
         ],
       ),
     );
   }
 
-  /// Interactive replacement for the old one-shot SnackBar: a persistent,
-  /// dismissible card so a failed solve can offer follow-up actions instead
-  /// of just naming the failure once and vanishing. Only shows the two
-  /// action chips when [error.bottlenecks] is non-empty - a generic/
-  /// unexplained infeasibility (e.g. rooted in a hard safety constraint)
-  /// has nothing concrete for "suggest ingredients"/"relax targets" to act
-  /// on.
+  /// Persistent, dismissible card for the now-rare case
+  /// [DietCalculator.calculate] can't produce any ration at all - no
+  /// candidates, or a hard safety constraint that can't be satisfied even
+  /// after relaxing every nutrient target. Nothing to retry here, just the
+  /// reason.
   Widget _buildDiagnosticBanner(RationCalculationError error) {
-    final hasBottlenecks = error.bottlenecks.isNotEmpty;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
@@ -492,48 +504,21 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.redAccent),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 18),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  hasBottlenecks ? DietCalculator.describeBottlenecks(error.bottlenecks) : error.message,
-                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                ),
-              ),
-              InkWell(
-                onTap: () => setState(() => _lastError = null),
-                child: const Icon(Icons.close, color: Colors.white54, size: 18),
-              ),
-            ],
-          ),
-          if (hasBottlenecks) ...[
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                ActionChip(
-                  backgroundColor: const Color(0xFF242426),
-                  label: const Text('Suggest missing ingredients', style: TextStyle(color: Colors.white)),
-                  onPressed: () => _showSuggestionsDialog(error),
-                ),
-                ActionChip(
-                  backgroundColor: const Color(0xFFF97316),
-                  label: const Text(
-                    'Allow temporary target relaxation',
-                    style: TextStyle(color: Color(0xFF1A1A1C), fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: _retryWithRelaxation,
-                ),
-              ],
+          const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              error.message,
+              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
             ),
-          ],
+          ),
+          InkWell(
+            onTap: () => setState(() => _lastError = null),
+            child: const Icon(Icons.close, color: Colors.white54, size: 18),
+          ),
         ],
       ),
     );

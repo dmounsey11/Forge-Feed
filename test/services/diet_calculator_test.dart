@@ -24,6 +24,8 @@ SpeciesRequirement _target({
   double maxSodiumPerc = 100,
   double minMeKcal = 0,
   double maxMeKcal = 1000000,
+  double minLysinePerc = 0,
+  double minMethioninePerc = 0,
   double targetWeightKg = 5.0,
 }) {
   return SpeciesRequirement(
@@ -44,8 +46,8 @@ SpeciesRequirement _target({
     maxPhosphorusPerc: maxPhosphorusPerc,
     minSodiumPerc: minSodiumPerc,
     maxSodiumPerc: maxSodiumPerc,
-    minLysinePerc: 0,
-    minMethioninePerc: 0,
+    minLysinePerc: minLysinePerc,
+    minMethioninePerc: minMethioninePerc,
   );
 }
 
@@ -59,6 +61,8 @@ Ingredient _food(
   double copperPpm = 0,
   double molybdenumPpm = 0,
   double oxalatePct = 0,
+  double lysinePct = 0,
+  double methioninePct = 0,
   double? dryMatterPct,
 }) {
   return Ingredient(
@@ -74,6 +78,8 @@ Ingredient _food(
       copperPpm: copperPpm,
       molybdenumPpm: molybdenumPpm,
       oxalatePct: oxalatePct,
+      lysinePct: lysinePct,
+      methioninePct: methioninePct,
       dryMatterPct: dryMatterPct,
     ),
   );
@@ -88,7 +94,9 @@ const _fixedAmount = PrepAmountResult(mode: PrepMode.amount, value: 10.0);
 /// [DietCalculator.calculate] returns either a [RationResult] or a
 /// [RationCalculationError] - callers pick whichever they expect for a
 /// given scenario (`as RationResult`, or an `is RationCalculationError`
-/// check).
+/// check). Nutrient-target conflicts no longer produce an error at all -
+/// see [DietCalculator._autoRelax] - only [DietFailureReason.noCandidates]
+/// and [DietFailureReason.safetyConflict] still do.
 Object _calc({
   required AnimalProfile profile,
   required SpeciesRequirement target,
@@ -96,7 +104,6 @@ Object _calc({
   List<Ingredient> supplementItems = const [],
   List<SafetyRule> safetyRules = const [],
   bool stageHasDedicatedData = true,
-  List<NutrientRelaxation>? relaxations,
 }) {
   return DietCalculator.calculate(
     profile: profile,
@@ -107,24 +114,44 @@ Object _calc({
     supplementItems: supplementItems,
     safetyRules: safetyRules,
     stageHasDedicatedData: stageHasDedicatedData,
-    relaxations: relaxations,
   );
 }
 
 void main() {
   group('LP-enforced nutrient ranges', () {
-    test('a single ingredient that can never satisfy the protein range is reported infeasible', () {
+    test('a single ingredient that can never satisfy the protein range gets a real ration back, '
+        'with the unreachable ceiling reported as a shortfall instead of blocking the batch', () {
       // Only one food, fixed at 100% of the batch by the total-weight
       // equality constraint - its 50% protein has no room to blend down
-      // into a 10-20% range, so there is truly no feasible ration here.
-      // The old heuristic used to silently accept this and just mark the
-      // comparison "high"; the LP correctly refuses to produce it at all.
+      // into a 10-20% range. Nutrient-target ranges are cumulative/
+      // preference-shaped, not safety limits, so the calculator still
+      // produces this batch (using the only food available) and reports
+      // the 20% protein ceiling as unreachable rather than refusing to
+      // produce anything.
       final result = _calc(
         profile: _profile(),
         target: _target(minProteinPerc: 10, maxProteinPerc: 20),
         pantryItems: [_food('a', proteinPct: 50)],
+      ) as RationResult;
+
+      final protein = result.nutrientComparisons.firstWhere((c) => c.label == 'Protein');
+      // The comparison still reports against the real, un-relaxed target -
+      // 50% is honestly flagged high, never silently redefined as on track.
+      expect(protein.status, NutrientStatus.high);
+      expect(protein.actual, closeTo(50.0, 0.01));
+
+      expect(result.nutrientShortfalls, hasLength(1));
+      final shortfall = result.nutrientShortfalls.single;
+      expect(shortfall.label, 'Protein');
+      expect(shortfall.isMinBound, isFalse);
+      expect(shortfall.targetValue, 20.0);
+      expect(shortfall.achievableValue, closeTo(50.0, 0.01));
+      expect(shortfall.suggestion, isNotEmpty);
+
+      expect(
+        result.warnings.any((w) => w.message.contains('Protein') && w.severity == WarningSeverity.medium),
+        isTrue,
       );
-      expect(result, isA<RationCalculationError>());
     });
 
     test('a feasible blend never reports a hard-constrained nutrient as low or high', () {
@@ -145,6 +172,7 @@ void main() {
       // both is required - confirms the LP actually mixed them rather than
       // picking one at 100%.
       expect(result.baseItems.length, 2);
+      expect(result.nutrientShortfalls, isEmpty);
     });
   });
 
@@ -172,9 +200,10 @@ void main() {
     test('a single ingredient that would breach the DM-basis copper cap is infeasible, not just warned about', () {
       // 6 ppm as-fed / 50% DM = 12 ppm DM, over the 10 ppm cap - and with
       // only this one ingredient available, there's no way to dilute it
-      // down. The DM-basis cap is now a hard LP constraint (see
-      // _hardSafetyConstraints), so this correctly fails to solve instead
-      // of quietly producing an over-cap blend with a warning attached.
+      // down. The DM-basis cap is a hard safety constraint (see
+      // _hardSafetyConstraints), never a relaxation candidate, so this
+      // correctly fails to solve at all rather than quietly producing an
+      // over-cap blend.
       final result = _calc(
         profile: _profile(),
         target: _target(),
@@ -182,6 +211,7 @@ void main() {
         safetyRules: [copperRule],
       );
       expect(result, isA<RationCalculationError>());
+      expect((result as RationCalculationError).reason, DietFailureReason.safetyConflict);
     });
 
     test('given an alternative, the LP routes around a copper cap instead of tripping it', () {
@@ -233,6 +263,7 @@ void main() {
         safetyRules: [oxalateRule],
       );
       expect(result, isA<RationCalculationError>());
+      expect((result as RationCalculationError).reason, DietFailureReason.safetyConflict);
     });
   });
 
@@ -333,7 +364,7 @@ void main() {
     });
   });
 
-  group('Diagnostic pass: nutrient infeasibility', () {
+  group('Auto-relax: nutrient targets are loosened automatically, never blocked', () {
     // 'meat' is the only source of protein and it's also the only source of
     // fat - a 30% protein floor forces at least ~6.5 lbs of it into a
     // 10-lb batch, but a 10% fat ceiling caps it at ~4.67 lbs. There is no
@@ -346,63 +377,39 @@ void main() {
     SpeciesRequirement proteinFatConflictTarget() => _target(minProteinPerc: 30, maxFatPerc: 10);
 
     test(
-        'single-culprit: protein floor vs. fat ceiling is pinned to the Protein bound with the '
-        'real achievable max, computed by re-solving the LP', () {
+        'protein floor vs. fat ceiling: still produces a real ration, with the fat ceiling (added '
+        'after the protein floor in build order) reported as the shortfall and a matching medium-'
+        'severity warning', () {
       final result = _calc(
         profile: _profile(),
         target: proteinFatConflictTarget(),
         pantryItems: proteinFatConflictPantry(),
-      );
+      ) as RationResult;
 
-      expect(result, isA<RationCalculationError>());
-      final error = result as RationCalculationError;
-      expect(error.reason, DietFailureReason.nutrientInfeasibility);
-      expect(error.bottlenecks, hasLength(1));
-      final bottleneck = error.bottlenecks.single;
-      expect(bottleneck.label, 'Protein');
-      expect(bottleneck.isMinBound, isTrue);
-      expect(bottleneck.blockedBoundValue, 30.0);
-      // Maximizing protein at the 10%-fat ceiling: 0.15x = 0.7 => x = 14/3
-      // lbs of 'meat', giving 2.5733... lbs protein over a 10-lb batch.
-      expect(bottleneck.achievableValue, closeTo(25.73, 0.05));
+      expect(result.nutrientShortfalls, hasLength(1));
+      final shortfall = result.nutrientShortfalls.single;
+      expect(shortfall.label, 'Fat');
+      expect(shortfall.isMinBound, isFalse);
+      expect(shortfall.targetValue, 10.0);
+      // With the protein floor kept, minimizing fat still requires enough
+      // 'meat' to clear 30% protein: at that boundary (m ~= 6.52 lbs of a
+      // 10-lb batch), fat comes out to ~12.78%, not the 10% ceiling.
+      expect(shortfall.achievableValue, closeTo(12.78, 0.05));
+
+      final warning = result.warnings.firstWhere((w) => w.message.contains('Fat'));
+      expect(warning.severity, WarningSeverity.medium);
+      expect(warning.message, contains('running/cumulative'));
     });
 
     test(
-        'relaxing exactly the identified bottleneck produces a feasible ration with a '
-        '"relaxed" warning attached', () {
-      final diagnostic = _calc(
-        profile: _profile(),
-        target: proteinFatConflictTarget(),
-        pantryItems: proteinFatConflictPantry(),
-      ) as RationCalculationError;
-      final bottleneck = diagnostic.bottlenecks.single;
-
-      final result = _calc(
-        profile: _profile(),
-        target: proteinFatConflictTarget(),
-        pantryItems: proteinFatConflictPantry(),
-        relaxations: [
-          NutrientRelaxation(
-            label: bottleneck.label,
-            unit: bottleneck.unit,
-            isMinBound: bottleneck.isMinBound,
-            relaxedValue: bottleneck.achievableValue,
-          ),
-        ],
-      );
-
-      expect(result, isA<RationResult>());
-      expect((result as RationResult).warnings.any((w) => w.message.contains('relaxed')), isTrue);
-    });
-
-    test(
-        'pairwise-culprit: two independent conflicts (protein/fat and calcium/sodium) - neither '
-        'fixed by a single bound removal - are reported as a 2-entry bottleneck list', () {
+        'pairwise conflict: two independent conflicts (protein/fat and calcium/sodium) that share no '
+        'ingredient both surface as separate shortfalls', () {
       // 'meat'/'lean' reproduce the protein/fat conflict above; 'mineralMix'
       // is the only calcium source but also carries sodium, so reaching the
       // calcium floor necessarily blows the sodium ceiling. The two
-      // conflicts don't share an ingredient, so no single bound removal
-      // resolves both at once - only removing one bound from each pair does.
+      // conflicts don't share an ingredient, so keeping one pair's bounds
+      // doesn't help the other - this is exactly the shape the old single/
+      // pair-removal diagnostic could miss.
       final result = _calc(
         profile: _profile(),
         target: _target(minProteinPerc: 30, maxFatPerc: 10, minCalciumPerc: 5, maxSodiumPerc: 1),
@@ -411,18 +418,40 @@ void main() {
           _food('lean', proteinPct: 15, fatPct: 3),
           _food('mineralMix', calciumPct: 30, sodiumPct: 20),
         ],
-      );
+      ) as RationResult;
 
-      expect(result, isA<RationCalculationError>());
-      final error = result as RationCalculationError;
-      expect(error.reason, DietFailureReason.nutrientInfeasibility);
-      expect(error.bottlenecks, hasLength(2));
-      expect(error.bottlenecks.map((b) => b.label).toSet(), hasLength(2));
+      expect(result.nutrientShortfalls, hasLength(2));
+      expect(result.nutrientShortfalls.map((s) => s.label).toSet(), hasLength(2));
     });
 
     test(
-        'a safety-rule-driven infeasibility (never a relaxation candidate) is reported as '
-        'unexplained, not misattributed to a nutrient bound', () {
+        'two simultaneously-unreachable floors (e.g. lysine and methionine on a pantry with no amino '
+        'acid data) are both reported - the exact case the old single/pair-removal diagnostic could '
+        'never explain', () {
+      // A single ingredient, forced to 100% of the batch, with real but
+      // tiny lysine/methionine values - nowhere near the floors below, and
+      // with only one candidate there's no blend to change that.
+      final result = _calc(
+        profile: _profile(),
+        target: _target(minLysinePerc: 0.5, minMethioninePerc: 0.3),
+        pantryItems: [_food('a', proteinPct: 20, lysinePct: 0.1, methioninePct: 0.05)],
+      ) as RationResult;
+
+      expect(result.nutrientShortfalls, hasLength(2));
+      final lysine = result.nutrientShortfalls.firstWhere((s) => s.label == 'Lysine');
+      expect(lysine.isMinBound, isTrue);
+      expect(lysine.targetValue, 0.5);
+      expect(lysine.achievableValue, closeTo(0.1, 0.01));
+
+      final methionine = result.nutrientShortfalls.firstWhere((s) => s.label == 'Methionine');
+      expect(methionine.isMinBound, isTrue);
+      expect(methionine.targetValue, 0.3);
+      expect(methionine.achievableValue, closeTo(0.05, 0.01));
+    });
+
+    test(
+        'a safety-rule-driven infeasibility is a genuine block: even relaxing every nutrient target '
+        'still can\'t clear the hard copper cap, so this reports safetyConflict, not a shortfall', () {
       final copperRule = SafetyRule(
         ruleId: 'cu_cap',
         targetType: 'dm_concentration',
@@ -432,8 +461,8 @@ void main() {
         warningMessage: 'Copper level unsafe',
       );
       // Wide-open nutrient target - the only possible source of
-      // infeasibility is the hard copper cap, which the diagnostic pass
-      // must never treat as a removable/relaxable nutrient bound.
+      // infeasibility is the hard copper cap, which auto-relax must never
+      // treat as a removable/relaxable nutrient bound.
       final result = _calc(
         profile: _profile(),
         target: _target(),
@@ -443,11 +472,10 @@ void main() {
 
       expect(result, isA<RationCalculationError>());
       final error = result as RationCalculationError;
-      expect(error.reason, DietFailureReason.unexplainedInfeasibility);
-      expect(error.bottlenecks, isEmpty);
+      expect(error.reason, DietFailureReason.safetyConflict);
     });
 
-    test('no pantry or supplement items at all is reported as noCandidates, not diagnosed', () {
+    test('no pantry or supplement items at all is reported as noCandidates', () {
       final result = _calc(
         profile: _profile(),
         target: _target(),
@@ -457,7 +485,6 @@ void main() {
       expect(result, isA<RationCalculationError>());
       final error = result as RationCalculationError;
       expect(error.reason, DietFailureReason.noCandidates);
-      expect(error.bottlenecks, isEmpty);
     });
   });
 }

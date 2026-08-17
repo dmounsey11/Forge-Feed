@@ -9,7 +9,8 @@ import '../widgets/upgrade_dialog.dart';
 const String _kReportFooter =
     'Estimate only - ForgeFeed is a mathematical estimation tool, not a diagnostic system. '
     'All dietary changes for unwell, injured, or high-risk animals must be supervised by a '
-    'licensed veterinarian.';
+    'licensed veterinarian. Never feed cooked bones of any kind - cooking makes bone brittle and '
+    'prone to splintering, which can injure or obstruct the digestive tract.';
 
 class RationResultScreen extends StatelessWidget {
   final RationResult result;

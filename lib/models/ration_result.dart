@@ -80,6 +80,15 @@ class RationResult {
   final int? portionCount;
   final double? portionSizeOz;
 
+  /// Nutrient-target bounds the calculator couldn't hit for this batch and
+  /// automatically relaxed rather than refusing to produce a ration - see
+  /// [DietCalculator._autoRelax]. Empty when every target was met. These are
+  /// preference/cumulative-style ranges, not safety limits, so their
+  /// presence here is informational (also surfaced as a matching
+  /// medium-severity entry in [warnings]), never a reason to block the
+  /// batch.
+  final List<NutrientShortfall> nutrientShortfalls;
+
   const RationResult({
     required this.totalWeightLbs,
     required this.baseItems,
@@ -91,96 +100,72 @@ class RationResult {
     this.instructionSteps = const [],
     this.portionCount,
     this.portionSizeOz,
+    this.nutrientShortfalls = const [],
   });
 }
 
-/// Why [RationCalculationError] was returned instead of a [RationResult] -
-/// lets the UI tell a genuine nutrient-target conflict (which the
-/// calculator's diagnostic pass can explain and offer to relax) apart from
-/// an input problem no diagnostic can help with.
+/// Why [RationCalculationError] was returned instead of a [RationResult].
+/// Nutrient-target conflicts no longer produce an error at all - see
+/// [DietCalculator._autoRelax] - so this only covers cases nothing can
+/// relax around.
 enum DietFailureReason {
   /// No pantry/supplement candidates were available, or the batch weight
-  /// was <= 0 - nothing for a diagnostic pass to explain or relax.
+  /// was <= 0.
   noCandidates,
 
-  /// The primary solve failed, but the diagnostic pass confirmed which
-  /// nutrient-target bound(s) are the bottleneck by actually re-solving the
-  /// LP - see [RationCalculationError.bottlenecks].
-  nutrientInfeasibility,
-
-  /// The primary solve failed and the diagnostic pass could not pin the
-  /// conflict to one nutrient bound or one pair of them (a deeper conflict,
-  /// or one rooted in a hard safety constraint, which is never a relaxation
-  /// candidate) - reported the same as before, with no bottleneck detail.
-  unexplainedInfeasibility,
+  /// Even after relaxing every nutrient-target bound, a hard safety
+  /// constraint (or the candidate pool itself) still can't be satisfied -
+  /// a genuine danger/feasibility conflict, not a preference-range miss.
+  safetyConflict,
 }
 
-/// One nutrient-target bound the diagnostic pass identified as (part of)
-/// why the primary solve was infeasible, plus the real achievable extreme
-/// for that nutrient - computed by re-solving the LP with every hard safety
+/// One nutrient-target bound the calculator couldn't hit for this batch and
+/// relaxed instead of blocking, plus the real achievable extreme for that
+/// nutrient - computed by re-solving the LP with every hard safety
 /// constraint and every *other* nutrient bound still active, never
-/// estimated or interpolated.
-class NutrientBottleneck {
+/// estimated or interpolated - and a plain-language suggestion for a
+/// natural food/supplement that would close the gap.
+class NutrientShortfall {
   /// Matches a [NutrientComparison.label] (e.g. 'Protein', 'Fat').
   final String label;
   final String unit;
 
-  /// The original target's bound value, in display units (e.g. 30.0 for
-  /// "30%"), before this diagnostic ever ran.
-  final double blockedBoundValue;
-
-  /// True if [blockedBoundValue] is a floor that can't be reached; false if
-  /// it's a ceiling that can't be stayed under.
+  /// True if [targetValue] is a floor that couldn't be reached; false if
+  /// it's a ceiling that couldn't be stayed under.
   final bool isMinBound;
+
+  /// This nutrient's normal target bound, in display units (e.g. 30.0 for
+  /// "30%"), before it was relaxed.
+  final double targetValue;
 
   /// The true achievable extreme (max reachable if [isMinBound], min
-  /// reachable otherwise) for this nutrient given every other original
-  /// constraint, including every hard safety constraint.
+  /// reachable otherwise) for this nutrient given every other constraint
+  /// this batch actually satisfies, including every hard safety constraint.
   final double achievableValue;
 
-  const NutrientBottleneck({
+  /// Plain-language "what to stock" suggestion for closing this gap.
+  final String suggestion;
+
+  const NutrientShortfall({
     required this.label,
     required this.unit,
-    required this.blockedBoundValue,
     required this.isMinBound,
+    required this.targetValue,
     required this.achievableValue,
-  });
-}
-
-/// Identifies exactly one nutrient-target bound to loosen for a single
-/// "allow temporary target relaxation" re-solve of [DietCalculator.calculate]
-/// - built directly from a [NutrientBottleneck] the diagnostic pass already
-/// computed, so only the handful of addRange-based nutrient bounds are ever
-/// reachable here - hard safety constraints have no corresponding label and
-/// can never be constructed into one of these.
-class NutrientRelaxation {
-  final String label;
-  final String unit;
-  final bool isMinBound;
-  final double relaxedValue;
-
-  const NutrientRelaxation({
-    required this.label,
-    required this.unit,
-    required this.isMinBound,
-    required this.relaxedValue,
+    required this.suggestion,
   });
 }
 
 /// Returned instead of a [RationResult] when the calculator can't run yet
-/// (no species data, no pantry items) or the primary LP solve found no
-/// feasible ration - the screen shows [message] rather than crashing or
-/// showing an empty/misleading result. [reason] and [bottlenecks] are
-/// additive/optional: existing callers that only read [message] are
-/// unaffected.
+/// (no species data, no pantry items) or even relaxing every nutrient
+/// target still can't clear a hard safety constraint - the screen shows
+/// [message] rather than crashing or showing an empty/misleading result.
 class RationCalculationError {
   final String message;
   final DietFailureReason reason;
-  final List<NutrientBottleneck> bottlenecks;
 
   const RationCalculationError(
     this.message, {
-    this.reason = DietFailureReason.unexplainedInfeasibility,
-    this.bottlenecks = const [],
+    this.reason = DietFailureReason.safetyConflict,
   });
 }
