@@ -51,7 +51,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
     ),
     (
       'Contact us',
-      'Questions about this policy? Email [ADD YOUR CONTACT EMAIL].',
+      'Questions about this policy? Email Keystone.apps.support@gmail.com.',
     ),
   ];
 
