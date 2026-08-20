@@ -49,16 +49,16 @@ class UpgradeDialog extends StatelessWidget {
                   )
                 else ...[
                   const _PlanTile(
-                    productId: PurchaseProductIds.hobbyMonthly,
+                    productId: PurchaseProductIds.hobbyAnnual,
                     title: 'Hobby Tier',
-                    fallbackPrice: '\$4.99/mo',
+                    fallbackPrice: '\$4.99/yr',
                     description: 'Up to 5 animal profiles, flock & herd tracking, Dog, Cat, Rabbit & Chicken.',
                   ),
                   const SizedBox(height: 12),
                   const _PlanTile(
-                    productId: PurchaseProductIds.proMonthly,
+                    productId: PurchaseProductIds.proAnnual,
                     title: 'Pro',
-                    fallbackPrice: '\$9.99/mo',
+                    fallbackPrice: '\$9.99/yr',
                     description:
                         'Everything in Hobby, plus every species, unlimited profiles, health screening, ad-free, email & download recipes.',
                   ),

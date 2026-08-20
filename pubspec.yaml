@@ -1,7 +1,7 @@
 name: forge_feed
 description: "ForgeFeed - Livestock & Poultry Feed Ration Calculator & Pantry Manager"
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.0+3
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -44,6 +44,6 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: false
-  image_path: "assets/images/app_icon.png"
+  image_path: "assets/images/icon.png"
   adaptive_icon_background: "#1A1A1C"
-  adaptive_icon_foreground: "assets/images/app_icon_foreground.png"
+  adaptive_icon_foreground: "assets/images/icon.png"

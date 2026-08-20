@@ -3,20 +3,20 @@ import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'tier_service.dart';
 
-/// Product IDs must be created as monthly subscriptions in Google Play
+/// Product IDs must be created as annual subscriptions in Google Play
 /// Console (and later App Store Connect) with these exact IDs before real
 /// purchases will resolve - until then [PurchaseService.products] comes
 /// back empty and [PurchaseService.buy] surfaces a "not available" error.
 class PurchaseProductIds {
-  static const hobbyMonthly = 'forgefeed_hobby_monthly';
-  static const proMonthly = 'forgefeed_pro_monthly';
-  static const all = {hobbyMonthly, proMonthly};
+  static const hobbyAnnual = 'hobby_annual';
+  static const proAnnual = 'pro_annual';
+  static const all = {hobbyAnnual, proAnnual};
 
   static UserTier? tierFor(String productId) {
     switch (productId) {
-      case hobbyMonthly:
+      case hobbyAnnual:
         return UserTier.tier1;
-      case proMonthly:
+      case proAnnual:
         return UserTier.pro;
       default:
         return null;

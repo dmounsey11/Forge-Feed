@@ -54,6 +54,10 @@ android {
             // Uses the real upload key once android/key.properties exists;
             // falls back to the debug key so builds without it don't break.
             signingConfig = if (hasReleaseSigning) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }

@@ -27,7 +27,9 @@ class AdUnitIds {
 /// with your device's ID, and add it here. Prevents your own dev/test
 /// clicks on real ads from getting the AdMob account flagged for invalid
 /// traffic.
-const _testDeviceIds = <String>[];
+const _testDeviceIds = <String>[
+  '3033D76E620D81A8BE0D767AA9D8D00A', // Darwin's Galaxy test phone
+];
 
 Future<void> initializeAds() async {
   if (!adsSupported) return;

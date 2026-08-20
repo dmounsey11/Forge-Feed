@@ -62,6 +62,7 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
 
     return Dialog(
       backgroundColor: const Color(0xFF1E1E20),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: Color(0xFFF97316), width: 1.5),
@@ -134,24 +135,31 @@ class _MasterIngredientPickerState extends State<MasterIngredientPicker> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2C2C2E),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFF97316)),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _selectedGroup,
-                      dropdownColor: const Color(0xFF2C2C2E),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      items: _groups.map((g) {
-                        return DropdownMenuItem(value: g, child: Text(g));
-                      }).toList(),
-                      onChanged: (val) {
-                        if (val != null) setState(() => _selectedGroup = val);
-                      },
+                SizedBox(
+                  width: 170,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2C2C2E),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFF97316)),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedGroup,
+                        isExpanded: true,
+                        dropdownColor: const Color(0xFF2C2C2E),
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        items: _groups.map((g) {
+                          return DropdownMenuItem(
+                            value: g,
+                            child: Text(g, overflow: TextOverflow.ellipsis),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          if (val != null) setState(() => _selectedGroup = val);
+                        },
+                      ),
                     ),
                   ),
                 ),
